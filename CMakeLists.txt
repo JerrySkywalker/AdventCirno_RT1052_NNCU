@@ -1,0 +1,362 @@
+cmake_minimum_required(VERSION 3.16)
+project(AdventCirno_RT1052_NNCU C)
+
+set(CMAKE_C_STANDARD 11)
+
+include_directories(amazon-freertos/freertos_kernel/include)
+include_directories(amazon-freertos/freertos_kernel/portable/GCC/ARM_CM4F)
+include_directories(board)
+include_directories(CMSIS)
+include_directories(CMSIS/NN/Include)
+include_directories(component/lists)
+include_directories(component/osa)
+include_directories(component/serial_manager)
+include_directories(component/uart)
+include_directories(device)
+include_directories(drivers)
+include_directories(fatfs/source)
+include_directories(fatfs/source/fsl_ram_disk)
+include_directories(fatfs/source/fsl_sd_disk)
+include_directories(littlefs)
+include_directories(sdmmc/inc)
+include_directories(sdmmc/port)
+include_directories(source)
+include_directories(source/generated)
+include_directories(tensorflow-lite)
+include_directories(tensorflow-lite/tensorflow)
+include_directories(tensorflow-lite/tensorflow/core)
+include_directories(tensorflow-lite/tensorflow/core/public)
+include_directories(tensorflow-lite/tensorflow/lite)
+include_directories(tensorflow-lite/tensorflow/lite/c)
+include_directories(tensorflow-lite/tensorflow/lite/core)
+include_directories(tensorflow-lite/tensorflow/lite/core/api)
+include_directories(tensorflow-lite/tensorflow/lite/kernels)
+include_directories(tensorflow-lite/tensorflow/lite/kernels/internal)
+include_directories(tensorflow-lite/tensorflow/lite/kernels/internal/reference)
+include_directories(tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops)
+include_directories(tensorflow-lite/tensorflow/lite/profiling)
+include_directories(tensorflow-lite/tensorflow/lite/schema)
+include_directories(tensorflow-lite/third_party)
+include_directories(tensorflow-lite/third_party/flatbuffers)
+include_directories(tensorflow-lite/third_party/flatbuffers/include)
+include_directories(tensorflow-lite/third_party/flatbuffers/include/flatbuffers)
+include_directories(usb/device/class)
+include_directories(usb/device/include)
+include_directories(usb/device/source)
+include_directories(usb/device/source/ehci)
+include_directories(usb/device/source/khci)
+include_directories(usb/device/source/lpcip3511)
+include_directories(usb/include)
+include_directories(usb/phy)
+include_directories(utilities)
+include_directories(xip)
+
+add_executable(AdventCirno_RT1052_NNCU
+        amazon-freertos/freertos_kernel/include/atomic.h
+        amazon-freertos/freertos_kernel/include/deprecated_definitions.h
+        amazon-freertos/freertos_kernel/include/event_groups.h
+        amazon-freertos/freertos_kernel/include/FreeRTOS.h
+        amazon-freertos/freertos_kernel/include/freertos_tasks_c_additions.h
+        amazon-freertos/freertos_kernel/include/list.h
+        amazon-freertos/freertos_kernel/include/message_buffer.h
+        amazon-freertos/freertos_kernel/include/mpu_prototypes.h
+        amazon-freertos/freertos_kernel/include/mpu_wrappers.h
+        amazon-freertos/freertos_kernel/include/portable.h
+        amazon-freertos/freertos_kernel/include/projdefs.h
+        amazon-freertos/freertos_kernel/include/queue.h
+        amazon-freertos/freertos_kernel/include/semphr.h
+        amazon-freertos/freertos_kernel/include/stack_macros.h
+        amazon-freertos/freertos_kernel/include/stream_buffer.h
+        amazon-freertos/freertos_kernel/include/task.h
+        amazon-freertos/freertos_kernel/include/timers.h
+        amazon-freertos/freertos_kernel/portable/GCC/ARM_CM4F/port.c
+        amazon-freertos/freertos_kernel/portable/GCC/ARM_CM4F/portmacro.h
+        amazon-freertos/freertos_kernel/portable/MemMang/heap_1.c
+        amazon-freertos/freertos_kernel/portable/MemMang/heap_2.c
+        amazon-freertos/freertos_kernel/portable/MemMang/heap_3.c
+        amazon-freertos/freertos_kernel/portable/MemMang/heap_4.c
+        amazon-freertos/freertos_kernel/portable/MemMang/heap_5.c
+        amazon-freertos/freertos_kernel/portable/MemMang/heap_useNewlib.c
+        amazon-freertos/freertos_kernel/event_groups.c
+        amazon-freertos/freertos_kernel/list.c
+        amazon-freertos/freertos_kernel/queue.c
+        amazon-freertos/freertos_kernel/stream_buffer.c
+        amazon-freertos/freertos_kernel/tasks.c
+        amazon-freertos/freertos_kernel/timers.c
+        board/board.c
+        board/board.h
+        board/clock_config.c
+        board/clock_config.h
+        board/peripherals.c
+        board/peripherals.h
+        board/pin_mux.c
+        board/pin_mux.h
+        CMSIS/NN/ActivationFunctions/arm_nn_activations_q15.c
+        CMSIS/NN/ActivationFunctions/arm_nn_activations_q7.c
+        CMSIS/NN/ActivationFunctions/arm_relu_q15.c
+        CMSIS/NN/ActivationFunctions/arm_relu_q7.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_1x1_HWC_q7_fast_nonsquare.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q15_basic.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q15_fast.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q15_fast_nonsquare.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q7_basic.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q7_basic_nonsquare.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q7_fast.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q7_fast_nonsquare.c
+        CMSIS/NN/ConvolutionFunctions/arm_convolve_HWC_q7_RGB.c
+        CMSIS/NN/ConvolutionFunctions/arm_depthwise_conv_u8_basic_ver1.c
+        CMSIS/NN/ConvolutionFunctions/arm_depthwise_separable_conv_HWC_q7.c
+        CMSIS/NN/ConvolutionFunctions/arm_depthwise_separable_conv_HWC_q7_nonsquare.c
+        CMSIS/NN/ConvolutionFunctions/arm_nn_mat_mult_kernel_q7_q15.c
+        CMSIS/NN/ConvolutionFunctions/arm_nn_mat_mult_kernel_q7_q15_reordered.c
+        CMSIS/NN/FullyConnectedFunctions/arm_fully_connected_mat_q7_vec_q15.c
+        CMSIS/NN/FullyConnectedFunctions/arm_fully_connected_mat_q7_vec_q15_opt.c
+        CMSIS/NN/FullyConnectedFunctions/arm_fully_connected_q15.c
+        CMSIS/NN/FullyConnectedFunctions/arm_fully_connected_q15_opt.c
+        CMSIS/NN/FullyConnectedFunctions/arm_fully_connected_q7.c
+        CMSIS/NN/FullyConnectedFunctions/arm_fully_connected_q7_opt.c
+        CMSIS/NN/Include/arm_nn_tables.h
+        CMSIS/NN/Include/arm_nnfunctions.h
+        CMSIS/NN/Include/arm_nnsupportfunctions.h
+        CMSIS/NN/NNSupportFunctions/arm_nn_mult_q15.c
+        CMSIS/NN/NNSupportFunctions/arm_nn_mult_q7.c
+        CMSIS/NN/NNSupportFunctions/arm_nntables.c
+        CMSIS/NN/NNSupportFunctions/arm_q7_to_q15_no_shift.c
+        CMSIS/NN/NNSupportFunctions/arm_q7_to_q15_reordered_no_shift.c
+        CMSIS/NN/PoolingFunctions/arm_pool_q7_HWC.c
+        CMSIS/NN/SoftmaxFunctions/arm_softmax_q15.c
+        CMSIS/NN/SoftmaxFunctions/arm_softmax_q7.c
+        CMSIS/arm_common_tables.h
+        CMSIS/arm_const_structs.h
+        CMSIS/arm_math.h
+        CMSIS/cmsis_armcc.h
+        CMSIS/cmsis_armclang.h
+        CMSIS/cmsis_armclang_ltm.h
+        CMSIS/cmsis_compiler.h
+        CMSIS/cmsis_gcc.h
+        CMSIS/cmsis_iccarm.h
+        CMSIS/cmsis_version.h
+        CMSIS/core_armv81mml.h
+        CMSIS/core_armv8mbl.h
+        CMSIS/core_armv8mml.h
+        CMSIS/core_cm7.h
+        CMSIS/mpu_armv7.h
+        CMSIS/mpu_armv8.h
+        component/lists/generic_list.c
+        component/lists/generic_list.h
+        component/osa/fsl_os_abstraction.h
+        component/osa/fsl_os_abstraction_config.h
+        component/osa/fsl_os_abstraction_free_rtos.c
+        component/osa/fsl_os_abstraction_free_rtos.h
+        component/serial_manager/serial_manager.c
+        component/serial_manager/serial_manager.h
+        component/serial_manager/serial_port_internal.h
+        component/serial_manager/serial_port_uart.c
+        component/serial_manager/serial_port_uart.h
+        component/uart/lpuart_adapter.c
+        component/uart/uart.h
+        device/fsl_device_registers.h
+        device/MIMXRT1052.h
+        device/MIMXRT1052_features.h
+        device/system_MIMXRT1052.c
+        device/system_MIMXRT1052.h
+        drivers/fsl_adc.c
+        drivers/fsl_adc.h
+        drivers/fsl_adc_etc.c
+        drivers/fsl_adc_etc.h
+        drivers/fsl_cache.c
+        drivers/fsl_cache.h
+        drivers/fsl_clock.c
+        drivers/fsl_clock.h
+        drivers/fsl_common.c
+        drivers/fsl_common.h
+        drivers/fsl_csi.c
+        drivers/fsl_csi.h
+        drivers/fsl_dmamux.c
+        drivers/fsl_dmamux.h
+        drivers/fsl_edma.c
+        drivers/fsl_edma.h
+        drivers/fsl_enc.c
+        drivers/fsl_enc.h
+        drivers/fsl_gpio.c
+        drivers/fsl_gpio.h
+        drivers/fsl_gpt.c
+        drivers/fsl_gpt.h
+        drivers/fsl_iomuxc.h
+        drivers/fsl_lpi2c.c
+        drivers/fsl_lpi2c.h
+        drivers/fsl_lpi2c_edma.c
+        drivers/fsl_lpi2c_edma.h
+        drivers/fsl_lpspi.c
+        drivers/fsl_lpspi.h
+        drivers/fsl_lpspi_edma.c
+        drivers/fsl_lpspi_edma.h
+        drivers/fsl_lpuart.c
+        drivers/fsl_lpuart.h
+        drivers/fsl_lpuart_edma.c
+        drivers/fsl_lpuart_edma.h
+        drivers/fsl_pit.c
+        drivers/fsl_pit.h
+        drivers/fsl_pwm.c
+        drivers/fsl_pwm.h
+        drivers/fsl_usdhc.c
+        drivers/fsl_usdhc.h
+        drivers/fsl_xbara.c
+        drivers/fsl_xbara.h
+        drivers/fsl_xbarb.c
+        drivers/fsl_xbarb.h
+        fatfs/source/fsl_ram_disk/fsl_ram_disk.c
+        fatfs/source/fsl_ram_disk/fsl_ram_disk.h
+        fatfs/source/fsl_sd_disk/fsl_sd_disk.c
+        fatfs/source/fsl_sd_disk/fsl_sd_disk.h
+        fatfs/source/diskio.c
+        fatfs/source/diskio.h
+        fatfs/source/ff.c
+        fatfs/source/ff.h
+        fatfs/source/ffsystem.c
+        fatfs/source/ffunicode.c
+        littlefs/lfs.c
+        littlefs/lfs.h
+        littlefs/lfs_util.c
+        littlefs/lfs_util.h
+        sdmmc/inc/fsl_sd.h
+        sdmmc/inc/fsl_sdmmc_common.h
+        sdmmc/inc/fsl_sdmmc_host.h
+        sdmmc/inc/fsl_sdmmc_spec.h
+        sdmmc/port/fsl_sdmmc_event.c
+        sdmmc/port/fsl_sdmmc_event.h
+        sdmmc/port/fsl_sdmmc_host.c
+        sdmmc/src/fsl_sd.c
+        sdmmc/src/fsl_sdmmc_common.c
+        source/generated/usb_device_config.h
+        source/AdventCirno_RT1052_NNCU.c
+        source/ffconf.h
+        source/FreeRTOSConfig.h
+        source/semihost_hardfault.c
+        startup/startup_mimxrt1052.c
+        tensorflow-lite/tensorflow/core/public/session.h
+        tensorflow-lite/tensorflow/core/public/version.h
+        tensorflow-lite/tensorflow/lite/c/builtin_op_data.h
+        tensorflow-lite/tensorflow/lite/c/c_api_internal.h
+        tensorflow-lite/tensorflow/lite/core/api/error_reporter.h
+        tensorflow-lite/tensorflow/lite/core/api/flatbuffer_conversions.h
+        tensorflow-lite/tensorflow/lite/core/api/op_resolver.h
+        tensorflow-lite/tensorflow/lite/core/api/profiler.h
+        tensorflow-lite/tensorflow/lite/core/subgraph.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/add.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/depthwise_conv.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/dequantize.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/l2normalization.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/log_softmax.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/mean.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/mul.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/pooling.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/softmax.h
+        tensorflow-lite/tensorflow/lite/kernels/internal/reference/integer_ops/tanh.h
+        tensorflow-lite/tensorflow/lite/kernels/activation_functor.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_context.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_gemm.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_gemm_custom_gemv.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_gemm_eigen.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_gemm_gemmlowp.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_gemm_params.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_gemm_ruy.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_support.h
+        tensorflow-lite/tensorflow/lite/kernels/cpu_backend_threadpool.h
+        tensorflow-lite/tensorflow/lite/kernels/eigen_support.h
+        tensorflow-lite/tensorflow/lite/kernels/gemmlowp_support.h
+        tensorflow-lite/tensorflow/lite/kernels/kernel_util.h
+        tensorflow-lite/tensorflow/lite/kernels/lstm_eval.h
+        tensorflow-lite/tensorflow/lite/kernels/op_macros.h
+        tensorflow-lite/tensorflow/lite/kernels/padding.h
+        tensorflow-lite/tensorflow/lite/kernels/register.h
+        tensorflow-lite/tensorflow/lite/kernels/register_ref.h
+        tensorflow-lite/tensorflow/lite/profiling/profile_buffer.h
+        tensorflow-lite/tensorflow/lite/profiling/profile_summarizer.h
+        tensorflow-lite/tensorflow/lite/profiling/profiler.h
+        tensorflow-lite/tensorflow/lite/profiling/time.h
+        tensorflow-lite/tensorflow/lite/schema/schema_generated.h
+        tensorflow-lite/tensorflow/lite/allocation.h
+        tensorflow-lite/tensorflow/lite/arena_planner.h
+        tensorflow-lite/tensorflow/lite/builtin_op_data.h
+        tensorflow-lite/tensorflow/lite/builtin_ops.h
+        tensorflow-lite/tensorflow/lite/context.h
+        tensorflow-lite/tensorflow/lite/context_util.h
+        tensorflow-lite/tensorflow/lite/error_reporter.h
+        tensorflow-lite/tensorflow/lite/graph_info.h
+        tensorflow-lite/tensorflow/lite/interpreter.h
+        tensorflow-lite/tensorflow/lite/memory_planner.h
+        tensorflow-lite/tensorflow/lite/minimal_logging.h
+        tensorflow-lite/tensorflow/lite/model.h
+        tensorflow-lite/tensorflow/lite/mutable_op_resolver.h
+        tensorflow-lite/tensorflow/lite/op_resolver.h
+        tensorflow-lite/tensorflow/lite/optional_debug_tools.h
+        tensorflow-lite/tensorflow/lite/simple_memory_arena.h
+        tensorflow-lite/tensorflow/lite/stderr_reporter.h
+        tensorflow-lite/tensorflow/lite/string.h
+        tensorflow-lite/tensorflow/lite/string_util.h
+        tensorflow-lite/tensorflow/lite/util.h
+        tensorflow-lite/tensorflow/lite/version.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/base.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/code_generators.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/flatbuffers.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/flexbuffers.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/hash.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/idl.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/minireflect.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/reflection.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/reflection_generated.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/registry.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/stl_emulation.h
+        tensorflow-lite/third_party/flatbuffers/include/flatbuffers/util.h
+        usb/device/class/usb_device_audio.c
+        usb/device/class/usb_device_audio.h
+        usb/device/class/usb_device_ccid.c
+        usb/device/class/usb_device_ccid.h
+        usb/device/class/usb_device_cdc_acm.c
+        usb/device/class/usb_device_cdc_acm.h
+        usb/device/class/usb_device_cdc_rndis.c
+        usb/device/class/usb_device_cdc_rndis.h
+        usb/device/class/usb_device_class.c
+        usb/device/class/usb_device_class.h
+        usb/device/class/usb_device_dfu.c
+        usb/device/class/usb_device_dfu.h
+        usb/device/class/usb_device_hid.c
+        usb/device/class/usb_device_hid.h
+        usb/device/class/usb_device_msc.c
+        usb/device/class/usb_device_msc.h
+        usb/device/class/usb_device_msc_ufi.c
+        usb/device/class/usb_device_msc_ufi.h
+        usb/device/class/usb_device_phdc.c
+        usb/device/class/usb_device_phdc.h
+        usb/device/class/usb_device_printer.c
+        usb/device/class/usb_device_printer.h
+        usb/device/class/usb_device_video.c
+        usb/device/class/usb_device_video.h
+        usb/device/include/usb_device.h
+        usb/device/source/ehci/usb_device_ehci.c
+        usb/device/source/ehci/usb_device_ehci.h
+        usb/device/source/khci/usb_device_khci.c
+        usb/device/source/khci/usb_device_khci.h
+        usb/device/source/lpcip3511/usb_device_lpcip3511.c
+        usb/device/source/lpcip3511/usb_device_lpcip3511.h
+        usb/device/source/usb_device_ch9.c
+        usb/device/source/usb_device_ch9.h
+        usb/device/source/usb_device_dci.c
+        usb/device/source/usb_device_dci.h
+        usb/include/usb.h
+        usb/include/usb_misc.h
+        usb/include/usb_spec.h
+        usb/phy/usb_phy.c
+        usb/phy/usb_phy.h
+        utilities/fsl_assert.c
+        utilities/fsl_debug_console.c
+        utilities/fsl_debug_console.h
+        utilities/fsl_debug_console_conf.h
+        utilities/fsl_str.c
+        utilities/fsl_str.h
+        xip/fsl_flexspi_nor_boot.c
+        xip/fsl_flexspi_nor_boot.h)
