@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../amazon-freertos/freertos_kernel/portable/MemMang/heap_4.c 
+../amazon-freertos/freertos_kernel/portable/MemMang/heap_5.c 
 
 OBJS += \
-./amazon-freertos/freertos_kernel/portable/MemMang/heap_4.o 
+./amazon-freertos/freertos_kernel/portable/MemMang/heap_5.o 
 
 C_DEPS += \
-./amazon-freertos/freertos_kernel/portable/MemMang/heap_4.d 
+./amazon-freertos/freertos_kernel/portable/MemMang/heap_5.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
