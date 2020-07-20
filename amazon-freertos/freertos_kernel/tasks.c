@@ -5211,4 +5211,30 @@ when performing module tests). */
 
 #endif
 
+/*-----------------------------------------------------------*/
+/* Support For CmBacktrace */
+uint32_t* vTaskStackAddr()
+{
+	return pxCurrentTCB->pxStack;
+}
+
+uint32_t vTaskStackSize()
+{
+#if ( portSTACK_GROWTH > 0 )
+
+	return (pxNewTCB->pxEndOfStack - pxNewTCB->pxStack + 1);
+
+#else /* ( portSTACK_GROWTH > 0 )*/
+
+	//return pxCurrentTCB->uxSizeOfStack;
+	return  (pxCurrentTCB->pxEndOfStack - pxCurrentTCB->pxStack + 1);;
+
+#endif /* ( portSTACK_GROWTH > 0 )*/
+}
+
+char* vTaskName()
+{
+	return pxCurrentTCB->pcTaskName;
+}
+/*-----------------------------------------------------------*/
 

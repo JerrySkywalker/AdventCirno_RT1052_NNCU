@@ -17,6 +17,9 @@ RM := rm -rf
 -include usb/device/source/subdir.mk
 -include usb/device/class/subdir.mk
 -include startup/subdir.mk
+-include source/smartcar/subdir.mk
+-include source/cm_backtrace/fault_handler/gcc/subdir.mk
+-include source/cm_backtrace/subdir.mk
 -include source/subdir.mk
 -include sdmmc/src/subdir.mk
 -include sdmmc/port/subdir.mk

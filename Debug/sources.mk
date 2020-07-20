@@ -37,6 +37,9 @@ littlefs \
 sdmmc/port \
 sdmmc/src \
 source \
+source/cm_backtrace \
+source/cm_backtrace/fault_handler/gcc \
+source/smartcar \
 startup \
 usb/device/class \
 usb/device/source/ehci \
