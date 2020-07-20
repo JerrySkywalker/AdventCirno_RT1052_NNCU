@@ -40,6 +40,7 @@ source \
 source/ac_lib \
 source/cm_backtrace \
 source/cm_backtrace/fault_handler/gcc \
+source/nncu \
 source/smartcar \
 startup \
 usb/device/class \

@@ -656,22 +656,21 @@ void pit(void *pv)
 			PIT_StopTimer(PIT, kPIT_Chnl_2);
 		}
 	}
+	int g_ServoHighFlag = 0
 	if (PIT_GetStatusFlags(PIT, kPIT_Chnl_3) == kPIT_TimerFlag)
 	{
 		PIT_ClearStatusFlags(PIT, kPIT_Chnl_3, kPIT_TimerFlag);
-//		c3count++;
-//		c3pit_us = TimerUsGet() - c3time_us;
-//		c3time_us = TimerUsGet();
-//		if (c3count >= 3)
-//		{
-//			PIT_StopTimer(PIT, kPIT_Chnl_3);
-//		}
 
-//		GPIO_PinWrite(GPIO1,0U,1);
-//		delay_us(15*100);
-//		GPIO_PinWrite(GPIO1,0U,0);
-//		PWM_Change(&my1);
-
+		if(0==g_ServoHighFlag)
+		{
+			GPIO_PinWrite(GPIO1,0U,1);
+			PIT_Init2(kPIT_Chnl_0, 15000);
+		}
+		else
+		{
+			GPIO_PinWrite(GPIO1,0U,1);
+			PIT_Init2(kPIT_Chnl_0, 185000);
+		}
 	}
 	/*中断服务函数内容*/
 	__DSB();
