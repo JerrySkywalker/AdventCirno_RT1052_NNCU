@@ -16,10 +16,6 @@
 *.gch
 *.pch
 
-# Libraries
-*.a
-*.la
-*.lo
 
 # Shared objects (inc. Windows DLLs)
 *.dll
@@ -151,11 +147,6 @@ fabric.properties
 *.mod
 *.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
 
 # Executables
 *.exe
