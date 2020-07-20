@@ -1661,7 +1661,7 @@
             <component name="system" uuid="aaff4d3f-7874-4344-9e1a-8772bc692a39" type_id="system_54b53072540eeeb8f8e9343e71f28176">
                <config_set_global name="global_system_definitions"/>
             </component>
-            <component name="msg" uuid="a9e9e186-9c88-41e7-8212-e44279fe66c8" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
+            <component name="msg" uuid="81bfd3d6-e828-4923-a2ac-41ff7b9afc6d" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
                <config_set_global name="global_messages"/>
             </component>
          </components>

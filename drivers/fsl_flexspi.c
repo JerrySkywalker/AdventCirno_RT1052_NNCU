@@ -7,7 +7,8 @@
  */
 
 #include "fsl_flexspi.h"
-
+//#include "board.h"
+#define RAMFUNC __attribute__((section(".ramfunc.$SRAM_OC")))
 /* Component ID definition, used by tools. */
 #ifndef FSL_COMPONENT_ID
 #define FSL_COMPONENT_ID "platform.drivers.flexspi"
@@ -70,7 +71,7 @@ typedef void (*flexspi_isr_t)(FLEXSPI_Type *base, flexspi_handle_t *handle);
  *
  * @param base FLEXSPI base pointer.
  */
-uint32_t FLEXSPI_GetInstance(FLEXSPI_Type *base);
+RAMFUNC uint32_t FLEXSPI_GetInstance(FLEXSPI_Type *base);
 
 /*!
  * @brief Configure flash A/B sample clock DLL.
@@ -78,7 +79,7 @@ uint32_t FLEXSPI_GetInstance(FLEXSPI_Type *base);
  * @param base FLEXSPI base pointer.
  * @param config Flash configuration parameters.
  */
-static uint32_t FLEXSPI_ConfigureDll(FLEXSPI_Type *base, flexspi_device_config_t *config);
+RAMFUNC static uint32_t FLEXSPI_ConfigureDll(FLEXSPI_Type *base, flexspi_device_config_t *config);
 
 /*!
  * @brief Check and clear IP command execution errors.
@@ -86,7 +87,7 @@ static uint32_t FLEXSPI_ConfigureDll(FLEXSPI_Type *base, flexspi_device_config_t
  * @param base FLEXSPI base pointer.
  * @param status interrupt status.
  */
-status_t FLEXSPI_CheckAndClearError(FLEXSPI_Type *base, uint32_t status);
+RAMFUNC status_t FLEXSPI_CheckAndClearError(FLEXSPI_Type *base, uint32_t status);
 
 /*******************************************************************************
  * Variables
@@ -120,7 +121,7 @@ static flexspi_isr_t s_flexspiIsr;
  * Code
  ******************************************************************************/
 
-uint32_t FLEXSPI_GetInstance(FLEXSPI_Type *base)
+RAMFUNC uint32_t FLEXSPI_GetInstance(FLEXSPI_Type *base)
 {
     uint32_t instance;
 
@@ -138,7 +139,7 @@ uint32_t FLEXSPI_GetInstance(FLEXSPI_Type *base)
     return instance;
 }
 
-static uint32_t FLEXSPI_ConfigureDll(FLEXSPI_Type *base, flexspi_device_config_t *config)
+RAMFUNC static uint32_t FLEXSPI_ConfigureDll(FLEXSPI_Type *base, flexspi_device_config_t *config)
 {
     bool isUnifiedConfig = true;
     uint32_t flexspiDllValue;
@@ -193,7 +194,7 @@ static uint32_t FLEXSPI_ConfigureDll(FLEXSPI_Type *base, flexspi_device_config_t
     return flexspiDllValue;
 }
 
-status_t FLEXSPI_CheckAndClearError(FLEXSPI_Type *base, uint32_t status)
+RAMFUNC status_t FLEXSPI_CheckAndClearError(FLEXSPI_Type *base, uint32_t status)
 {
     status_t result = kStatus_Success;
 
@@ -239,7 +240,7 @@ status_t FLEXSPI_CheckAndClearError(FLEXSPI_Type *base, uint32_t status)
  * param base FLEXSPI peripheral base address.
  * param config FLEXSPI configure structure.
  */
-void FLEXSPI_Init(FLEXSPI_Type *base, const flexspi_config_t *config)
+RAMFUNC void FLEXSPI_Init(FLEXSPI_Type *base, const flexspi_config_t *config)
 {
     uint32_t configValue = 0;
     uint8_t i            = 0;
@@ -332,7 +333,7 @@ void FLEXSPI_Init(FLEXSPI_Type *base, const flexspi_config_t *config)
  *
  * param config FLEXSPI configuration structure.
  */
-void FLEXSPI_GetDefaultConfig(flexspi_config_t *config)
+RAMFUNC void FLEXSPI_GetDefaultConfig(flexspi_config_t *config)
 {
     /* Initializes the configure structure to zero. */
     (void)memset(config, 0, sizeof(*config));
@@ -376,7 +377,7 @@ void FLEXSPI_GetDefaultConfig(flexspi_config_t *config)
  * Clears the FLEXSPI state and  FLEXSPI module registers.
  * param base FLEXSPI peripheral base address.
  */
-void FLEXSPI_Deinit(FLEXSPI_Type *base)
+RAMFUNC void FLEXSPI_Deinit(FLEXSPI_Type *base)
 {
     /* Reset peripheral. */
     FLEXSPI_SoftwareReset(base);
@@ -393,7 +394,7 @@ void FLEXSPI_Deinit(FLEXSPI_Type *base)
  * param config Flash configuration parameters.
  * param port FLEXSPI Operation port.
  */
-void FLEXSPI_SetFlashConfig(FLEXSPI_Type *base, flexspi_device_config_t *config, flexspi_port_t port)
+RAMFUNC void FLEXSPI_SetFlashConfig(FLEXSPI_Type *base, flexspi_device_config_t *config, flexspi_port_t port)
 {
     uint32_t configValue = 0;
     uint32_t statusValue = 0;
@@ -495,7 +496,7 @@ void FLEXSPI_SetFlashConfig(FLEXSPI_Type *base, flexspi_device_config_t *config,
  * param cmd Command sequence array.
  * param count Number of sequences.
  */
-void FLEXSPI_UpdateLUT(FLEXSPI_Type *base, uint32_t index, const uint32_t *cmd, uint32_t count)
+RAMFUNC void FLEXSPI_UpdateLUT(FLEXSPI_Type *base, uint32_t index, const uint32_t *cmd, uint32_t count)
 {
     assert(index < 64U);
 
@@ -527,7 +528,7 @@ void FLEXSPI_UpdateLUT(FLEXSPI_Type *base, uint32_t index, const uint32_t *cmd, 
  * param base FLEXSPI peripheral base address.
  * param clockSource clockSource of type #flexspi_read_sample_clock_t
  */
-void FLEXSPI_UpdateRxSampleClock(FLEXSPI_Type *base, flexspi_read_sample_clock_t clockSource)
+RAMFUNC void FLEXSPI_UpdateRxSampleClock(FLEXSPI_Type *base, flexspi_read_sample_clock_t clockSource)
 {
     uint32_t mcr0Val;
 
@@ -556,7 +557,7 @@ void FLEXSPI_UpdateRxSampleClock(FLEXSPI_Type *base, flexspi_read_sample_clock_t
  * retval kStatus_FLEXSPI_IpCommandSequenceError IP command sequence error detected
  * retval kStatus_FLEXSPI_IpCommandGrantTimeout IP command grant timeout detected
  */
-status_t FLEXSPI_WriteBlocking(FLEXSPI_Type *base, uint32_t *buffer, size_t size)
+RAMFUNC status_t FLEXSPI_WriteBlocking(FLEXSPI_Type *base, uint32_t *buffer, size_t size)
 {
     uint32_t txWatermark = ((base->IPTXFCR & FLEXSPI_IPTXFCR_TXWMRK_MASK) >> FLEXSPI_IPTXFCR_TXWMRK_SHIFT) + 1U;
     uint32_t status;
@@ -615,7 +616,7 @@ status_t FLEXSPI_WriteBlocking(FLEXSPI_Type *base, uint32_t *buffer, size_t size
  * retval kStatus_FLEXSPI_IpCommandSequenceError IP command sequence error detected
  * retval kStatus_FLEXSPI_IpCommandGrantTimeout IP command grant timeout detected
  */
-status_t FLEXSPI_ReadBlocking(FLEXSPI_Type *base, uint32_t *buffer, size_t size)
+RAMFUNC status_t FLEXSPI_ReadBlocking(FLEXSPI_Type *base, uint32_t *buffer, size_t size)
 {
     uint32_t rxWatermark = ((base->IPRXFCR & FLEXSPI_IPRXFCR_RXWMRK_MASK) >> FLEXSPI_IPRXFCR_RXWMRK_SHIFT) + 1U;
     uint32_t status;
@@ -702,7 +703,7 @@ status_t FLEXSPI_ReadBlocking(FLEXSPI_Type *base, uint32_t *buffer, size_t size)
  * retval kStatus_FLEXSPI_IpCommandSequenceError IP command sequence error detected
  * retval kStatus_FLEXSPI_IpCommandGrantTimeout IP command grant timeout detected
  */
-status_t FLEXSPI_TransferBlocking(FLEXSPI_Type *base, flexspi_transfer_t *xfer)
+RAMFUNC status_t FLEXSPI_TransferBlocking(FLEXSPI_Type *base, flexspi_transfer_t *xfer)
 {
     uint32_t configValue = 0;
     status_t result      = kStatus_Success;
@@ -769,7 +770,7 @@ status_t FLEXSPI_TransferBlocking(FLEXSPI_Type *base, flexspi_transfer_t *xfer)
  * param callback pointer to user callback function.
  * param userData user parameter passed to the callback function.
  */
-void FLEXSPI_TransferCreateHandle(FLEXSPI_Type *base,
+RAMFUNC void FLEXSPI_TransferCreateHandle(FLEXSPI_Type *base,
                                   flexspi_handle_t *handle,
                                   flexspi_transfer_callback_t callback,
                                   void *userData)
@@ -810,7 +811,7 @@ void FLEXSPI_TransferCreateHandle(FLEXSPI_Type *base,
  * retval kStatus_Success Successfully start the data transmission.
  * retval kStatus_FLEXSPI_Busy Previous transmission still not finished.
  */
-status_t FLEXSPI_TransferNonBlocking(FLEXSPI_Type *base, flexspi_handle_t *handle, flexspi_transfer_t *xfer)
+RAMFUNC status_t FLEXSPI_TransferNonBlocking(FLEXSPI_Type *base, flexspi_handle_t *handle, flexspi_transfer_t *xfer)
 {
     uint32_t configValue = 0;
     status_t result      = kStatus_Success;
@@ -887,7 +888,7 @@ status_t FLEXSPI_TransferNonBlocking(FLEXSPI_Type *base, flexspi_handle_t *handl
  * retval kStatus_InvalidArgument count is Invalid.
  * retval kStatus_Success Successfully return the count.
  */
-status_t FLEXSPI_TransferGetCount(FLEXSPI_Type *base, flexspi_handle_t *handle, size_t *count)
+RAMFUNC status_t FLEXSPI_TransferGetCount(FLEXSPI_Type *base, flexspi_handle_t *handle, size_t *count)
 {
     assert(NULL != handle);
 
@@ -914,7 +915,7 @@ status_t FLEXSPI_TransferGetCount(FLEXSPI_Type *base, flexspi_handle_t *handle, 
  * param base FLEXSPI peripheral base address.
  * param handle pointer to flexspi_handle_t structure which stores the transfer state
  */
-void FLEXSPI_TransferAbort(FLEXSPI_Type *base, flexspi_handle_t *handle)
+RAMFUNC void FLEXSPI_TransferAbort(FLEXSPI_Type *base, flexspi_handle_t *handle)
 {
     assert(NULL != handle);
 
@@ -928,7 +929,7 @@ void FLEXSPI_TransferAbort(FLEXSPI_Type *base, flexspi_handle_t *handle)
  * param base FLEXSPI peripheral base address.
  * param handle pointer to flexspi_handle_t structure.
  */
-void FLEXSPI_TransferHandleIRQ(FLEXSPI_Type *base, flexspi_handle_t *handle)
+RAMFUNC void FLEXSPI_TransferHandleIRQ(FLEXSPI_Type *base, flexspi_handle_t *handle)
 {
     uint32_t status;
     status_t result;
@@ -1039,7 +1040,7 @@ void FLEXSPI_TransferHandleIRQ(FLEXSPI_Type *base, flexspi_handle_t *handle)
 
 #if defined(FSL_DRIVER_TRANSFER_DOUBLE_WEAK_IRQ) && FSL_DRIVER_TRANSFER_DOUBLE_WEAK_IRQ
 #if defined(FLEXSPI)
-void FLEXSPI_DriverIRQHandler(void)
+RAMFUNC void FLEXSPI_DriverIRQHandler(void)
 {
     s_flexspiIsr(FLEXSPI, s_flexspiHandle[0]);
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

@@ -4,12 +4,18 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../xip/evkbimxrt1050_flexspi_nor_config.c \
+../xip/evkbimxrt1050_sdram_ini_dcd.c \
 ../xip/fsl_flexspi_nor_boot.c 
 
 OBJS += \
+./xip/evkbimxrt1050_flexspi_nor_config.o \
+./xip/evkbimxrt1050_sdram_ini_dcd.o \
 ./xip/fsl_flexspi_nor_boot.o 
 
 C_DEPS += \
+./xip/evkbimxrt1050_flexspi_nor_config.d \
+./xip/evkbimxrt1050_sdram_ini_dcd.d \
 ./xip/fsl_flexspi_nor_boot.d 
 
 
