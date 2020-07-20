@@ -41,7 +41,7 @@ volatile uint32_t g_eventTimeMilliseconds;
 //#ifdef __CA7_REV
 //    SystemClearSystickFlag();
 //#endif
-//    g_eventTimeMilliseconds++;
+//    g_eventTimeMilliseconds++;			//将在freertos中的中断处理中处理这个变量
 //}
 
 //void SDMMCEVENT_InitTimer(void)
