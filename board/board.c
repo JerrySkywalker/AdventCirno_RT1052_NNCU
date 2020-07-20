@@ -37,10 +37,10 @@
 
 #include <stdint.h>
 #include "board.h"
-#include <CMSIS/cmsis_gcc.h>
-#include <fsl_common.h>
-#include <fsl_debug_console.h>
-#include <drivers/fsl_iomuxc.h>
+#include "cmsis_gcc.h"
+#include "fsl_common.h"
+#include "fsl_debug_console.h"
+#include "fsl_iomuxc.h"
 
 BSS_DTC uint32_t UserVectors[256] ALIGN(1024);
 

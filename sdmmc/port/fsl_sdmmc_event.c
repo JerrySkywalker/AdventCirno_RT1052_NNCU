@@ -44,8 +44,8 @@ volatile uint32_t g_eventTimeMilliseconds;
 //    g_eventTimeMilliseconds++;			//将在freertos中的中断处理中处理这个变量
 //}
 
-//void SDMMCEVENT_InitTimer(void)
-//{
+void SDMMCEVENT_InitTimer(void)
+{
 //#ifdef __CA7_REV
 //    /* special for i.mx6ul */
 //    SystemSetupSystick(1000U, (void *)SysTick_Handler, 32U);
@@ -60,7 +60,7 @@ volatile uint32_t g_eventTimeMilliseconds;
 //    /* Set systick reload value to generate 1ms interrupt */
 //    SysTick_Config(CLOCK_GetFreq(kCLOCK_CoreSysClk) / 1000U);
 //#endif
-//}
+}
 
 static volatile uint32_t *SDMMCEVENT_GetInstance(sdmmc_event_t eventType)
 {
