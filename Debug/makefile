@@ -20,6 +20,7 @@ RM := rm -rf
 -include source/smartcar/subdir.mk
 -include source/cm_backtrace/fault_handler/gcc/subdir.mk
 -include source/cm_backtrace/subdir.mk
+-include source/ac_lib/subdir.mk
 -include source/subdir.mk
 -include sdmmc/src/subdir.mk
 -include sdmmc/port/subdir.mk
