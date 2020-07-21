@@ -201,17 +201,6 @@ void AC_Task(void *pvData)
 	memcpy(&data_identifier, g_flash_buff_r, sizeof(data_identifier));
 	memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
 
-	UART_Init(LPUART6, 9600, 80 * 1000 * 1000);
-	ZZF_Init(ZZF_FrameSize120x184, LPUART6);
-	capture.format = PixelFormatGray;
-	capture.width = 184;
-	capture.height = 120;
-	CAMERA_SubmitBuff(buff1);
-	CAMERA_SubmitBuff(buff2);
-	CAMERA_SubmitBuff(buff3);
-	CAMERA_SubmitBuff(buff4);
-	assert(kStatus_Success == CAMERA_ReceiverStart());
-
 	/*
 	 * @note: 	有关内存的读取说明。
 	 *
@@ -236,6 +225,17 @@ void AC_Task(void *pvData)
 	 *			最好方法就是，做好备份，善用Git。大改动前必须保证有一个可用版本。发现问题及时回溯！！
 	 * */
 
+	UART_Init(LPUART6, 9600, 80 * 1000 * 1000);
+
+	//ZZF_Init(ZZF_FrameSize120x184, LPUART6);
+	//	capture.format = PixelFormatGray;
+	//	capture.width = 184;
+	//	capture.height = 120;
+	//	CAMERA_SubmitBuff(buff1);
+	//	CAMERA_SubmitBuff(buff2);
+	//	CAMERA_SubmitBuff(buff3);
+	//	CAMERA_SubmitBuff(buff4);
+	//	assert(kStatus_Success == CAMERA_ReceiverStart());
 
 	while (1)
 	{
@@ -272,6 +272,7 @@ void AC_Task(void *pvData)
 //						PRINTF("fps=%d\r\n", (int)CAMERA_FpsGet());
 //						CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
 //					}
+
 
 
 		if (0 == GPIO_Read(&wakeUp))
