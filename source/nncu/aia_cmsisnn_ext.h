@@ -2,8 +2,8 @@
 #define _AIA_CMSISNN_EXT_H_
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
-#if(defined(__CC_ARM))//V5编译器
-	#pragma anon_unions
+#ifndef _MSC_VER
+#pragma anon_unions
 #endif
 typedef struct _CI_TnsDim_t {
 	union {
@@ -84,6 +84,51 @@ aia_convolve_HWC_q15_RGB(const q15_t* Im_in,
 	const int32_t out_shift,
 	q15_t* Im_out, const int32_t dim_im_out, q15_t* bufferA, q15_t* bufferB);
 
+arm_status
+aia_convolve_HWC_q15_fast_nonsquare(const q15_t * Im_in,
+    const uint16_t dim_im_in_x,
+    const uint16_t dim_im_in_y,
+    const uint16_t ch_im_in,
+    const q15_t * wt,
+    const uint16_t ch_im_out,
+    const uint16_t dim_kernel_x,
+    const uint16_t dim_kernel_y,
+    const uint16_t padding_x,
+    const uint16_t padding_y,
+    const uint16_t stride_x,
+    const uint16_t stride_y,
+    const q15_t * bias,
+    const uint16_t bias_shift,
+    const uint16_t out_shift,
+    q15_t * Im_out,
+    const uint16_t dim_im_out_x,
+    const uint16_t dim_im_out_y, 
+    q15_t * bufferA, 
+    q7_t * bufferB);
+    
+arm_status aia_convolve_HWC_q15_basic_nonsquare(
+    const q15_t * Im_in,
+    const int32_t dim_im_in_x,
+    const int32_t dim_im_in_y,
+    const int32_t ch_im_in,
+    const q15_t * wt,
+    const int32_t ch_im_out,
+    const int32_t dim_kernel_x,
+    const int32_t dim_kernel_y,
+    const int32_t padding_x,
+    const int32_t padding_y,
+    const int32_t stride_x,
+    const int32_t stride_y,
+    const q15_t * bias,
+    const int32_t bias_shift,
+    const int32_t out_shift,
+    q15_t * Im_out,
+    const int32_t dim_im_out_x,
+    const int32_t dim_im_out_y, 
+    q15_t * bufferA, 
+    q7_t * bufferB
+);
+    
 arm_status aia_depthwise_separable_conv_HWC_q15_nonsquare(const q15_t* Im_in,
 	const int32_t dim_im_in_x,
 	const int32_t dim_im_in_y,
@@ -181,5 +226,57 @@ aia_avepool_q15_HWC(q15_t* Im_in,
 	const int32_t padding,
 	const int32_t stride, const int32_t dim_im_out, q15_t* bufferA, q15_t* Im_out);
 
+void aia_avepool_q15_HWC_nonsquare(
+	const q15_t* Im_in,           // input image
+	const int32_t dim_im_in_x,   // input image dimension
+	const int32_t dim_im_in_y,   // input image dimension
+	const int32_t ch_im_in,      // number of input image channels
+	const int32_t dim_kernel_x,  // window kernel size
+	const int32_t dim_kernel_y,  // window kernel size
+	const int32_t padding_x,     // padding sizes
+	const int32_t padding_y,     // padding sizes
+	const int32_t stride_x,      // stride
+	const int32_t stride_y,      // stride
+	const int32_t dim_im_out_x,  // output image dimension
+	const int32_t dim_im_out_y,  // output image dimension
+	q15_t* bufferA,               // a buffer for local storage
+	q15_t* Im_out,                // output feature
+	const int32_t out_lshift);    // output left shift (scaling)
+
+void aia_maxpool_q7_HWC_nonsquare(
+	const q7_t* Im_in,           // input image
+	const int32_t dim_im_in_x,   // input image dimension
+	const int32_t dim_im_in_y,   // input image dimension
+	const int32_t ch_im_in,      // number of input image channels
+	const int32_t dim_kernel_x,  // window kernel size
+	const int32_t dim_kernel_y,  // window kernel size
+	const int32_t padding_x,     // padding sizes
+	const int32_t padding_y,     // padding sizes
+	const int32_t stride_x,      // stride
+	const int32_t stride_y,      // stride
+	const int32_t dim_im_out_x,  // output image dimension
+	const int32_t dim_im_out_y,  // output image dimension
+	q7_t* bufferA,               // a buffer for local storage
+	q7_t* Im_out,                // output feature
+	const int32_t out_lshift);   // output left shift (scaling)
+
+void aia_maxpool_q15_HWC_nonsquare(
+	const q15_t* Im_in,           // input image
+	const int32_t dim_im_in_x,   // input image dimension
+	const int32_t dim_im_in_y,   // input image dimension
+	const int32_t ch_im_in,      // number of input image channels
+	const int32_t dim_kernel_x,  // window kernel size
+	const int32_t dim_kernel_y,  // window kernel size
+	const int32_t padding_x,     // padding sizes
+	const int32_t padding_y,     // padding sizes
+	const int32_t stride_x,      // stride
+	const int32_t stride_y,      // stride
+	const int32_t dim_im_out_x,  // output image dimension
+	const int32_t dim_im_out_y,  // output image dimension
+	q15_t* bufferA,               // a buffer for local storage
+	q15_t* Im_out,                // output feature
+	const int32_t out_lshift);    // output left shift (scaling)
+  
+    
 void aia_nn_activations_direct_q15(q15_t* data, int size, int int_width, arm_nn_activation_type type, int quantBits);
 #endif

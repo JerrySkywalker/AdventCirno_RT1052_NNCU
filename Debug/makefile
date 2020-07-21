@@ -65,7 +65,7 @@ all: AdventCirno_RT1052_NNCU.axf
 AdventCirno_RT1052_NNCU.axf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU Linker'
-	arm-none-eabi-gcc -nostdlib -L"D:\Repos\MCUXpresso_workspace\AdventCirno_RT1052_NNCU\libs" -L"D:\Repos\MCUXpresso_workspace\AdventCirno_RT1052_NNCU\source\nncu" -Xlinker -Map="AdventCirno_RT1052_NNCU.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -T AdventCirno_RT1052_NNCU_Debug.ld -o "AdventCirno_RT1052_NNCU.axf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -nostdlib -L"D:\Repos\MCUXpresso_workspace\AdventCirno_RT1052_NNCU\libs" -Xlinker -Map="AdventCirno_RT1052_NNCU.map" -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -T AdventCirno_RT1052_NNCU_Debug.ld -o "AdventCirno_RT1052_NNCU.axf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build

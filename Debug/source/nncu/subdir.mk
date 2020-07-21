@@ -4,13 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/nncu/nncie_port_nxpsdk.c 
+../source/nncu/aia_cmsisnn_ext.c \
+../source/nncu/model_smartcar_ad_run.c \
+../source/nncu/model_smartcar_ad_weit.c 
 
 OBJS += \
-./source/nncu/nncie_port_nxpsdk.o 
+./source/nncu/aia_cmsisnn_ext.o \
+./source/nncu/model_smartcar_ad_run.o \
+./source/nncu/model_smartcar_ad_weit.o 
 
 C_DEPS += \
-./source/nncu/nncie_port_nxpsdk.d 
+./source/nncu/aia_cmsisnn_ext.d \
+./source/nncu/model_smartcar_ad_run.d \
+./source/nncu/model_smartcar_ad_weit.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

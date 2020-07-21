@@ -4,19 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/AdventCirno_RT1052_NNCU.c \
-../source/model.nncu.c \
-../source/tv.nctv.c 
+../source/AdventCirno_RT1052_NNCU.c 
 
 OBJS += \
-./source/AdventCirno_RT1052_NNCU.o \
-./source/model.nncu.o \
-./source/tv.nctv.o 
+./source/AdventCirno_RT1052_NNCU.o 
 
 C_DEPS += \
-./source/AdventCirno_RT1052_NNCU.d \
-./source/model.nncu.d \
-./source/tv.nctv.d 
+./source/AdventCirno_RT1052_NNCU.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -59,7 +59,7 @@
 #include "ac_lib/AC_Command.h"
 #include "ac_lib/AC_Pit.h"
 #include "ac_lib/Image.h"
-#include "NNCU_Config.h"
+
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
 BSS_OC uint8_t heap_heap2[128 * 1024] ALIGN(8);
 BSS_SDRAM uint8_t heap_heap3[4 * 1024 * 1024] ALIGN(8);
@@ -236,7 +236,6 @@ void AC_Task(void *pvData)
 	 *			最好方法就是，做好备份，善用Git。大改动前必须保证有一个可用版本。发现问题及时回溯！！
 	 * */
 
-	NNCU_Deploy();
 
 	while (1)
 	{
