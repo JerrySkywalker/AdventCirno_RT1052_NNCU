@@ -59,6 +59,7 @@
 #include "ac_lib/AC_Command.h"
 #include "ac_lib/AC_Pit.h"
 #include "ac_lib/Image.h"
+#include "nncu/nncu_Config.h"
 
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
 BSS_OC uint8_t heap_heap2[128 * 1024] ALIGN(8);
@@ -80,6 +81,7 @@ uint8_t g_Flag_WakeUp = 0;
 extern Data_t data[10];
 extern int data_identifier;
 extern uint8_t image_Buffer_0[CAMERA_H][CAMERA_W];
+extern
 
 //clock_t start, stop; //clock_t是clock（）函数返回的变量类型
 double duration;
@@ -98,7 +100,8 @@ int Flag_Signal = 0;
 /*TODO: Buffer declaration here*/
 uint8_t g_flash_buff_r[FLASH_SECTOR_SIZE];
 uint8_t g_flash_buff_w[FLASH_SECTOR_SIZE];
-uint8_t g_AD_Data[12];
+int8_t g_AD_Data[12];
+int8_t g_AD_nncu_Output;
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
 
@@ -159,6 +162,7 @@ void start_task(void *pvData)
  * @return: void
  */
 TaskHandle_t AC_task_handle;
+
 void AC_Task(void *pvData)
 {
 	img_t capture;
@@ -273,7 +277,7 @@ void AC_Task(void *pvData)
 //						CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
 //					}
 
-
+        g_AD_nncu_Output = RunModel(&g_AD_Data);
 
 		if (0 == GPIO_Read(&wakeUp))
 		{
@@ -314,6 +318,20 @@ void AC_Task(void *pvData)
 					PRINTF("[O K] AC: Menu Deleted! \r\n");
 				}
 			}
+
+			if(g_Flag_WakeUp == 0)
+            {
+			    /**TODO: PUT your idea info here!**/
+
+                OLED_P6x8Str(0,0,"#AC Ver 0.3.1");
+
+                OLED_P6x8Str(0,1,"Servo");
+                OLED_P6x8Str(0,2,"nncu-Out");
+
+                //OLED_Print_Num(60,2,g_AD_Servo?);
+                OLED_Print_Num(60,2,g_AD_nncu_Output);
+
+            }
 		}
 
 	}

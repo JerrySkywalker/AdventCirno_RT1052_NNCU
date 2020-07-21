@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "nncu_Config.h"
 #define ACT_RELU           1
 #define ACT_SOFTMAX        2
 #define ACT_RELU6          6

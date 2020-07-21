@@ -21,7 +21,12 @@ include_directories(littlefs)
 include_directories(sdmmc/inc)
 include_directories(sdmmc/port)
 include_directories(source)
+include_directories(source/ac_lib)
+include_directories(source/cm_backtrace)
+include_directories(source/examples)
 include_directories(source/generated)
+include_directories(source/nncu)
+include_directories(source/smartcar)
 include_directories(tensorflow-lite)
 include_directories(tensorflow-lite/tensorflow)
 include_directories(tensorflow-lite/tensorflow/core)
@@ -178,6 +183,8 @@ add_executable(AdventCirno_RT1052_NNCU
         drivers/fsl_edma.h
         drivers/fsl_enc.c
         drivers/fsl_enc.h
+        drivers/fsl_flexspi.c
+        drivers/fsl_flexspi.h
         drivers/fsl_gpio.c
         drivers/fsl_gpio.h
         drivers/fsl_gpt.c
@@ -228,11 +235,78 @@ add_executable(AdventCirno_RT1052_NNCU
         sdmmc/port/fsl_sdmmc_host.c
         sdmmc/src/fsl_sd.c
         sdmmc/src/fsl_sdmmc_common.c
+        source/ac_lib/AC_Command.c
+        source/ac_lib/AC_Command.h
+        source/ac_lib/AC_Control.c
+        source/ac_lib/AC_Control.h
+        source/ac_lib/AC_Menu.c
+        source/ac_lib/AC_Menu.h
+        source/ac_lib/AC_Pit.c
+        source/ac_lib/AC_Pit.h
+        source/ac_lib/Image.c
+        source/ac_lib/Image.h
+        source/cm_backtrace/cm_backtrace.c
+        source/cm_backtrace/cm_backtrace.h
+        source/cm_backtrace/cmb_cfg.h
+        source/cm_backtrace/cmb_def.h
+        source/examples/test.h
         source/generated/usb_device_config.h
+        source/nncu/aia_cmsisnn_ext.c
+        source/nncu/aia_cmsisnn_ext.h
+        source/nncu/model_smartcar_ad_run.c
+        source/nncu/model_smartcar_ad_weit.c
+        source/nncu/nncu_Config.h
+        source/smartcar/sc_ac_delay.c
+        source/smartcar/sc_ac_delay.h
+        source/smartcar/sc_ac_i2c_soft.c
+        source/smartcar/sc_ac_i2c_soft.h
+        source/smartcar/sc_ac_key_5D.c
+        source/smartcar/sc_ac_key_5D.h
+        source/smartcar/sc_ac_MPU6050.c
+        source/smartcar/sc_ac_MPU6050.h
+        source/smartcar/sc_ac_pwm.c
+        source/smartcar/sc_ac_pwm.h
+        source/smartcar/sc_adc.c
+        source/smartcar/sc_adc.h
+        source/smartcar/sc_camera_common.c
+        source/smartcar/sc_camera_common.h
+        source/smartcar/sc_camera_ov7725.c
+        source/smartcar/sc_camera_ov7725.h
+        source/smartcar/sc_camera_zzf.c
+        source/smartcar/sc_camera_zzf.h
+        source/smartcar/sc_enc.c
+        source/smartcar/sc_enc.h
+        source/smartcar/sc_flash.c
+        source/smartcar/sc_flash.h
+        source/smartcar/sc_gpio.c
+        source/smartcar/sc_gpio.h
+        source/smartcar/sc_i2c.c
+        source/smartcar/sc_i2c.h
+        source/smartcar/sc_keypad.c
+        source/smartcar/sc_keypad.h
+        source/smartcar/sc_lcd.c
+        source/smartcar/sc_lcd.h
+        source/smartcar/sc_oled.c
+        source/smartcar/sc_oled.h
+        source/smartcar/sc_pit.c
+        source/smartcar/sc_pit.h
+        source/smartcar/sc_pwm.c
+        source/smartcar/sc_pwm.h
+        source/smartcar/sc_sd.c
+        source/smartcar/sc_sd.h
+        source/smartcar/sc_spi.c
+        source/smartcar/sc_spi.h
+        source/smartcar/sc_uart.c
+        source/smartcar/sc_uart.h
+        source/smartcar/status.c
+        source/smartcar/status.h
+        source/smartcar/svpng.h
         source/AdventCirno_RT1052_NNCU.c
         source/ffconf.h
         source/FreeRTOSConfig.h
+        source/model.nncu.c
         source/semihost_hardfault.c
+        source/tv.nctv.c
         startup/startup_mimxrt1052.c
         tensorflow-lite/tensorflow/core/public/session.h
         tensorflow-lite/tensorflow/core/public/version.h
@@ -358,5 +432,9 @@ add_executable(AdventCirno_RT1052_NNCU
         utilities/fsl_debug_console_conf.h
         utilities/fsl_str.c
         utilities/fsl_str.h
+        xip/evkbimxrt1050_flexspi_nor_config.c
+        xip/evkbimxrt1050_flexspi_nor_config.h
+        xip/evkbimxrt1050_sdram_ini_dcd.c
+        xip/evkbimxrt1050_sdram_ini_dcd.h
         xip/fsl_flexspi_nor_boot.c
         xip/fsl_flexspi_nor_boot.h)
