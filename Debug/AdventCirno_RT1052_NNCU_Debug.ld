@@ -6,7 +6,7 @@
  * Generated linker script file for MIMXRT1052xxxxB
  * Created from linkscript.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.23
- * MCUXpresso IDE v11.1.1 [Build 3241] [2020-03-02] on 2020-7-21 23:09:17
+ * MCUXpresso IDE v11.1.1 [Build 3241] [2020-03-02] on 2020-7-22 15:03:00
  */
 
 INCLUDE "AdventCirno_RT1052_NNCU_Debug_library.ld"
