@@ -240,13 +240,17 @@ void AC_Task(void *pvData)
 	//	CAMERA_SubmitBuff(buff4);
 	//	assert(kStatus_Success == CAMERA_ReceiverStart());
 
+	/*两个测试数据*/
 	int8_t tmp_AD_Input[12] = {
 			0xEF,0xE9,0xC6,0xFE,0x08,0xFE,0x9F,0x9E,0x2B,0x83,0xA0,0x81
 	};
 	int8_t tmp_AD_Input2[12] = {
 	0xD1,0xCA,0x96,0xFE,0xAC,0xFE,0xD9,0xB3,0xDE,0xCF,0xCC,0x83
 	};
+	/*输出缓存区的指针，必须按照这个格式写*/
 	int16_t* g_AD_nncu_OutBuffer = (int16_t*)malloc(sizeof(int16_t));
+
+	/*将上面的缓冲区指针的数取出来放这里*/
 	int16_t g_AD_nncu_Output[2];
 
 	while (1)
@@ -287,8 +291,6 @@ void AC_Task(void *pvData)
 
 
 		/*For Test NNCU Only*/
-
-
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
 
 		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
@@ -346,7 +348,7 @@ void AC_Task(void *pvData)
                 OLED_P6x8Str(0,1,(uint8_t*)"Servo");
                 OLED_P6x8Str(0,2,(uint8_t*)"nncu-Out");
 
-
+                /*Just a demo*/
                 OLED_Print_Num(60,2,g_AD_nncu_Output[0]);
                 OLED_Print_Num(60,3,g_AD_nncu_Output[1]);
             }
