@@ -233,7 +233,7 @@ void enc(void *pv)
 #ifdef TEST_OLED
 	OLED_Init();
 	OLED_Fill(0x00);
-	OLED_P6x8Str(0, 0, "Init ENC test...");
+	OLED_P6x8Str(0, 0, (uint8_t*)"Init ENC test...");
 #endif
 
 	ENC_Init_t(ENC1);
@@ -244,7 +244,7 @@ void enc(void *pv)
 #ifdef TEST_OLED
 	while (1)
 	{
-		OLED_P6x8Str(0, 1, "ENC  Date  Pos  Rev");
+		OLED_P6x8Str(0, 1, (uint8_t*)"ENC  Date  Pos  Rev");
 		OLED_Print_Num1(0, 2, 1);
 		OLED_Print_Num1(0, 3, 2);
 		OLED_Print_Num1(0, 4, 3);
@@ -305,14 +305,14 @@ void flash_init(void *pv)
 #ifdef TEST_OLED
     OLED_Init();
     OLED_Fill(0x00);
-    OLED_P6x8Str(0, 0, "Init Flash test...");
+    OLED_P6x8Str(0, 0, (uint8_t*)"Init Flash test...");
 #endif
 
     PRINTF("[O K] AC: Init flash test\r\n");
     assert(0 == FLASH_Init());
 
 #ifdef TEST_OLED
-    OLED_P6x8Str(0, 1, "[O K] Flash Ok");
+    OLED_P6x8Str(0, 1, (uint8_t*)"[O K] Flash Ok");
 #endif
     PRINTF("[O K] AC: Flash test success!\r\n");
     vTaskDelete(NULL);
@@ -323,7 +323,7 @@ void flash(void *pv)
 #ifdef TEST_OLED
 	OLED_Init();
 	OLED_Fill(0x00);
-	OLED_P6x8Str(0, 0, "Init Flash test...");
+	OLED_P6x8Str(0, 0, (uint8_t*)"Init Flash test...");
 #endif
 
 	PRINTF("[O K] Init flash test\r\n");
@@ -354,7 +354,7 @@ void flash(void *pv)
 		}
 	}
 #ifdef TEST_OLED
-	OLED_P6x8Str(0, 1, "[O K] Flash Ok");
+	OLED_P6x8Str(0, 1, (uint8_t*)"[O K] Flash Ok");
 #endif
 	PRINTF("flash test success\r\n");
 	vTaskDelete(NULL);
@@ -486,8 +486,8 @@ void oled(void *pv)
 	delay_ms(100);
 	OLED_Fill(0x00);
 
-	OLED_P6x8Str(0, 0, "Init Boot Test...");
-	OLED_P6x8Str(0, 1, "[ O K ] OLED");
+	OLED_P6x8Str(0, 0, (uint8_t*)"Init Boot Test...");
+	OLED_P6x8Str(0, 1, (uint8_t*)"[ O K ] OLED");
 	delay_ms(100);
 	OLED_Fill(0x00);
 
@@ -869,7 +869,7 @@ void key_5d(void *pv)
 #ifdef TEST_OLED
 	OLED_Init();
 	OLED_Fill(0x00);
-	OLED_P6x8Str(0, 0, "Init key test...");
+	OLED_P6x8Str(0, 0, (uint8_t*)"Init key test...");
 #endif
 
 	KEY_5D_Init();
@@ -916,7 +916,7 @@ void key_5d(void *pv)
 		if(5 == keyCheckPass)
 		{
 #ifdef TEST_OLED
-			OLED_P6x8Rst(0,6,"Success!");
+			OLED_P6x8Rst(0,6,(uint8_t*)"Success!");
 #endif
 			delay_ms(1000);
 			OLED_Fill(0x00);
@@ -943,7 +943,7 @@ void uart(void *pv)
 #ifdef TEST_OLED
 	OLED_Init();
 	OLED_Fill(0x00);
-	OLED_P6x8Str(0, 0, "Init BT test...");
+	OLED_P6x8Str(0, 0, (uint8_t*)"Init BT test...");
 #endif
 
 	char tmp = 0x78;
@@ -981,14 +981,14 @@ void test_MPU6050(void)
 #ifdef TEST_OLED
 	OLED_Init();
 	OLED_Fill(0x00);
-	OLED_P6x8Str(0,0,"[O K] MPU 6050 Test");
+	OLED_P6x8Str(0,0,(uint8_t*)"[O K] MPU 6050 Test");
 #endif
     PRINTF("[O K] MPU 6050 Test\n");
 
     if(MPU6050_Init())
     {
 #ifdef TEST_OLED
-		OLED_P6x8Str(15,2,"[Err] MPU 6050 Test Failed!");	
+		OLED_P6x8Str(15,2,(uint8_t*)"[Err] MPU 6050 Test Failed!");
 #endif
     PRINTF("[Err] MPU 6050 Test Failed!\n");
 		
@@ -1000,17 +1000,17 @@ void test_MPU6050(void)
         MPU_Get_Raw_data(&aacx,&aacy,&aacz,&gyrox,&gyroy,&gyroz);	//得到加速度传感器数据
 #ifdef TEST_OLED
 		sprintf((char*)txt,"ax:%06d",aacx);
-        OLED_P6x8Str(0,2,txt);
+        OLED_P6x8Str(0,2,(uint8_t*)txt);
         sprintf((char*)txt,"ay:%06d",aacy);
-        OLED_P6x8Str(0,3,txt);
+        OLED_P6x8Str(0,3,(uint8_t*)txt);
         sprintf((char*)txt,"az:%06d",aacz);
-        OLED_P6x8Str(0,4,txt);
+        OLED_P6x8Str(0,4,(uint8_t*)txt);
         sprintf((char*)txt,"gx:%06d",gyrox);
-        OLED_P6x8Str(0,5,txt);
+        OLED_P6x8Str(0,5,(uint8_t*)txt);
         sprintf((char*)txt,"gy:%06d",gyroy);
-        OLED_P6x8Str(0,6,txt);
+        OLED_P6x8Str(0,6,(uint8_t*)txt);
         sprintf((char*)txt,"gz:%06d",gyroz);
-        OLED_P6x8Str(0,7,txt);
+        OLED_P6x8Str(0,7,(uint8_t*)txt);
 #endif
         PRINTF("\r\nAX: %d  ",aacx);
         PRINTF("\r\nAY: %d  ",aacy);

@@ -229,7 +229,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tensorflow-lite/third_party/flatbuffers/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/board}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/nncu/aiann}&quot;"/>
 								</option>
 								<option id="gnu.both.asm.option.warnings.nowarn.594534119" name="Suppress warnings (-W)" superClass="gnu.both.asm.option.warnings.nowarn" useByScannerDiscovery="false"/>
 								<option id="gnu.both.asm.option.version.1056589349" name="Announce version (-v)" superClass="gnu.both.asm.option.version" useByScannerDiscovery="false"/>

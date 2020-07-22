@@ -206,6 +206,8 @@ void AC_Task(void *pvData)
 	memcpy(&data_identifier, g_flash_buff_r, sizeof(data_identifier));
 	memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
 
+    delay_ms(500);
+    OLED_Fill(0);
 	/*
 	 * @note: 	有关内存的读取说明。
 	 *
@@ -362,7 +364,7 @@ void AC_Task(void *pvData)
             OLED_Print_Num(60,3,g_AD_nncu_Output[1]);
             OLED_Print_Num(60,4,g_time_duration_us);
 
-            PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
+            //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 
 
         }
