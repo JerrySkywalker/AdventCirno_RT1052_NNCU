@@ -308,13 +308,13 @@ void flash_init(void *pv)
     OLED_P6x8Str(0, 0, "Init Flash test...");
 #endif
 
-    PRINTF("[O K] Init flash test\r\n");
+    PRINTF("[O K] AC: Init flash test\r\n");
     assert(0 == FLASH_Init());
 
 #ifdef TEST_OLED
     OLED_P6x8Str(0, 1, "[O K] Flash Ok");
 #endif
-    PRINTF("flash test success\r\n");
+    PRINTF("[O K] AC: Flash test success!\r\n");
     vTaskDelete(NULL);
 }
 void flash(void *pv)

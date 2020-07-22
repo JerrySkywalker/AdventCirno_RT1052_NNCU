@@ -54,6 +54,7 @@
 #include "smartcar/sc_oled.h"
 #include "smartcar/sc_flash.h"
 #include "smartcar/sc_pwm.h"
+#include "smartcar/status.h"
 #include "ac_lib/AC_Control.h"
 #include "ac_lib/AC_Menu.h"
 #include "ac_lib/AC_Command.h"
@@ -95,7 +96,8 @@ int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
 
 int Flag_Signal = 0;
-
+uint32_t g_time_us = 0;
+uint32_t g_time_duration_us = 0;
 
 /*TODO: Buffer declaration here*/
 uint8_t g_flash_buff_r[FLASH_SECTOR_SIZE];
@@ -291,9 +293,10 @@ void AC_Task(void *pvData)
 
 
 		/*For Test NNCU Only*/
+		g_time_us= TimerUsGet();
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
-
 		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
+		g_time_duration_us = TimerUsGet() - g_time_us;
 
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
 
@@ -339,20 +342,30 @@ void AC_Task(void *pvData)
 				}
 			}
 
-			if(g_Flag_WakeUp == 0)
-            {
-			    /**TODO: PUT your idea info here!**/
-
-                OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
-
-                OLED_P6x8Str(0,1,(uint8_t*)"Servo");
-                OLED_P6x8Str(0,2,(uint8_t*)"nncu-Out");
-
-                /*Just a demo*/
-                OLED_Print_Num(60,2,g_AD_nncu_Output[0]);
-                OLED_Print_Num(60,3,g_AD_nncu_Output[1]);
-            }
 		}
+
+        if(g_Flag_WakeUp == 0)
+        {
+            /**TODO: PUT your idea info here!**/
+
+            OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+
+            OLED_P6x8Str(0,1,(uint8_t*)"Servo");
+            OLED_P6x8Str(0,2,(uint8_t*)"nncu-Out");
+            OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+
+            /*Just a demo*/
+            Str_Clr(60,2,5);
+            Str_Clr(60,3,5);
+            Str_Clr(60,4,5);
+            OLED_Print_Num(60,2,g_AD_nncu_Output[0]);
+            OLED_Print_Num(60,3,g_AD_nncu_Output[1]);
+            OLED_Print_Num(60,4,g_time_duration_us);
+
+            PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
+
+
+        }
 
 	}
 }
@@ -366,9 +379,9 @@ int main(void)
 	BOARD_InitBootPeripherals();
 	BOARD_InitDebugConsole();
 
-	PRINTF("\r\n********************\n");
+	PRINTF("\r\n********************\r\n");
 	PRINTF("Advent Cirno v0.3.1");
-	PRINTF("\r\n********************\n");
+	PRINTF("\r\n********************\r\n");
     Control_Init();
 
 	cm_backtrace_init("IMRT10XX.axf", "1.1.1", "19.4.14");
@@ -394,13 +407,11 @@ void LPUART2_IRQHandler(void)
     /* If new data arrived. */
     if ((kLPUART_RxDataRegFullFlag)&LPUART_GetStatusFlags(LPUART2))
     {
-        //data = LPUART_ReadByte(LPUART2);
-        //LPUART_WriteByte(LPUART1,data);
-
         LPUART_ReadBlocking(LPUART2,temp_COM_data_buffer,19);
 
+#ifdef DEBUG_K66_OUTPUT
         LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,19);
-
+#endif
         /*Get AD Data*/
         for(int i = 0;i<12;i++)
         {
