@@ -504,9 +504,9 @@ RAMFUNC void FLEXSPI_UpdateLUT(FLEXSPI_Type *base, uint32_t index, const uint32_
     volatile uint32_t *lutBase;
 
     /* Wait for bus idle before change flash configuration. */
-    while (!FLEXSPI_GetBusIdleStatus(base))
-    {
-    }
+//    while (!FLEXSPI_GetBusIdleStatus(base))
+//    {
+//    }
 
     /* Unlock LUT for update. */
     base->LUTKEY = FLEXSPI_LUT_KEY_VAL;
