@@ -341,6 +341,9 @@ void AC_Task(void *pvData)
 
 					/*Delete your task  Here*/
 					vTaskDelete(AC_Menu_task_handle);
+					OLED_P6x8Str(0,0,(uint8_t*)"Data Saved!");
+					vTaskDelay(300);
+					OLED_Fill(0);
 					PRINTF("[O K] AC: Menu Deleted! \r\n");
 				}
 			}
