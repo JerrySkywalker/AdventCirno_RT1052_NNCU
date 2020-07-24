@@ -56,11 +56,11 @@ void Dir_Control(void)
     {
         if(Huandao_shibie_flag==1)
         {
-          s_error = (g_AD_Data[0] - g_AD_Data[10]) / (g_AD_Data[0] * g_AD_Data[10]+1);
+          s_error = (g_AD_Data[0] - g_AD_Data[6]) / (g_AD_Data[0] * g_AD_Data[6]+1);
         }
         else
         {
-          s_error = (data[data_identifier].Weight_x * 0.01*((float)  g_AD_Data[0] - (float)g_AD_Data[10]) + data[data_identifier].Weight_y * 0.01*((float)g_AD_Data[2] - (float)g_AD_Data[8])) / ((float)g_AD_Data[0] + (float)g_AD_Data[10]+1);
+          s_error = (data[data_identifier].Weight_x * 0.01*((float)  g_AD_Data[0] - (float)g_AD_Data[6]) + data[data_identifier].Weight_y * 0.01*((float)g_AD_Data[1] - (float)g_AD_Data[5])) / ((float)g_AD_Data[0] + (float)g_AD_Data[6]+1);
         }
 
         s_dir = 10 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
@@ -104,7 +104,7 @@ void Speed_Control(void)
 
     if (data[data_identifier].mode == 1)
     {
-        if (g_AD_Data[0] == 0 || g_AD_Data[10] == 0) //电磁出赛道保护
+        if (g_AD_Data[0] == 0 || g_AD_Data[6] == 0) //电磁出赛道保护
         {
 //            Ftm_PWM_Change(FTM0, kFTM_Chnl_0, 20000, 0);
 //            Ftm_PWM_Change(FTM0, kFTM_Chnl_1, 20000, 0);

@@ -373,11 +373,9 @@ void AC_Task(void *pvData)
 				Str_Clr(0,5,8);
 				Str_Clr(0,6,8);
 				Str_Clr(60,1,8);
-				Str_Clr(60,2,8);
+
 				Str_Clr(60,3,8);
 				Str_Clr(60,4,8);
-				Str_Clr(60,5,8);
-				Str_Clr(60,6,8);
 
 				OLED_Print_Num(0,1, g_AD_Data[0]);
 				OLED_Print_Num(0,2, g_AD_Data[1]);
@@ -386,11 +384,9 @@ void AC_Task(void *pvData)
 				OLED_Print_Num(0,5, g_AD_Data[4]);
 				OLED_Print_Num(0,6, g_AD_Data[5]);
 				OLED_Print_Num(60,1, g_AD_Data[6]);
-				OLED_Print_Num(60,2, g_AD_Data[7]);
-				OLED_Print_Num(60,3, g_AD_Data[8]);
-				OLED_Print_Num(60,4, g_AD_Data[9]);
-				OLED_Print_Num(60,5, g_AD_Data[10]);
-				OLED_Print_Num(60,6, g_AD_Data[11]);
+
+				OLED_Print_Num(60,3, g_AD_Data[7]);
+				OLED_Print_Num(60,4, g_AD_Data[8]);
 			}
 			else{
 
@@ -407,8 +403,7 @@ void AC_Task(void *pvData)
             OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
             OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
             OLED_P6x8Str(0,5,(uint8_t*)"AD-0");
-            OLED_P6x8Str(0,6,(uint8_t*)"AD-10");
-
+            OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
 
             Str_Clr(60,1,10);
             Str_Clr(60,2,8);
@@ -417,7 +412,6 @@ void AC_Task(void *pvData)
             Str_Clr(60,5,8);
             Str_Clr(60,6,8);
 
-
             OLED_Print_Num(60,1,g_Boma[0]);
             OLED_Print_Num(66,1,g_Boma[1]);
             OLED_Print_Num(72,1,g_Boma[2]);
@@ -425,18 +419,15 @@ void AC_Task(void *pvData)
             OLED_Print_Num(84,1,g_Boma[4]);
             OLED_Print_Num(90,1,g_Boma[5]);
 
-            //OLED_Print_Num(60,2,???);Print curent servo data 仍待补全
-            OLED_Print_Num(60,3,g_AD_nncu_Output[0]);
+            OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
+            OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
             OLED_Print_Num(60,4,g_time_duration_us);
-
             OLED_Print_Num(60,5,g_AD_Data[0]);
-            OLED_Print_Num(60,6,g_AD_Data[10]);
+            OLED_Print_Num(60,6,g_AD_Data[6]);
 
             //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 			}
-
         }
-
 	}
 }
 
@@ -473,23 +464,23 @@ int main(void)
 
 void LPUART2_IRQHandler(void)
 {
-    uint8_t temp_COM_data_buffer[19];
+    uint8_t temp_COM_data_buffer[16];
     /* If new data arrived. */
     if ((kLPUART_RxDataRegFullFlag)&LPUART_GetStatusFlags(LPUART2))
     {
-        LPUART_ReadBlocking(LPUART2,temp_COM_data_buffer,19);
+        LPUART_ReadBlocking(LPUART2,temp_COM_data_buffer,16);
 
 #ifdef DEBUG_K66_OUTPUT
-        LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,19);
+        LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,16);
 #endif
         /*Get AD Data*/
-        for(int i = 0;i<12;i++)
+        for(int i = 0;i<9;i++)
         {
             g_AD_Data[i] = temp_COM_data_buffer[i+3];
         }
 
         /*Get Boma Data*/
-        g_Boma_Compressed = temp_COM_data_buffer[15];
+        g_Boma_Compressed = temp_COM_data_buffer[12];
         for(int i = 0;i<6;i++)
         {
             g_Boma[i] = g_Boma_Compressed % 2;
