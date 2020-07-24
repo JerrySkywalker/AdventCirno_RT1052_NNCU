@@ -78,6 +78,7 @@ void OLED_P8x16Str(uint8_t x, uint8_t y, uint8_t ch[]);
 void OLED_HEXACSII(uint16_t hex, uint8_t* Print);
 void OLED_Print_Num(uint8_t x, uint8_t y, uint16_t num);
 void OLED_Print_Num1(uint8_t x, uint8_t y, int16_t num);
+void OLED_Print_Num_float(uint8_t x, uint8_t y, float num);
 void dis_bmp(uint16_t high, uint16_t width, uint8_t* p, uint8_t value);
 void image_size_half_forOLED(uint8_t* src, uint8_t* dst, const int row, const int col);
 void Str_Clr(uint32_t x, uint32_t y, uint32_t num);

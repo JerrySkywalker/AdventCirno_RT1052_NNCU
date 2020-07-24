@@ -22,6 +22,10 @@ float s_speed_left_now = 0, s_speed_right_now = 0, s_speed_left = 0, s_speed_rig
 float s_speed_aim_left = 0, s_speed_aim_right = 0;
 float s_error_left = 0, s_error_right = 0;
 
+float Huandao_zhongzhi_figure;
+int Huandao_shibie_flag = 0;
+float s_error_former[10];
+
 pwm_t my1 = {PWM2, kPWM_Module_0, 20 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 20 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
 gpio_t OE_B = {GPIO5,02U,0 };	//L7 74LVC245_OE_B, 电机PWM相关，低电平有效
@@ -50,16 +54,19 @@ void Dir_Control(void)
     }
     else if (data[data_identifier].mode == 1)
     {
-         s_error = ((float)g_AD_Data[0] - (float)g_AD_Data[10]) / ((float)g_AD_Data[0] * (float)g_AD_Data[10]);
-//         g_dir_error_sum += s_error;
-//         if (s_error == 0)
-//         {
-//           g_dir_error_sum = 0;
-//         }
-        s_dir = 0.1 * (data[data_identifier].dirkp * s_error  + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+        if(Huandao_shibie_flag==1)
+        {
+          s_error = (g_AD_Data[0] - g_AD_Data[10]) / (g_AD_Data[0] * g_AD_Data[10]+1);
+        }
+        else
+        {
+          s_error = (data[data_identifier].Weight_x * 0.01*((float)  g_AD_Data[0] - (float)g_AD_Data[10]) + data[data_identifier].Weight_y * 0.01*((float)g_AD_Data[2] - (float)g_AD_Data[8])) / ((float)g_AD_Data[0] + (float)g_AD_Data[10]+1);
+        }
+
+        s_dir = 10 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
         g_dir_error_1 = s_error;
         //Servo_Protect(&s_dir);
-    	PWM_AC_SetServoDuty((uint16_t)(100*(DIR_M + s_dir)));
+    	PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + s_dir));
     }
 }
 
@@ -257,4 +264,28 @@ void Dir_Control_Zebra_Crossing(void)
 {
     //Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, DIR_M);
 	PWM_AC_SetServoDuty(100*DIR_M);
+}
+
+void Dir_Control_Huandao_Shibie(void)
+{
+  int figure_ad;
+  float s_error;
+  figure_ad = g_AD_Data[3];
+  if(figure_ad > 1.2*Huandao_zhongzhi_figure)
+  {
+    Huandao_shibie_flag = 1 ;
+  }
+  else
+  {
+    Huandao_shibie_flag = 0;
+  }
+
+}
+
+void Dir_Control_Zhongxian_Biaoding(void)
+{
+  if(g_AD_Data[3] > Huandao_zhongzhi_figure)
+  {
+    Huandao_zhongzhi_figure = g_AD_Data[3];
+  }
 }

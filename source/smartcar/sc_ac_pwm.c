@@ -11,7 +11,7 @@
 
 /* 最大占空比 可自行修改 */
 /*注意以下的duty换算单位均为万分之一。比如7.5% 在duty中写作750*/
-#define AC_DUTY_MAX 9000
+#define AC_DUTY_MAX 10000
 
 /**
   * @brief    PWM初始化

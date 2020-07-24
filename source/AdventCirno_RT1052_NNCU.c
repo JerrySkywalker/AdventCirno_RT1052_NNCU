@@ -82,10 +82,11 @@ uint8_t g_Flag_WakeUp = 0;
 extern Data_t data[10];
 extern int data_identifier;
 extern uint8_t image_Buffer_0[CAMERA_H][CAMERA_W];
-extern
+extern float s_dir;
 
 //clock_t start, stop; //clock_t是clock（）函数返回的变量类型
 double duration;
+int flag_refreshScreen = 5;
 int Delayed_departure_flag = 1;   //拨码2中用于延时发车,0=stop
 int Delayed_departure_flag_1 = 1; //普通情况的运行时长 0=stop
 int Control_timenow = 0;		  //计数
@@ -252,7 +253,7 @@ void AC_Task(void *pvData)
 	0xD1,0xCA,0x96,0xFE,0xAC,0xFE,0xD9,0xB3,0xDE,0xCF,0xCC,0x83
 	};
 	/*输出缓存区的指针，必须按照这个格式写*/
-	int16_t* g_AD_nncu_OutBuffer = (int16_t*)malloc(sizeof(int16_t));
+	int16_t* g_AD_nncu_OutBuffer = (int16_t*)pvPortMalloc(sizeof(int16_t));
 
 	/*将上面的缓冲区指针的数取出来放这里*/
 	int16_t g_AD_nncu_Output[2];
@@ -350,19 +351,22 @@ void AC_Task(void *pvData)
         {
             /**TODO: PUT your idea info here!**/
 
-            OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
-
-            OLED_P6x8Str(0,1,(uint8_t*)"Servo");
-            OLED_P6x8Str(0,2,(uint8_t*)"nncu-Out");
-            OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+//            OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+//
+//            OLED_P6x8Str(0,1,(uint8_t*)"Servo");
+//            OLED_P6x8Str(0,2,(uint8_t*)"nncu-Out");
+//            OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
 
             /*Just a demo*/
-            Str_Clr(60,2,5);
-            Str_Clr(60,3,5);
-            Str_Clr(60,4,5);
-            OLED_Print_Num(60,2,g_AD_nncu_Output[0]);
-            OLED_Print_Num(60,3,g_AD_nncu_Output[1]);
-            OLED_Print_Num(60,4,g_time_duration_us);
+            Str_Clr(60,2,6);
+            Str_Clr(60,3,6);
+            Str_Clr(60,4,6);
+//            OLED_Print_Num(60,2,g_AD_nncu_Output[0]);
+//            OLED_Print_Num(60,3,g_AD_nncu_Output[1]);
+//            OLED_Print_Num(60,4,g_time_duration_us);
+            OLED_Print_Num1(60,2,g_AD_Data[0]);
+            OLED_Print_Num1(60,3,g_AD_Data[10]);
+            OLED_Print_Num1(60,4,g_Boma[5]);
 
             //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 

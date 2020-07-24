@@ -53,6 +53,8 @@ typedef struct Data
     int forward_view;
     int auto_threshold;
     int running_time;
+    int Weight_x;
+    int Weight_y;
 } Data_t;
 
 typedef enum
@@ -134,5 +136,7 @@ int Set_Mode(int (*action)(int *data,int modify));
 int Set_ForwardView(int (*action)(int *data,int modify));
 int Set_AutoThreshold(int (*action)(int *data,int modify));
 int Set_RunningTime(int (*action)(int *data,int modify));
+int Set_Weight_x(int (*action)(int *data,int modify));
+int Set_Weight_y(int (*action)(int *data,int modify));
 
 #endif

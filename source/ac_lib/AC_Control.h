@@ -16,7 +16,7 @@
 #define CAMERA_M  94
 #define CAMERA_H  120
 #define CAMERA_W  188
-#define DIR_M 6.6
+#define DIR_M 7.35
 #define MAX_SERVO_DUTY 0.8                        //舵机限幅
 #define MAX_MOTOR_DUTY 90                        //电机限幅
 #define MIN_MOTOR_DUTY -90
@@ -31,6 +31,8 @@ void Speed_Control(void);
 void Servo_Protect(float *dir);
 void Motor_Protect(float *speed);
 void Speed_Judge(float speed_L, float speed_R);
+void Dir_Control_Huandao_Shibie(void);
+void Dir_Control_Zhongxian_Biaoding(void);
 
 extern Data_t data[10];
 extern float s_speed_aim_left;

@@ -38,6 +38,8 @@ MenuNode_t *Menu_SetForwardView;
 MenuNode_t *Menu_SetAutoThreshold;
 MenuNode_t *Menu_SetRunningTime;
 MenuNode_t *Menu_SetSetupTime;
+MenuNode_t *Menu_Weight_x;
+MenuNode_t *Menu_Weight_y;
 
 /*
  * OLED display variables
@@ -361,10 +363,13 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_SetDirKi, "SetDirKi", FUNC, Set_DirKi, Menu_Direction);
     Menu_MenuNodeCreate(&Menu_SetDirKd, "SetDirKd", FUNC, Set_DirKd, Menu_Direction);
 
+    //else
     Menu_MenuNodeCreate(&Menu_SetForwardView, "SetFW", FUNC, Set_ForwardView, root);
     Menu_MenuNodeCreate(&Menu_SetAutoThreshold, "SetAutoTH", FUNC, Set_AutoThreshold, root);
     Menu_MenuNodeCreate(&Menu_SetRunningTime, "SetRunTime", FUNC, Set_RunningTime, root);
     // Menu_MenuNodeCreate(&Menu_SetSetupTime, "SetSetupTime", FUNC, Set_SetupTime, root);
+    Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", FUNC, Set_Weight_x, root);
+    Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", FUNC, Set_Weight_y, root);
 }
 
 /**
@@ -674,5 +679,21 @@ int Set_RunningTime(int (*action)(int *data,int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].running_time = ans;
+    return ans;
+}
+int Set_Weight_x(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Weight_x, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Weight_x = ans;
+    return ans;
+}
+int Set_Weight_y(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Weight_y, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Weight_y = ans;
     return ans;
 }
