@@ -95,6 +95,7 @@ int Stop_Car_flag = 0;
 int Boma2_flag = 0;
 int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
+int Flag_ScreenRefresh;
 
 int Flag_Signal = 0;
 uint32_t g_time_us = 0;
@@ -186,6 +187,7 @@ void AC_Task(void *pvData)
 	vTaskDelay(1000);
 	OLED_Fill(0x00);
 
+	Flag_ScreenRefresh = -1;
 	/*TODO: Your Init Sequence Here*/
 	//Init ENC
 	ENC_Init_t(ENC2);	//R
@@ -356,21 +358,26 @@ void AC_Task(void *pvData)
 
         	if(1==g_Boma[0])
 			{
-				/*TODO: Print AD on 1052*/
+				if(0!=Flag_ScreenRefresh)
+                {
+                    Flag_ScreenRefresh = 0;
+				    OLED_Fill(0x00);
+                }
+        		/*TODO: Print AD on 1052*/
 				OLED_P6x8Str(0,0,(uint8_t*)"#AD After Norm");
 
-				Str_Clr(0,1,7);
-				Str_Clr(0,2,7);
-				Str_Clr(0,3,7);
-				Str_Clr(0,4,7);
-				Str_Clr(0,5,7);
-				Str_Clr(0,6,7);
-				Str_Clr(60,1,7);
-				Str_Clr(60,2,7);
-				Str_Clr(60,3,7);
-				Str_Clr(60,4,7);
-				Str_Clr(60,5,7);
-				Str_Clr(60,6,7);
+				Str_Clr(0,1,8);
+				Str_Clr(0,2,8);
+				Str_Clr(0,3,8);
+				Str_Clr(0,4,8);
+				Str_Clr(0,5,8);
+				Str_Clr(0,6,8);
+				Str_Clr(60,1,8);
+				Str_Clr(60,2,8);
+				Str_Clr(60,3,8);
+				Str_Clr(60,4,8);
+				Str_Clr(60,5,8);
+				Str_Clr(60,6,8);
 
 				OLED_Print_Num(0,1, g_AD_Data[0]);
 				OLED_Print_Num(0,2, g_AD_Data[1]);
@@ -387,35 +394,43 @@ void AC_Task(void *pvData)
 			}
 			else{
 
-//            OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
-//
-//            /** @note: just a NNCU demo*/
-//            OLED_P6x8Str(0,1,(uint8_t*)"Boma");
-//            OLED_P6x8Str(0,2,(uint8_t*)"Servo");
-//            OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
-//            OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-//            OLED_P6x8Str(0,5,(uint8_t*)"AD-0");
-//            OLED_P6x8Str(0,6,(uint8_t*)"AD-10");
-//
-//
-//            Str_Clr(60,1,10);
-//            Str_Clr(60,2,6);
-//            Str_Clr(60,3,6);
-//            Str_Clr(60,4,6);
-//
-//            OLED_Print_Num(60,1,g_Boma[0]);
-//            OLED_Print_Num(66,1,g_Boma[1]);
-//            OLED_Print_Num(72,1,g_Boma[2]);
-//            OLED_Print_Num(78,1,g_Boma[3]);
-//            OLED_Print_Num(84,1,g_Boma[4]);
-//            OLED_Print_Num(90,1,g_Boma[5]);
-//
-//            //OLED_Print_Num(60,2,???);Print curent servo data 仍待补全
-//            OLED_Print_Num(60,3,g_AD_nncu_Output[0]);
-//            OLED_Print_Num(60,4,g_time_duration_us);
+                if(-1!=Flag_ScreenRefresh)
+                {
+                    Flag_ScreenRefresh = -1;
+                    OLED_Fill(0x00);
+                }
+            OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
 
-            OLED_Print_Num1(60,2,g_AD_Data[0]);
-            OLED_Print_Num1(60,3,g_AD_Data[10]);
+            /** @note: just a NNCU demo*/
+            OLED_P6x8Str(0,1,(uint8_t*)"Boma");
+            OLED_P6x8Str(0,2,(uint8_t*)"Servo");
+            OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
+            OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+            OLED_P6x8Str(0,5,(uint8_t*)"AD-0");
+            OLED_P6x8Str(0,6,(uint8_t*)"AD-10");
+
+
+            Str_Clr(60,1,10);
+            Str_Clr(60,2,8);
+            Str_Clr(60,3,8);
+            Str_Clr(60,4,8);
+            Str_Clr(60,5,8);
+            Str_Clr(60,6,8);
+
+
+            OLED_Print_Num(60,1,g_Boma[0]);
+            OLED_Print_Num(66,1,g_Boma[1]);
+            OLED_Print_Num(72,1,g_Boma[2]);
+            OLED_Print_Num(78,1,g_Boma[3]);
+            OLED_Print_Num(84,1,g_Boma[4]);
+            OLED_Print_Num(90,1,g_Boma[5]);
+
+            //OLED_Print_Num(60,2,???);Print curent servo data 仍待补全
+            OLED_Print_Num(60,3,g_AD_nncu_Output[0]);
+            OLED_Print_Num(60,4,g_time_duration_us);
+
+            OLED_Print_Num(60,5,g_AD_Data[0]);
+            OLED_Print_Num(60,6,g_AD_Data[10]);
 
             //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 			}
