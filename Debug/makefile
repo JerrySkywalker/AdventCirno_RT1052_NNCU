@@ -18,7 +18,7 @@ RM := rm -rf
 -include usb/device/class/subdir.mk
 -include startup/subdir.mk
 -include source/smartcar/subdir.mk
--include source/nncu/Network/Dense_Complex/subdir.mk
+-include source/nncu/Network/Dense_Complex_200_Round/subdir.mk
 -include source/nncu/subdir.mk
 -include source/cm_backtrace/fault_handler/gcc/subdir.mk
 -include source/cm_backtrace/subdir.mk
