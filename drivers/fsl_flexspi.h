@@ -639,7 +639,8 @@ static inline flexspi_ahb_error_code_t FLEXSPI_GetAHBCommandErrorCode(FLEXSPI_Ty
  */
 static inline bool FLEXSPI_GetBusIdleStatus(FLEXSPI_Type *base)
 {
-    return (0U != (base->STS0 & FLEXSPI_STS0_ARBIDLE_MASK)) && (0U != (base->STS0 & FLEXSPI_STS0_SEQIDLE_MASK));
+    return (base->STS0 & 3) == 3;       /**@note Try to fix flash Problem*/
+    //return (0U != (base->STS0 & FLEXSPI_STS0_ARBIDLE_MASK)) && (0U != (base->STS0 & FLEXSPI_STS0_SEQIDLE_MASK));
 }
 /*@}*/
 

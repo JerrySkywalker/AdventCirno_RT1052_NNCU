@@ -41,9 +41,11 @@ MenuNode_t *Menu_SetSetupTime;
 MenuNode_t *Menu_Weight_x;
 MenuNode_t *Menu_Weight_y;
 
-/*
- * OLED display variables
- *
+/**NNCU Data*/
+MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
+
+/**
+ * @brief OLED display variables
  */
 
 /*A tracker for the rendering menu*/
@@ -332,38 +334,47 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_SetClass, "SetClass", FUNC, Set_Class, root);
     Menu_MenuNodeCreate(&Menu_SetMode, "SetMode", FUNC, Set_Mode, root);
 
-    Menu_MenuNodeCreate(&Menu_Led_CoreBoard, "Led_Board", MID, NULL, root);
+    /**@brief Settings for board LED only*/
+//    Menu_MenuNodeCreate(&Menu_Led_CoreBoard, "Led_Board", MID, NULL, root);
+//    {
+//        Menu_MenuNodeCreate(&Menu_CB_LED1, "SetLed1", FUNC, Led_CB_1, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED2, "SetLed2", FUNC, Led_CB_2, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED3, "SetLed3", FUNC, Led_CB_3, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED4, "SetLed4", FUNC, Led_CB_4, Menu_Led_CoreBoard);
+//    }
+
+    /**@brief Settings for Differential */
     Menu_MenuNodeCreate(&Menu_Speed, "Speed", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_SetSpeedKp_L, "SetSpeedKp_L", FUNC, Set_SpeedKp_L, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKi_L, "SetSpeedKi_L", FUNC, Set_SpeedKi_L, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKd_L, "SetSpeedKd_L", FUNC, Set_SpeedKd_L, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKp_R, "SetSpeedKp_R", FUNC, Set_SpeedKp_R, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKi_R, "SetSpeedKi_R", FUNC, Set_SpeedKi_R, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKd_R, "SetSpeedKd_R", FUNC, Set_SpeedKd_R, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKL, "SetSpeedKL", FUNC, Set_SpeedKL, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKR, "SetSpeedKR", FUNC, Set_SpeedKR, Menu_Speed);
+    }
+
+    /**@brief Settings for Direction PID */
     Menu_MenuNodeCreate(&Menu_Direction, "Direction", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_SetDirKp, "SetDirKp", FUNC, Set_DirKp, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKi, "SetDirKi", FUNC, Set_DirKi, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKd, "SetDirKd", FUNC, Set_DirKd, Menu_Direction);
+    }
 
-    //level 2:Led_Board
+    /**@brief Settings for NNCU */
+    Menu_MenuNodeCreate(&Menu_NNCU,"NNCU",MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor, "NormFactor", FUNC, Set_NNCU_NormalizeFactor, Menu_NNCU);
+    }
 
-    Menu_MenuNodeCreate(&Menu_CB_LED1, "SetLed1", FUNC, Led_CB_1, Menu_Led_CoreBoard);
-    Menu_MenuNodeCreate(&Menu_CB_LED2, "SetLed2", FUNC, Led_CB_2, Menu_Led_CoreBoard);
-    Menu_MenuNodeCreate(&Menu_CB_LED3, "SetLed3", FUNC, Led_CB_3, Menu_Led_CoreBoard);
-    Menu_MenuNodeCreate(&Menu_CB_LED4, "SetLed4", FUNC, Led_CB_4, Menu_Led_CoreBoard);
-
-    //level 1:Quick Set
+    /** Level 1:Quick Set*/
     Menu_MenuNodeCreate(&Menu_SetBuzz, "SetBuzz", FUNC, Set_Buzz, root);
     Menu_MenuNodeCreate(&Menu_SetSpeed, "SetSpeed", FUNC, Set_Speed, root);
 
-    //level 2:Speed
-
-    Menu_MenuNodeCreate(&Menu_SetSpeedKp_L, "SetSpeedKp_L", FUNC, Set_SpeedKp_L, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKi_L, "SetSpeedKi_L", FUNC, Set_SpeedKi_L, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKd_L, "SetSpeedKd_L", FUNC, Set_SpeedKd_L, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKp_R, "SetSpeedKp_R", FUNC, Set_SpeedKp_R, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKi_R, "SetSpeedKi_R", FUNC, Set_SpeedKi_R, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKd_R, "SetSpeedKd_R", FUNC, Set_SpeedKd_R, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKL, "SetSpeedKL", FUNC, Set_SpeedKL, Menu_Speed);
-    Menu_MenuNodeCreate(&Menu_SetSpeedKR, "SetSpeedKR", FUNC, Set_SpeedKR, Menu_Speed);
-
-    //level 2:Direction
-    Menu_MenuNodeCreate(&Menu_SetDirKp, "SetDirKp", FUNC, Set_DirKp, Menu_Direction);
-    Menu_MenuNodeCreate(&Menu_SetDirKi, "SetDirKi", FUNC, Set_DirKi, Menu_Direction);
-    Menu_MenuNodeCreate(&Menu_SetDirKd, "SetDirKd", FUNC, Set_DirKd, Menu_Direction);
-
-    //else
+    /** Level 1: else*/
     Menu_MenuNodeCreate(&Menu_SetForwardView, "SetFW", FUNC, Set_ForwardView, root);
     Menu_MenuNodeCreate(&Menu_SetAutoThreshold, "SetAutoTH", FUNC, Set_AutoThreshold, root);
     Menu_MenuNodeCreate(&Menu_SetRunningTime, "SetRunTime", FUNC, Set_RunningTime, root);
@@ -695,5 +706,19 @@ int Set_Weight_y(int (*action)(int *data,int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].Weight_y = ans;
+    return ans;
+}
+
+
+/**
+ * @brief NNCU_NormalizeFactor Callback
+ * @since v1.0
+ * */
+int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].NNCU_NormalizeFactor, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].NNCU_NormalizeFactor = ans;
     return ans;
 }

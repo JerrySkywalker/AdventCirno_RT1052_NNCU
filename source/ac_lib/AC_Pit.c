@@ -10,6 +10,8 @@
 
 TaskHandle_t AC_Pit_task_handle;
 
+extern Data_t data[10];
+extern int data_identifier;
 extern int Flag_InitComplete;
 extern int16_t g_AD_nncu_Output[3];
 
@@ -99,7 +101,7 @@ void AC_Pit(void *pv)
 
 //        	}
 //        Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, 7.5);
-        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/10));
+        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor));
 
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_2) == kPIT_TimerFlag)
