@@ -104,10 +104,10 @@ uint32_t g_time_duration_us = 0;
 /*TODO: Buffer declaration here*/
 uint8_t g_flash_buff_r[FLASH_SECTOR_SIZE];
 uint8_t g_flash_buff_w[FLASH_SECTOR_SIZE];
-int8_t g_AD_Data[12];
+int8_t g_AD_Data[9];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
-
+int16_t g_AD_nncu_Output[3];
 
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
@@ -257,9 +257,6 @@ void AC_Task(void *pvData)
 	/*输出缓存区的指针，必须按照这个格式写*/
 	int16_t* g_AD_nncu_OutBuffer = (int16_t*)pvPortMalloc(sizeof(int16_t));
 
-	/*将上面的缓冲区指针的数取出来放这里*/
-	int16_t g_AD_nncu_Output[2];
-
 	while (1)
 	{
 //		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
@@ -298,14 +295,16 @@ void AC_Task(void *pvData)
 
 
 		/*For Test NNCU Only*/
-		g_time_us= TimerUsGet();
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
 		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
-		g_time_duration_us = TimerUsGet() - g_time_us;
 
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
-
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
+
+		g_time_us= TimerUsGet();
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&g_AD_Data);
+		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+		g_time_duration_us = TimerUsGet() - g_time_us;
 
 		if (0 == GPIO_Read(&wakeUp))
 		{
@@ -420,7 +419,7 @@ void AC_Task(void *pvData)
             OLED_Print_Num(90,1,g_Boma[5]);
 
             OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
-            OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
+            OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
             OLED_Print_Num(60,4,g_time_duration_us);
             OLED_Print_Num(60,5,g_AD_Data[0]);
             OLED_Print_Num(60,6,g_AD_Data[6]);

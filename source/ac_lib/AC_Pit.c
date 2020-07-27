@@ -3,6 +3,7 @@
 #include "smartcar/status.h"
 #include "smartcar/sc_pwm.h"
 #include "smartcar/sc_gpio.h"
+#include "smartcar/sc_ac_pwm.h"
 #include "AC_Control.h"
 #include "AC_Menu.h"
 #include "Image.h"
@@ -10,6 +11,7 @@
 TaskHandle_t AC_Pit_task_handle;
 
 extern int Flag_InitComplete;
+extern int16_t g_AD_nncu_Output[3];
 
 uint16_t duty;  //测试舵机用
 
@@ -93,10 +95,11 @@ void AC_Pit(void *pv)
 //        			Dir_Control();
 //        		}
 
-        		Dir_Control();
+        		//Dir_Control();
 
 //        	}
-        	// Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, 7.5);
+//        Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, 7.5);
+        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/10));
 
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_2) == kPIT_TimerFlag)
