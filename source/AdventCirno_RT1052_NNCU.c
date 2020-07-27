@@ -376,16 +376,16 @@ void AC_Task(void *pvData)
 				Str_Clr(60,3,8);
 				Str_Clr(60,4,8);
 
-				OLED_Print_Num(0,1, g_AD_Data[0]);
-				OLED_Print_Num(0,2, g_AD_Data[1]);
-				OLED_Print_Num(0,3, g_AD_Data[2]);
-				OLED_Print_Num(0,4, g_AD_Data[3]);
-				OLED_Print_Num(0,5, g_AD_Data[4]);
-				OLED_Print_Num(0,6, g_AD_Data[5]);
-				OLED_Print_Num(60,1, g_AD_Data[6]);
+				OLED_Print_Num1(0,1, g_AD_Data[0]);
+				OLED_Print_Num1(0,2, g_AD_Data[1]);
+				OLED_Print_Num1(0,3, g_AD_Data[2]);
+				OLED_Print_Num1(0,4, g_AD_Data[3]);
+				OLED_Print_Num1(0,5, g_AD_Data[4]);
+				OLED_Print_Num1(0,6, g_AD_Data[5]);
+				OLED_Print_Num1(60,1, g_AD_Data[6]);
 
-				OLED_Print_Num(60,3, g_AD_Data[7]);
-				OLED_Print_Num(60,4, g_AD_Data[8]);
+				OLED_Print_Num1(60,3, g_AD_Data[7]);
+				OLED_Print_Num1(60,4, g_AD_Data[8]);
 			}
 			else{
 
@@ -475,7 +475,7 @@ void LPUART2_IRQHandler(void)
         /*Get AD Data*/
         for(int i = 0;i<9;i++)
         {
-            g_AD_Data[i] = temp_COM_data_buffer[i+3];
+            g_AD_Data[i] = temp_COM_data_buffer[i+3] + 128;
         }
 
         /*Get Boma Data*/

@@ -99,7 +99,7 @@ void AC_Pit(void *pv)
 
 //        	}
 //        Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, 7.5);
-        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/10));
+        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]));
 
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_2) == kPIT_TimerFlag)
