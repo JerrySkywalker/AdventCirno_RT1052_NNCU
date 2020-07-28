@@ -290,9 +290,6 @@ void AC_Task(void *pvData)
 
         /**@brief Init NNCU*/
 		{
-		/*两个测试数据*/
-		int8_t tmp_AD_Input[9] = {0xC2,0x8E,0x90,0xC9,0xDB,0x94,0xF2,0xCD,0x0C};
-		int8_t tmp_AD_Input2[9] = {0xC0,0x90,0x8B,0xC2,0xDE,0x9C,0xE8,0xF1,0x19};
         /*输出缓存区的指针，必须按照这个格式写*/
         g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
 		}

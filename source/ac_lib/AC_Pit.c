@@ -140,15 +140,15 @@ void AC_Pit(void *pv)
     	/*产生阶跃信号，调电机PID用*/
     	 if (Flag_Signal == 1)
     	 {
-    	 	Flag_Signal = 0;
-    	 	s_speed_aim_left = -2;
-    	 	s_speed_aim_right = -2;
+//    	 	Flag_Signal = 0;
+//    	 	s_speed_aim_left = -2;
+//    	 	s_speed_aim_right = -2;
     	 }
     	 else if (Flag_Signal == 0)
     	 {
-    	 	Flag_Signal = 1;
-    	 	s_speed_aim_left = 2;
-    	 	s_speed_aim_right = 2;
+//    	 	Flag_Signal = 1;
+//    	 	s_speed_aim_left = 2;
+//    	 	s_speed_aim_right = 2;
     	 }
 
         /*在屏幕上显示编码器返回值*/

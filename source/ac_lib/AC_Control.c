@@ -95,8 +95,8 @@ void Speed_Control(void)
 
     /*目标速度*/
     s_speed_aim = 0.1*data[data_identifier].speed;
-    //s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
-    //s_speed_aim_right = s_speed_aim*(1+data[data_identifier].speedkr*Differencial);
+    s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
+    s_speed_aim_right = s_speed_aim*(1+data[data_identifier].speedkr*Differencial);
 
     /*PID*/
     s_error_left = s_speed_aim_left - s_speed_left_now;
@@ -143,7 +143,7 @@ void Speed_Control(void)
 		Speed_Judge(s_speed_left, s_speed_right);
     }
 
-    Send_Variable();
+//    Send_Variable();
 
     ENC_Dateclear(ENC2);
     ENC_Dateclear(ENC3);

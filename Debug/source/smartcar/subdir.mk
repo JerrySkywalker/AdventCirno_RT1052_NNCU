@@ -24,6 +24,7 @@ C_SRCS += \
 ../source/smartcar/sc_sd.c \
 ../source/smartcar/sc_spi.c \
 ../source/smartcar/sc_uart.c \
+../source/smartcar/sc_upload.c \
 ../source/smartcar/status.c 
 
 OBJS += \
@@ -47,6 +48,7 @@ OBJS += \
 ./source/smartcar/sc_sd.o \
 ./source/smartcar/sc_spi.o \
 ./source/smartcar/sc_uart.o \
+./source/smartcar/sc_upload.o \
 ./source/smartcar/status.o 
 
 C_DEPS += \
@@ -70,6 +72,7 @@ C_DEPS += \
 ./source/smartcar/sc_sd.d \
 ./source/smartcar/sc_spi.d \
 ./source/smartcar/sc_uart.d \
+./source/smartcar/sc_upload.d \
 ./source/smartcar/status.d 
 
 

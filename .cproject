@@ -517,7 +517,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="littlefs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="sdmmc"/>
-						<entry excluding="nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Simple|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/aiann/aia_cmsisnn_ext.h|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.h|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
+						<entry excluding="nncu/Network/Dense_Simple_CNN|nncu/Network/Dense_Simple_4Layer|nncu/Network/Dense_Complex_Pro|nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Simple|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/aiann/aia_cmsisnn_ext.h|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.h|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tensorflow-lite"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="usb"/>
@@ -904,7 +904,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="littlefs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="sdmmc"/>
-						<entry excluding="nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/Network/Dense_Complex/model_smartcar_ad_weit.c|nncu/Network/Dense_Simple|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
+						<entry excluding="nncu/Network/Dense_Simple_CNN|nncu/Network/Dense_Simple_4Layer|nncu/Network/Dense_Complex_Pro|nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/Network/Dense_Complex/model_smartcar_ad_weit.c|nncu/Network/Dense_Simple|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tensorflow-lite"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="usb"/>
