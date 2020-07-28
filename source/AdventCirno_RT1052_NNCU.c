@@ -97,7 +97,6 @@ int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
 int Flag_ScreenRefresh;
 
-int Flag_Signal = 0;
 uint32_t g_time_us = 0;
 uint32_t g_time_duration_us = 0;
 
@@ -144,7 +143,7 @@ void start_task(void *pvData)
 	//test(adc, "adc", 0, 1, 1);						/*一代主控：未测试，没有电感板子*/
 	//test(camera, "camera ov7725", 0, 0, 0);			/*二代主控：ING*//*一代主控：硬件设计缺陷（致命），共用boot引脚，未测试，没有摄像头*/
 	//test(camera, "camera zzf", 0, 0, 0);              /*二代主控：ING*//*一代主控：硬件设计缺陷（致命），共用boot引脚，未测试，没有摄像头/
-	//test(enc, "enc", 0, 1, 1);						/*一代主控：硬件设计缺陷（致命）：电阻多焊*/
+	test(enc, "enc", 0, 1, 1);						/*一代主控：硬件设计缺陷（致命）：电阻多焊*/
 	//test(flash, "Test flash", 0, 1, 1); /*二代主控：OK*/ /*一代主控：OK*/
 	//test(flash_lfs, "Test flash_lfs", 1000, 0, 1);		/*二代主控：OK*//*一代主控：OK*/
 	//test(keypad, "keypad", 0, 1, 1);					/*二代主控：NULL*//*一代主控：未测试，采用替代方案-五向按键*/
@@ -154,7 +153,7 @@ void start_task(void *pvData)
 	//test(pwm, "pwm", 0, 1, 0);							/*二代主控：学长的库有问题*/
 	//test(sd, "Test sd", 0, 1, 0);						/*二代主控：OK*//*一代主控：检测不到SD*/
 	//test(status, "status", 0, 1, 1);
-	test(pwm_ac, "pwm_ac", 0, 1, 0);					/*二代主控：Servo OK*/
+	//test(pwm_ac, "pwm_ac", 0, 1, 0);					/*二代主控：Servo OK*/
 	vTaskDelete(NULL);
 }
 
@@ -198,6 +197,9 @@ void AC_Task(void *pvData)
 	PWM_AC_Init(PWM2, kPWM_Module_3, kPWM_PwmA, 50);
 	//Init key_5D
 	KEY_5D_Init();
+	//Init Uart
+	UART_Init(LPUART4, 115200, 80 * 1000 * 1000);		//蓝牙
+	UART_Init(LPUART6, 9600, 80 * 1000 * 1000);			//总钻风
 
 	/*CAUTION: FLASH OPERATION*/
 	PRINTF("[O K] AC: Flash: Init flash test\r\n");
@@ -234,8 +236,6 @@ void AC_Task(void *pvData)
 	 * 			- 程序其他地方的任何语句
 	 *			最好方法就是，做好备份，善用Git。大改动前必须保证有一个可用版本。发现问题及时回溯！！
 	 * */
-
-	UART_Init(LPUART6, 9600, 80 * 1000 * 1000);
 
 	//ZZF_Init(ZZF_FrameSize120x184, LPUART6);
 	//	capture.format = PixelFormatGray;
@@ -362,7 +362,7 @@ void AC_Task(void *pvData)
                     Flag_ScreenRefresh = 0;
 				    OLED_Fill(0x00);
                 }
-        		/*TODO: Print AD on 1052*/
+        		/* TODO: Print AD on 1052 */
 				OLED_P6x8Str(0,0,(uint8_t*)"#AD After Norm");
 
 				Str_Clr(0,1,8);
@@ -387,7 +387,18 @@ void AC_Task(void *pvData)
 				OLED_Print_Num1(60,3, g_AD_Data[7]);
 				OLED_Print_Num1(60,4, g_AD_Data[8]);
 			}
-			else{
+        	if(1==g_Boma[1])
+			{
+				if(0!=Flag_ScreenRefresh)
+                {
+                    Flag_ScreenRefresh = 0;
+				    OLED_Fill(0x00);
+                }
+        		/* TODO: Your Code */
+
+			}
+			else
+			{
 
                 if(-1!=Flag_ScreenRefresh)
                 {
@@ -453,7 +464,7 @@ int main(void)
 	xTaskCreate(AC_Task, "AC_Task", 2048, NULL, 2, &AC_task_handle);
     xTaskCreate(AC_Pit, "AC_Pit", 2048, NULL, 2, &AC_Pit_task_handle);
 
-	UART_Init(LPUART2,1152000,80000000);
+	UART_Init(LPUART2,1152000,80000000);	//K66
 	LPUART_EnableInterrupts(LPUART2, kLPUART_RxDataRegFullInterruptEnable);
 	EnableIRQ(LPUART2_IRQn);
 

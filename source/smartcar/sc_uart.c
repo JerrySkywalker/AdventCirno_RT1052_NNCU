@@ -7,7 +7,6 @@
 #include "ac_lib/Image.h"
 
 #define NUM_VAR 6
-float Variable[NUM_VAR]; //发送缓存数组
 extern uint8_t image_Buffer_0[CAMERA_H][CAMERA_W];
 
 status_t UART_Init(LPUART_Type *base, uint32_t baudRate_Bps_,

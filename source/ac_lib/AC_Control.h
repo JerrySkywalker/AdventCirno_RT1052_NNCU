@@ -20,7 +20,7 @@
 #define MAX_SERVO_DUTY 0.8                        //舵机限幅
 #define MAX_MOTOR_DUTY 90                        //电机限幅
 #define MIN_MOTOR_DUTY -90
-#define FTM_CONSTANT 1/(2890*0.02)                //  1/((走1米编码器的返回值)*0.02)
+#define FTM_CONSTANT 1/(11550*0.02)                //  1/((走1米编码器的返回值)*0.02);K66:2890;RT1052:11550
 #define SIZE_CONSTANT 15.5/(19.9*2)               //  B/2L，B是两后轮间距，L是前后轮间距
 
 void Control_Init();
