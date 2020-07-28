@@ -253,10 +253,18 @@ add_executable(AdventCirno_RT1052_NNCU
         source/cm_backtrace/cmb_def.h
         source/examples/test.h
         source/generated/usb_device_config.h
+        source/nncu/Network/Dense_Complex/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Complex/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Simple/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Simple/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Simple_Plus/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Simple_Plus/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Simple_SE/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Simple_SE/model_smartcar_ad_weit.c
         source/nncu/aia_cmsisnn_ext.c
         source/nncu/aia_cmsisnn_ext.h
-        source/nncu/model_smartcar_ad_run.c
-        source/nncu/model_smartcar_ad_weit.c
         source/nncu/nncu_Config.h
         source/smartcar/sc_ac_delay.c
         source/smartcar/sc_ac_delay.h
