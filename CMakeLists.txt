@@ -243,6 +243,8 @@ add_executable(AdventCirno_RT1052_NNCU
         source/ac_lib/AC_Menu.h
         source/ac_lib/AC_Pit.c
         source/ac_lib/AC_Pit.h
+        source/ac_lib/AC_SD_Storage.c
+        source/ac_lib/AC_SD_Storage.h
         source/ac_lib/Image.c
         source/ac_lib/Image.h
         source/cm_backtrace/cm_backtrace.c

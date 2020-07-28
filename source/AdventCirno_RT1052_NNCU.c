@@ -342,7 +342,12 @@ void AC_Task(void *pvData)
 
 					/*Delete your task  Here*/
 					vTaskDelete(AC_Menu_task_handle);
-					OLED_P6x8Str(0,0,(uint8_t*)"Data Saved!");
+					OLED_P6x8Str(0,0,(uint8_t*)"Flash: Data Saved!");
+
+                    /**TODO : SDMMC Storage task here*/
+
+
+
 					vTaskDelay(300);
 					OLED_Fill(0);
 					PRINTF("[O K] AC: Menu Deleted! \r\n");

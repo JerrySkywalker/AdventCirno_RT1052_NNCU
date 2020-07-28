@@ -8,6 +8,7 @@ C_SRCS += \
 ../source/ac_lib/AC_Control.c \
 ../source/ac_lib/AC_Menu.c \
 ../source/ac_lib/AC_Pit.c \
+../source/ac_lib/AC_SD_Storage.c \
 ../source/ac_lib/Image.c 
 
 OBJS += \
@@ -15,6 +16,7 @@ OBJS += \
 ./source/ac_lib/AC_Control.o \
 ./source/ac_lib/AC_Menu.o \
 ./source/ac_lib/AC_Pit.o \
+./source/ac_lib/AC_SD_Storage.o \
 ./source/ac_lib/Image.o 
 
 C_DEPS += \
@@ -22,6 +24,7 @@ C_DEPS += \
 ./source/ac_lib/AC_Control.d \
 ./source/ac_lib/AC_Menu.d \
 ./source/ac_lib/AC_Pit.d \
+./source/ac_lib/AC_SD_Storage.d \
 ./source/ac_lib/Image.d 
 
 
