@@ -1,6 +1,12 @@
 # Prerequisites
 *.d
-
+/.vs
+/Debug/
+/Release/
+/.vs
+/.idea
+/cmake-build-debug
+/x64/
 # Object files
 *.o
 *.ko

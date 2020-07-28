@@ -301,20 +301,10 @@ void enc(void *pv)
 
 void flash_init(void *pv)
 {
-
-#ifdef TEST_OLED
-    OLED_Init();
-    OLED_Fill(0x00);
-    OLED_P6x8Str(0, 0, (uint8_t*)"Init Flash test...");
-#endif
-
-    PRINTF("[O K] AC: Init flash test\r\n");
+    PRINTF("[O K] AC: Flash: Init test\r\n");
     assert(0 == FLASH_Init());
 
-#ifdef TEST_OLED
-    OLED_P6x8Str(0, 1, (uint8_t*)"[O K] Flash Ok");
-#endif
-    PRINTF("[O K] AC: Flash test success!\r\n");
+    PRINTF("[O K] AC: Flash: test success!\r\n");
     vTaskDelete(NULL);
 }
 void flash(void *pv)

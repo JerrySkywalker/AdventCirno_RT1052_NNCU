@@ -28,15 +28,19 @@
 /*TODO: DataSet definition here*/
 typedef struct Data
 {
+    /**LED status*/
     int Led_CB_1;
     int Led_CB_2;
     int Led_CB_3;
     int Led_CB_4;
 
-    //int Preset_Class;
+    /**Buzz status*/
     int Buzz;
 
+    /**Car Speed*/
     int speed;
+
+    /**Motor Differential*/
     int speedkp_l;
     int speedki_l;
     int speedkd_l;
@@ -46,10 +50,14 @@ typedef struct Data
     int speedkl;        //左轮差速强度
     int speedkr;        //右轮差速强度
 
+    /**Direction PID*/
     int dirkp;
     int dirki;
     int dirkd;
+
+    /**Mode for Camera/EM Control*/
     int mode;
+
     int forward_view;
     int auto_threshold;
     int running_time;
@@ -149,6 +157,7 @@ int Set_AutoThreshold(int (*action)(int *data,int modify));
 int Set_RunningTime(int (*action)(int *data,int modify));
 int Set_Weight_x(int (*action)(int *data,int modify));
 int Set_Weight_y(int (*action)(int *data,int modify));
+
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));
 
 #endif

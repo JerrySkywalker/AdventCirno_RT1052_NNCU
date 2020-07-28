@@ -157,11 +157,15 @@ void Menu_MenuShow(MenuNode_t *menu, int page) {
     int range = temp_showIndex + 1;
     while (temp_showIndex > 0) {
         OLED_P6x8Str(12, range - temp_showIndex, rendering->menuName);
-        if (rendering->type == FUNC) {
+        if (FUNC == rendering->type) {
             Str_Clr(PRINT_START_DATA, range - temp_showIndex,
                     PRINT_LENGTH_DATA);
             OLED_Print_Num(PRINT_START_DATA, range - temp_showIndex,
                            rendering->target_function(Show_int));
+        }
+        else if(MID == rendering->type)
+        {
+            OLED_P6x8Str(116,range - temp_showIndex,(uint8_t*)">");
         }
         rendering = rendering->next;
         temp_showIndex--;

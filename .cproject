@@ -505,6 +505,7 @@
 						</tool>
 					</fileInfo>
 					<fileInfo id="com.crt.advproject.config.exe.debug.597543778.1299500498" name="sc_lcd.h" rcbsApplicability="disable" resourcePath="source/smartcar/sc_lcd.h" toolsToInvoke=""/>
+					<fileInfo id="com.crt.advproject.config.exe.debug.597543778.1299434472" name="AC_SD_Storage.h" rcbsApplicability="disable" resourcePath="source/ac_lib/AC_SD_Storage.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="CMSIS"/>
 						<entry excluding="freertos_kernel/portable/MemMang/heap_useNewlib.c|freertos_kernel/portable/MemMang/heap_1.c|freertos_kernel/portable/MemMang/heap_2.c|freertos_kernel/portable/MemMang/heap_3.c|freertos_kernel/portable/MemMang/heap_4.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="amazon-freertos"/>
@@ -516,7 +517,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="littlefs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="sdmmc"/>
-						<entry excluding="nncu/Network/Dense_Complex|nncu/Network/Dense_Simple|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/aiann/aia_cmsisnn_ext.h|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.h|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
+						<entry excluding="nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Simple|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/aiann/aia_cmsisnn_ext.h|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.h|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tensorflow-lite"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="usb"/>
@@ -903,7 +904,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="littlefs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="sdmmc"/>
-						<entry excluding="nncu/Network/Dense_Complex|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/Network/Dense_Complex/model_smartcar_ad_weit.c|nncu/Network/Dense_Simple|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
+						<entry excluding="nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/Network/Dense_Complex/model_smartcar_ad_weit.c|nncu/Network/Dense_Simple|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tensorflow-lite"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="usb"/>
