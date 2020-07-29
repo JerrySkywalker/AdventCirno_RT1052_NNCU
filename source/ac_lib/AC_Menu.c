@@ -10,6 +10,7 @@
 #include "smartcar/sc_ac_key_5D.h"
 #include "smartcar/sc_flash.h"
 #include "smartcar/sc_oled.h"
+#include "ac_lib/AC_SD_Storage.h"
 
 TaskHandle_t AC_Menu_task_handle;
 
@@ -356,8 +357,16 @@ void Menu_TaskRun(MenuNode_t *targetMenu) {
     OLED_P6x8Str(0,0,"Run Task...");
 
     /**Your Task Log here*/
+    int err = targetMenu->target_function();
 
-    OLED_P6x8Rst(0,6,"Success!...");
+    if(kStatus_Success == err)
+    {
+        OLED_P6x8Rst(0,6,"Success!...");
+    }
+    else
+    {
+        OLED_P6x8Rst(0,6,"Err!...");
+    }
     OLED_P6x8Str(0,7,"Exiting...");
 
     delay_ms(500);
@@ -379,8 +388,16 @@ void Menu_ServiceRun(MenuNode_t *targetMenu)
     OLED_P6x8Str(0,0,"Run Service...");
 
     /**Your Task Log here*/
+    int err = targetMenu->target_function();
 
-    OLED_P6x8Rst(0,6,"Success!...");
+    if(kStatus_Success == err)
+    {
+        OLED_P6x8Rst(0,6,"Success!...");
+    }
+    else
+    {
+        OLED_P6x8Rst(0,6,"Err!...");
+    }
     OLED_P6x8Str(0,7,"Exiting...");
 
     delay_ms(500);
@@ -813,15 +830,28 @@ int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify))
 /**TODO: Task Declaration*/
 int Task_SD_SaveMenu(int (*action)(int *data,int modify))
 {
-    return 0;
+    OLED_P6x8Str(0,1,(uint8_t*)"SD:Save Menu");
+    PRINTF("[O K] AC: Menu: Start SD:Save Menu\r\n");
+
+
+    int err = AC_SD_MenuSave();
+
+    return err;
 }
 int Task_SD_LoadMenu(int (*action)(int *data,int modify))
 {
-    return 0;
+    OLED_P6x8Str(0,1,(uint8_t*)"SD:Load Menu");
+    PRINTF("[O K] AC: Menu: Start SD:Load Menu\r\n");
+
+    int err = AC_SD_MenuLoad();
+
+    return err;
+
 }
 
 /**TODO: Service Declaration*/
 int Service_SD_SyncMenu(int (*action)(int *data,int modify))
 {
+    OLED_P6x8Str(0,1,(uint8_t*)"SD:Sync Menu");
     return 0;
 }
