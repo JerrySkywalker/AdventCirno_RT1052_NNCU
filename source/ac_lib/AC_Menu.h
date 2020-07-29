@@ -139,6 +139,8 @@ void Menu_CursorShow(int index);
 void Menu_CursorMove(CursorMove move);
 void Menu_CursorEnter(CursorMove move);
 
+void Menu_TaskRun(MenuNode_t *targetMenu);
+void Menu_ServiceRun(MenuNode_t *targetMenu);
 
 /*TODO: Action List*/
 

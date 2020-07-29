@@ -176,7 +176,7 @@ void Menu_MenuShow(MenuNode_t *menu, int page) {
         }
         else if(SERVICE == rendering->type)
         {
-            OLED_P6x8Str(PRINT_START_DATA,range - temp_showIndex,(uint8_t*)"Service");
+            OLED_P6x8Str(PRINT_START_DATA,range - temp_showIndex,(uint8_t*)"+");
         }
         else if(TASK == rendering->type)
         {
@@ -258,9 +258,19 @@ void Menu_CursorEnter(CursorMove move) {
         targetMenu = targetMenu->next;
     }
 
-    if (move == CursorMove_Right && targetMenu->type == DATA_INT) {
+    if (move == CursorMove_Right && targetMenu->type == DATA_INT)
+    {
         Menu_DataEdit(targetMenu);
-    } else if (move == CursorMove_Right && targetMenu->type == MID) {
+    }
+    else if  (move == CursorMove_Right && targetMenu->type == TASK)
+    {
+        Menu_TaskRun(targetMenu);
+    }
+    else if  (move == CursorMove_Right && targetMenu->type == SERVICE)
+    {
+        Menu_ServiceRun(targetMenu);
+    }
+    else if (move == CursorMove_Right && targetMenu->type == MID) {
         cursor_rendering = targetMenu->firstson;
         OLED_Fill(0);
         cursor_page = 1;
@@ -331,6 +341,54 @@ void Menu_DataEdit(MenuNode_t *targetMenu) {
 
     Menu_MenuShow(cursor_rendering, cursor_page);
 }
+
+
+/**
+ *  @brief      Run Task
+ *  @param      targetMenu   the node you want to edit.
+ *  @example	 Menu_TaskRun(targetMenu);
+ *  @Tips       you can change the multiplicator's range in this function
+ *  @since      v1.0
+ */
+void Menu_TaskRun(MenuNode_t *targetMenu) {
+
+    OLED_Fill(0x00);
+    OLED_P6x8Str(0,0,"Run Task...");
+
+    /**Your Task Log here*/
+
+    OLED_P6x8Rst(0,6,"Success!...");
+    OLED_P6x8Str(0,7,"Exiting...");
+
+    delay_ms(500);
+    OLED_Fill(0x00);
+
+    Menu_MenuShow(cursor_rendering, cursor_page);
+}
+
+/**
+ *  @brief      Service Task
+ *  @param      targetMenu   the node you want to edit.
+ *  @example	 Menu_TaskRun(targetMenu);
+ *  @Tips       you can change the multiplicator's range in this function
+ *  @since      v1.0
+ */
+void Menu_ServiceRun(MenuNode_t *targetMenu)
+{
+    OLED_Fill(0x00);
+    OLED_P6x8Str(0,0,"Run Service...");
+
+    /**Your Task Log here*/
+
+    OLED_P6x8Rst(0,6,"Success!...");
+    OLED_P6x8Str(0,7,"Exiting...");
+
+    delay_ms(500);
+    OLED_Fill(0x00);
+
+    Menu_MenuShow(cursor_rendering, cursor_page);
+}
+
 
 /*TODO: init your menu here!*/
 /**
