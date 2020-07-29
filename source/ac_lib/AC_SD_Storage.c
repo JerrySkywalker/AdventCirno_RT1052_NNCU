@@ -23,6 +23,7 @@
 #include "fsl_clock.h"
 #include "ff.h"
 
+#include "smartcar/sc_oled.h"
 #include "smartcar/status.h"
 #include "smartcar/sc_ac_delay.h"
 #include "smartcar/sc_gpio.h"
@@ -38,6 +39,8 @@ extern Data_t data[10];
  ******************************************************************************/
 /* buffer size (in byte) for read/write operations */
 #define BUFFER_SIZE_MENU sizeof(data)+2U
+
+#define OLED_128x64
 
 static FIL g_fileObject_Menu;   /* File object */
 
@@ -72,29 +75,48 @@ status_t AC_SD_MenuSave()
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: Directory exists.\r\n");
+#ifdef OLED_128x64
+            OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
+#endif
         }
         else
         {
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
+#ifdef OLED_128x64
+            OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+#endif
             return kStatus_Fail;
         }
     }
     PRINTF("[O K] AC: SD: Successfully make dir /data.\r\n");
+#ifdef OLED_128x64
+    OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+#endif
 
-    error = f_open(&g_fileObject_Menu, _T("/data/menu.txt"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
+    error = f_open(&g_fileObject_Menu, _T("/data/menu.dat"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
     if (error)
     {
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: File exists.\r\n");
+#ifdef OLED_128x64
+            OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
+#endif
         }
         else
         {
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
+#ifdef OLED_128x64
+            OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+#endif
             return kStatus_Fail;
         }
     }
     PRINTF("[O K] AC: SD: Successfully open menu.txt \r\n");
+#ifdef OLED_128x64
+    OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+#endif
+
 
     memcpy(g_bufferWrite_Menu,data,sizeof(data));
     g_bufferWrite_Menu[BUFFER_SIZE_MENU - 2U] = '\r';
@@ -108,6 +130,9 @@ status_t AC_SD_MenuSave()
     {
         PRINTF("[Err] AC: SD: Write file failed. \r\n");
         failedFlag = true;
+#ifdef OLED_128x64
+        OLED_P6x8Str(0,4,(uint8_t*)"Err - Write File");
+#endif
         return kStatus_Fail;
     }
 
@@ -115,6 +140,9 @@ status_t AC_SD_MenuSave()
     if (f_lseek(&g_fileObject_Menu, 0U))
     {
         PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
+#ifdef OLED_128x64
+        OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
+#endif
         failedFlag = true;
         return kStatus_Fail;
     }
@@ -125,6 +153,9 @@ status_t AC_SD_MenuSave()
     if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
     {
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
+#ifdef OLED_128x64
+        OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+#endif
         failedFlag = true;
         return kStatus_Fail;
     }
@@ -133,14 +164,21 @@ status_t AC_SD_MenuSave()
     if (memcmp(g_bufferWrite_Menu, g_bufferRead_Menu, sizeof(g_bufferWrite_Menu)))
     {
         PRINTF("[Err] AC: SD: Compare read/write content isn't consistent.\r\n");
+
         failedFlag = true;
         return kStatus_Fail;
     }
     PRINTF("[O K] AC: SD: The read/write content is consistent.\r\n");
+#ifdef OLED_128x64
+    OLED_P6x8Str(0,4,(uint8_t*)"O K - Write file");
+#endif
 
     if (f_close(&g_fileObject_Menu))
     {
         PRINTF("[Err] AC: SD: Close file failed.\r\n");
+#ifdef OLED_128x64
+        OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+#endif
         return kStatus_Fail;
     }
 
