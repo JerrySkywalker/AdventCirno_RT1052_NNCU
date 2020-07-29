@@ -298,37 +298,195 @@ status_t AC_SD_MenuSave()
 
 status_t AC_SD_MenuLoad()
 {
-    int error;
+    FRESULT error;
+    DIR directory; /* Directory object */
+    FILINFO fileInformation;
+    UINT bytesWritten;
+    UINT bytesRead;
+    const TCHAR driverNumberBuffer[3U] = {SDDISK + '0', ':', '/'};
+    volatile bool failedFlag           = false;
+    char ch                            = '0';
+    BYTE work[FF_MAX_SS];
 
-    error = f_mkdir(_T("/data"));
+
+    /** For file name change **/
+    multiplicator = 1;          /*due to the limitation of 5D-key, file Name can only be numbers.Therefore we can change numbers for file names*/
+    g_Flag_FileNameDefault = 0;
+    g_Name_MenuFileName = 0;
+
+    char *MenuDir = "/menu/";
+    char *MenuNameDefault = "default";
+    char *FullPath = (char *) pvPortMalloc(20);
+
+    /** Start **/
+
+    PRINTF("[O K] AC: Menu: Start SD:Load Menu\r\n");
+    OLED_P6x8Str(0,0,"Run Task...");
+    OLED_P6x8Str(0,1,(uint8_t*)"SD:Load Menu");
+
+    PRINTF("[O K] AC: Menu: Set names\r\n");
+    OLED_P6x8Str(0,2,(uint8_t*)"Load default?");
+    while(true)
+    {
+        if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
+        {
+            delay_ms(10);
+            if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
+            {
+                g_Flag_FileNameDefault = 0;
+                break;
+            }
+        }
+        if(KEY_P_DOWN == Key_Check(KEY_LEFT))
+        {
+            delay_ms(10);
+            if(KEY_P_DOWN == Key_Check(KEY_LEFT))
+            {
+                g_Flag_FileNameDefault = 1;
+                break;
+            }
+        }
+    }
+
+    Str_Clr(0,2,21);
+
+    if(1 == g_Flag_FileNameDefault) {
+        OLED_P6x8Str(0, 2, (uint8_t *) "Src Name?");
+
+        int temp_Flag_DirReadLoop = 1;
+
+        PRINTF("\r\n[O K] AC: SD: List the file in that directory......\r\n");
+        if (f_opendir(&directory, "/menu")) {
+            PRINTF("[Err] AC: SD: Open directory failed.\r\n");
+            OLED_Print_Num(0, 2, "Err - Open Dir");
+            return kStatus_Fail;
+        }
+
+
+        while (temp_Flag_DirReadLoop) {
+            error = f_readdir(&directory, &fileInformation);
+
+            /* To the end. */
+            if ((error != FR_OK) || (fileInformation.fname[0U] == 0U)) {
+                OLED_P6x8Str(0, 3, "Err - Cancelled");
+                return kStatus_Fail;      // 读取失败或者读取完所有条目,取消任务
+            }
+            if (fileInformation.fname[0] == '.')    // 隐藏文件
+            {
+                continue;
+            }
+            if (fileInformation.fattrib & AM_DIR)   // 是文件夹
+            {
+                continue;
+            } else {
+                Str_Clr(80, 2, 7);
+                OLED_P6x8Str(80, 2, fileInformation.fname);
+
+                int temp_Flag_DirFilterWaiting = 1;
+
+                while (temp_Flag_DirFilterWaiting) {
+                    if (Key_Check(KEY_ENTER) == KEY_P_DOWN) {
+                        delay_ms(10);
+                        if (Key_Check(KEY_ENTER) == KEY_P_DOWN) {
+                            sprintf(FullPath, "%s%s", MenuDir, fileInformation.fname);
+                            temp_Flag_DirReadLoop = 0;
+                            break;
+                        }
+                    } else if (Key_Check(KEY_DOWN) == KEY_P_DOWN) {
+                        delay_ms(10);
+                        if (Key_Check(KEY_DOWN) == KEY_P_DOWN) {
+                            temp_Flag_DirFilterWaiting = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Str_Clr(0,2,23);
+
+    error = f_mkdir(_T("/menu"));
     if (error)
     {
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: Directory exists.\r\n");
+            OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
         }
         else
         {
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
+            OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
             return kStatus_Fail;
         }
     }
+    else
+    {
+        PRINTF("[O K] AC: SD: Successfully make dir /data.\r\n");
+        OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+    }
 
-    error = f_open(&g_fileObject_Menu, _T("/data/menu.txt"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
+
+    if(0==g_Flag_FileNameDefault)
+    {
+        error = f_open(&g_fileObject_Menu, _T("/MENU/DEFAULT"), (FA_READ));
+    }
+    else
+    {
+        error = f_open(&g_fileObject_Menu, _T(FullPath), ( FA_READ));
+    }
+
     if (error)
     {
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: File exists.\r\n");
+            OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
         }
         else
         {
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
+            OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
             return kStatus_Fail;
         }
     }
+    else
+    {
+        PRINTF("[O K] AC: SD: Successfully open file \r\n");
+        OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+    }
 
+//        /* Move the file pointer */
+//    if (f_lseek(&g_fileObject_Menu, 0U))
+//    {
+//        PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
+//        OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
+//        failedFlag = true;
+//        return kStatus_Fail;
+//    }
 
+    PRINTF("[O K] AC: SD: Read from above created file.\r\n");
+    memset(g_bufferRead_Menu, 0U, sizeof(g_bufferRead_Menu));
+
+    //g_fileObject_Menu.obj.objsize = sizeof(g_bufferRead_Menu);
+
+    error = f_read(&g_fileObject_Menu, g_bufferRead_Menu, sizeof(g_bufferRead_Menu), &bytesRead);
+    if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
+    {
+        PRINTF("[Err] AC: SD: Read file failed. \r\n");
+        OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+        failedFlag = true;
+        return kStatus_Fail;
+    }
+
+    memcpy(data,g_bufferRead_Menu,sizeof(data));
+    OLED_P6x8Str(0,4,(uint8_t*)"O K - Read file");
+
+    if (f_close(&g_fileObject_Menu))
+    {
+        PRINTF("[Err] AC: SD: Close file failed.\r\n");
+        OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+        return kStatus_Fail;
+    }
 
     return kStatus_Success;
 }
