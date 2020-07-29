@@ -8,6 +8,7 @@
 #include "AC_SD_Storage.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "MIMXRT1052.h"
@@ -28,6 +29,7 @@
 #include "smartcar/sc_ac_delay.h"
 #include "smartcar/sc_gpio.h"
 #include "smartcar/sc_sd.h"
+#include "smartcar/sc_ac_key_5D.h"
 
 #include "ac_lib/AC_Menu.h"
 
@@ -40,7 +42,22 @@ extern Data_t data[10];
 /* buffer size (in byte) for read/write operations */
 #define BUFFER_SIZE_MENU sizeof(data)+2U
 
-#define OLED_128x64
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+/*A multiplicator for data modification */
+extern int multiplicator;
+
+/*A operator marker for data modification, 1 is plus ,-1 is minus*/
+extern int pm;
+
+static const int PRINT_START_DATA = 90, PRINT_START_MULTIPLICATOR = 84, PRINT_LENGTH_DATA = 5;
+
+/* some location mark related to CURSOR rendering on 128x64 OLED*/
+static const int CURSOR_SUP = 1, CURSOR_INF = 7;
+
+static int g_Flag_FileNameDefault;
+static int g_Name_MenuFileName;
 
 static FIL g_fileObject_Menu;   /* File object */
 
@@ -69,53 +86,155 @@ status_t AC_SD_MenuSave()
     char ch                            = '0';
     BYTE work[FF_MAX_SS];
 
-    error = f_mkdir(_T("/data"));
+
+    /** For file name change **/
+    multiplicator = 1;          /*due to the limitation of 5D-key, file Name can only be numbers.Therefore we can change numbers for file names*/
+    g_Flag_FileNameDefault = 0;
+    g_Name_MenuFileName = 0;
+
+    char *MenuDir = "/menu/";
+    char *MenuNameDefault = "default";
+    char *FullPath = (char *) pvPortMalloc(20);
+
+    /** Start **/
+
+    PRINTF("[O K] AC: Menu: Start SD:Save Menu\r\n");
+    OLED_P6x8Str(0,0,"Run Task...");
+    OLED_P6x8Str(0,1,(uint8_t*)"SD:Save Menu");
+
+    PRINTF("[O K] AC: Menu: Set names\r\n");
+    OLED_P6x8Str(0,2,(uint8_t*)"Use default name?");
+    while(true)
+    {
+        if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
+        {
+            delay_ms(10);
+            if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
+            {
+                g_Flag_FileNameDefault = 0;
+                break;
+            }
+        }
+        if(KEY_P_DOWN == Key_Check(KEY_LEFT))
+        {
+            delay_ms(10);
+            if(KEY_P_DOWN == Key_Check(KEY_LEFT))
+            {
+                g_Flag_FileNameDefault = 1;
+                break;
+            }
+        }
+    }
+
+    Str_Clr(0,2,21);
+
+    if(1 == g_Flag_FileNameDefault)
+    {
+        OLED_P6x8Str(0,2,(uint8_t*)"Dst Name?");
+
+        Str_Clr(PRINT_START_MULTIPLICATOR, 0, PRINT_LENGTH_DATA + 1);
+        OLED_P6x8Str(PRINT_START_MULTIPLICATOR, 0, "X");
+        OLED_Print_Num(PRINT_START_DATA, 0, multiplicator);
+
+        OLED_Print_Num(PRINT_START_DATA,2,g_Name_MenuFileName);
+
+        while (Key_Check(KEY_ENTER) != KEY_P_DOWN) {
+            delay_ms(10);
+            if (Key_Check(KEY_ENTER) != KEY_P_DOWN) {
+                if (KEY_P_DOWN == Key_Check(KEY_DOWN)) {
+                    Str_Clr(PRINT_START_DATA, 2, 6);
+                    pm = -1;
+                    g_Name_MenuFileName += pm * multiplicator;
+
+                    if(g_Name_MenuFileName<0)
+                        g_Name_MenuFileName = 0;
+
+                    OLED_Print_Num(PRINT_START_DATA, 2, g_Name_MenuFileName);
+                }
+                if (KEY_P_DOWN == Key_Check(KEY_UP)) {
+                    Str_Clr(PRINT_START_DATA, 2, 6);
+                    pm = 1;
+                    g_Name_MenuFileName += pm * multiplicator;
+
+                    if(g_Name_MenuFileName>30000)
+                        g_Name_MenuFileName = 30000;
+
+                    OLED_Print_Num(PRINT_START_DATA, 2, g_Name_MenuFileName);
+                }
+                if (KEY_P_DOWN == Key_Check(KEY_RIGHT)) {
+                    multiplicator *= 10;
+                    if (multiplicator > 10000) {
+                        multiplicator = 10000;
+                    }
+                    Str_Clr(PRINT_START_DATA, 0, PRINT_LENGTH_DATA + 1);
+                    OLED_Print_Num(PRINT_START_DATA, 0, multiplicator);
+                }
+                if (KEY_P_DOWN == Key_Check(KEY_LEFT)) {
+                    multiplicator /= 10;
+                    if (multiplicator < 1) {
+                        multiplicator = 1;
+                    }
+                    Str_Clr(PRINT_START_DATA, 0, PRINT_LENGTH_DATA + 1);
+                    OLED_Print_Num(PRINT_START_DATA, 0, multiplicator);
+                }
+            }
+        }
+    }
+
+    Str_Clr(0,2,23);
+
+    error = f_mkdir(_T("/menu"));
     if (error)
     {
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: Directory exists.\r\n");
-#ifdef OLED_128x64
             OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
-#endif
         }
         else
         {
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
-#ifdef OLED_128x64
             OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
-#endif
             return kStatus_Fail;
         }
     }
-    PRINTF("[O K] AC: SD: Successfully make dir /data.\r\n");
-#ifdef OLED_128x64
-    OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
-#endif
+    else
+    {
+        PRINTF("[O K] AC: SD: Successfully make dir /data.\r\n");
+        OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+    }
 
-    error = f_open(&g_fileObject_Menu, _T("/data/menu.dat"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
+
+   if(0==g_Flag_FileNameDefault)
+   {
+       error = f_open(&g_fileObject_Menu, _T("/menu/default"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
+   }
+    else
+   {
+       sprintf(FullPath,"%s%d",MenuDir,g_Name_MenuFileName);
+       error = f_open(&g_fileObject_Menu, _T(FullPath), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
+   }
+
     if (error)
     {
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: File exists.\r\n");
-#ifdef OLED_128x64
             OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
-#endif
         }
         else
         {
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
-#ifdef OLED_128x64
             OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
-#endif
             return kStatus_Fail;
         }
     }
-    PRINTF("[O K] AC: SD: Successfully open menu.txt \r\n");
-#ifdef OLED_128x64
-    OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
-#endif
+    else
+    {
+        PRINTF("[O K] AC: SD: Successfully open file \r\n");
+        OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+    }
+
 
 
     memcpy(g_bufferWrite_Menu,data,sizeof(data));
@@ -130,9 +249,7 @@ status_t AC_SD_MenuSave()
     {
         PRINTF("[Err] AC: SD: Write file failed. \r\n");
         failedFlag = true;
-#ifdef OLED_128x64
         OLED_P6x8Str(0,4,(uint8_t*)"Err - Write File");
-#endif
         return kStatus_Fail;
     }
 
@@ -140,9 +257,7 @@ status_t AC_SD_MenuSave()
     if (f_lseek(&g_fileObject_Menu, 0U))
     {
         PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
-#ifdef OLED_128x64
         OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
-#endif
         failedFlag = true;
         return kStatus_Fail;
     }
@@ -153,9 +268,7 @@ status_t AC_SD_MenuSave()
     if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
     {
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
-#ifdef OLED_128x64
         OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
-#endif
         failedFlag = true;
         return kStatus_Fail;
     }
@@ -169,16 +282,12 @@ status_t AC_SD_MenuSave()
         return kStatus_Fail;
     }
     PRINTF("[O K] AC: SD: The read/write content is consistent.\r\n");
-#ifdef OLED_128x64
     OLED_P6x8Str(0,4,(uint8_t*)"O K - Write file");
-#endif
 
     if (f_close(&g_fileObject_Menu))
     {
         PRINTF("[Err] AC: SD: Close file failed.\r\n");
-#ifdef OLED_128x64
         OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
-#endif
         return kStatus_Fail;
     }
 
