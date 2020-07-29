@@ -84,11 +84,26 @@ typedef enum
     CursorMove_Right,
 }CursorMove;
 
+/**
+ * @brief Defines the type of Menu node callback properties
+ * @note    There are sereval different types:
+ *
+ *          MID:            MID node for Menu ,no callbacks
+ *
+ *          DATA_XXX:       DATA storaged in Menu, XXX is data type . Now only INT ins supported
+
+ *          TASK            (FREERTOS)TASK run only once
+ *
+ *          SERVICE         (FREERTOS)TASK run in background
+ *
+ *
+ * */
 typedef enum
 {
     MID,
-    FUNC,
-    GO,
+    DATA_INT,
+    TASK,
+    SERVICE,
 }MenuType;
 
 typedef struct Menu
@@ -159,5 +174,13 @@ int Set_Weight_x(int (*action)(int *data,int modify));
 int Set_Weight_y(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));
+
+/**TODO: Task Declaration*/
+int Task_SD_SaveMenu(int (*action)(int *data,int modify));
+int Task_SD_LoadMenu(int (*action)(int *data,int modify));
+
+/**TODO: Service Declaration*/
+int Service_SD_SyncMenu(int (*action)(int *data,int modify));
+
 
 #endif

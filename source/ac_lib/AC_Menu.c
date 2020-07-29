@@ -44,6 +44,13 @@ MenuNode_t *Menu_Weight_y;
 /**NNCU Data*/
 MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
 
+/** Menu: Task and Services*/
+MenuNode_t *Menu_Task;
+MenuNode_t *Menu_Task_SD_SaveMeu,*Menu_Task_SD_LoadMenu;
+
+MenuNode_t *Menu_Service;
+MenuNode_t *Menu_Service_SD_SyncMenu;
+
 /**
  * @brief OLED display variables
  */
@@ -88,7 +95,7 @@ void Menu_BarShow(MenuNode_t *cursor_rendering) {
  * @brief Create Menu Node ,and fill in data.....IN ONE LINE,ANYWHERE IN THE CODE!
  * @param menu the address of menu pointer
  * @param name the name of menu ,will be shown on the oled
- * @param type the type of menu node, MID is the jumping node, FUNC is the function node
+ * @param type the type of menu node, MID is the jumping node, DATA_INT is the function node
  * @param target_function the target function for function node ,NULL for MID
  * @param father the father of this node
  * @example Menu_MenuNodeCreate(&Menu_Led_CoreBoard, "Led_Board", MID, NULL, root);
@@ -157,7 +164,7 @@ void Menu_MenuShow(MenuNode_t *menu, int page) {
     int range = temp_showIndex + 1;
     while (temp_showIndex > 0) {
         OLED_P6x8Str(12, range - temp_showIndex, rendering->menuName);
-        if (FUNC == rendering->type) {
+        if (DATA_INT == rendering->type) {
             Str_Clr(PRINT_START_DATA, range - temp_showIndex,
                     PRINT_LENGTH_DATA);
             OLED_Print_Num(PRINT_START_DATA, range - temp_showIndex,
@@ -166,6 +173,14 @@ void Menu_MenuShow(MenuNode_t *menu, int page) {
         else if(MID == rendering->type)
         {
             OLED_P6x8Str(116,range - temp_showIndex,(uint8_t*)">");
+        }
+        else if(SERVICE == rendering->type)
+        {
+            OLED_P6x8Str(PRINT_START_DATA,range - temp_showIndex,(uint8_t*)"Service");
+        }
+        else if(TASK == rendering->type)
+        {
+            OLED_P6x8Str(116,range - temp_showIndex,(uint8_t*)"#");
         }
         rendering = rendering->next;
         temp_showIndex--;
@@ -243,7 +258,7 @@ void Menu_CursorEnter(CursorMove move) {
         targetMenu = targetMenu->next;
     }
 
-    if (move == CursorMove_Right && targetMenu->type == FUNC) {
+    if (move == CursorMove_Right && targetMenu->type == DATA_INT) {
         Menu_DataEdit(targetMenu);
     } else if (move == CursorMove_Right && targetMenu->type == MID) {
         cursor_rendering = targetMenu->firstson;
@@ -317,6 +332,7 @@ void Menu_DataEdit(MenuNode_t *targetMenu) {
     Menu_MenuShow(cursor_rendering, cursor_page);
 }
 
+/*TODO: init your menu here!*/
 /**
  * @brief Menu initialization sequence. Menu can be managed in the order bellow
  * @since v2.0
@@ -326,65 +342,74 @@ void Menu_DataEdit(MenuNode_t *targetMenu) {
  *
  *          2. Create menu node and fill in data here(in one line,yeh!!!)
  *
- *          3. If it is a FUNC, DIY your func in the end of this code
+ *          3. If it is a DATA_INT, DIY your func in the end of this code
  *
  * @tips: you don't need to care about the order of init lines,only make sure
  *          the menu of same level is under you wish
  * */
 void Menu_Init() {
 
-    /* TODO: init your menu here! */
-
-    Menu_MenuNodeCreate(&Menu_SetClass, "SetClass", FUNC, Set_Class, root);
-    Menu_MenuNodeCreate(&Menu_SetMode, "SetMode", FUNC, Set_Mode, root);
+    Menu_MenuNodeCreate(&Menu_SetClass, "SetClass", DATA_INT, Set_Class, root);
+    Menu_MenuNodeCreate(&Menu_SetMode, "SetMode", DATA_INT, Set_Mode, root);
 
     /**@brief Settings for board LED only*/
 //    Menu_MenuNodeCreate(&Menu_Led_CoreBoard, "Led_Board", MID, NULL, root);
 //    {
-//        Menu_MenuNodeCreate(&Menu_CB_LED1, "SetLed1", FUNC, Led_CB_1, Menu_Led_CoreBoard);
-//        Menu_MenuNodeCreate(&Menu_CB_LED2, "SetLed2", FUNC, Led_CB_2, Menu_Led_CoreBoard);
-//        Menu_MenuNodeCreate(&Menu_CB_LED3, "SetLed3", FUNC, Led_CB_3, Menu_Led_CoreBoard);
-//        Menu_MenuNodeCreate(&Menu_CB_LED4, "SetLed4", FUNC, Led_CB_4, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED1, "SetLed1", DATA_INT, Led_CB_1, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED2, "SetLed2", DATA_INT, Led_CB_2, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED3, "SetLed3", DATA_INT, Led_CB_3, Menu_Led_CoreBoard);
+//        Menu_MenuNodeCreate(&Menu_CB_LED4, "SetLed4", DATA_INT, Led_CB_4, Menu_Led_CoreBoard);
 //    }
 
     /**@brief Settings for Differential */
     Menu_MenuNodeCreate(&Menu_Speed, "Speed", MID, NULL, root);
     {
-        Menu_MenuNodeCreate(&Menu_SetSpeedKp_L, "SetSpeedKp_L", FUNC, Set_SpeedKp_L, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKi_L, "SetSpeedKi_L", FUNC, Set_SpeedKi_L, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKd_L, "SetSpeedKd_L", FUNC, Set_SpeedKd_L, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKp_R, "SetSpeedKp_R", FUNC, Set_SpeedKp_R, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKi_R, "SetSpeedKi_R", FUNC, Set_SpeedKi_R, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKd_R, "SetSpeedKd_R", FUNC, Set_SpeedKd_R, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKL, "SetSpeedKL", FUNC, Set_SpeedKL, Menu_Speed);
-        Menu_MenuNodeCreate(&Menu_SetSpeedKR, "SetSpeedKR", FUNC, Set_SpeedKR, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKp_L, "SetSpeedKp_L", DATA_INT, Set_SpeedKp_L, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKi_L, "SetSpeedKi_L", DATA_INT, Set_SpeedKi_L, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKd_L, "SetSpeedKd_L", DATA_INT, Set_SpeedKd_L, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKp_R, "SetSpeedKp_R", DATA_INT, Set_SpeedKp_R, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKi_R, "SetSpeedKi_R", DATA_INT, Set_SpeedKi_R, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKd_R, "SetSpeedKd_R", DATA_INT, Set_SpeedKd_R, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKL, "SetSpeedKL", DATA_INT, Set_SpeedKL, Menu_Speed);
+        Menu_MenuNodeCreate(&Menu_SetSpeedKR, "SetSpeedKR", DATA_INT, Set_SpeedKR, Menu_Speed);
     }
 
     /**@brief Settings for Direction PID */
     Menu_MenuNodeCreate(&Menu_Direction, "Direction", MID, NULL, root);
     {
-        Menu_MenuNodeCreate(&Menu_SetDirKp, "SetDirKp", FUNC, Set_DirKp, Menu_Direction);
-        Menu_MenuNodeCreate(&Menu_SetDirKi, "SetDirKi", FUNC, Set_DirKi, Menu_Direction);
-        Menu_MenuNodeCreate(&Menu_SetDirKd, "SetDirKd", FUNC, Set_DirKd, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKp, "SetDirKp", DATA_INT, Set_DirKp, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKi, "SetDirKi", DATA_INT, Set_DirKi, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKd, "SetDirKd", DATA_INT, Set_DirKd, Menu_Direction);
     }
 
     /**@brief Settings for NNCU */
     Menu_MenuNodeCreate(&Menu_NNCU,"NNCU",MID, NULL, root);
     {
-        Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor, "NormFactor", FUNC, Set_NNCU_NormalizeFactor, Menu_NNCU);
+        Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor, "NormFactor", DATA_INT, Set_NNCU_NormalizeFactor, Menu_NNCU);
     }
 
     /** Level 1:Quick Set*/
-    Menu_MenuNodeCreate(&Menu_SetBuzz, "SetBuzz", FUNC, Set_Buzz, root);
-    Menu_MenuNodeCreate(&Menu_SetSpeed, "SetSpeed", FUNC, Set_Speed, root);
+    Menu_MenuNodeCreate(&Menu_SetBuzz, "SetBuzz", DATA_INT, Set_Buzz, root);
+    Menu_MenuNodeCreate(&Menu_SetSpeed, "SetSpeed", DATA_INT, Set_Speed, root);
 
     /** Level 1: else*/
-    Menu_MenuNodeCreate(&Menu_SetForwardView, "SetFW", FUNC, Set_ForwardView, root);
-    Menu_MenuNodeCreate(&Menu_SetAutoThreshold, "SetAutoTH", FUNC, Set_AutoThreshold, root);
-    Menu_MenuNodeCreate(&Menu_SetRunningTime, "SetRunTime", FUNC, Set_RunningTime, root);
-    // Menu_MenuNodeCreate(&Menu_SetSetupTime, "SetSetupTime", FUNC, Set_SetupTime, root);
-    Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", FUNC, Set_Weight_x, root);
-    Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", FUNC, Set_Weight_y, root);
+    Menu_MenuNodeCreate(&Menu_SetForwardView, "SetFW", DATA_INT, Set_ForwardView, root);
+    Menu_MenuNodeCreate(&Menu_SetAutoThreshold, "SetAutoTH", DATA_INT, Set_AutoThreshold, root);
+    Menu_MenuNodeCreate(&Menu_SetRunningTime, "SetRunTime", DATA_INT, Set_RunningTime, root);
+    // Menu_MenuNodeCreate(&Menu_SetSetupTime, "SetSetupTime", DATA_INT, Set_SetupTime, root);
+    Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", DATA_INT, Set_Weight_x, root);
+    Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", DATA_INT, Set_Weight_y, root);
+
+    Menu_MenuNodeCreate(&Menu_Task, "Task", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_Task_SD_SaveMeu, "SaveMenu", TASK, Task_SD_SaveMenu, Menu_Task);
+        Menu_MenuNodeCreate(&Menu_Task_SD_LoadMenu, "LoadMenu", TASK, Task_SD_LoadMenu, Menu_Task);
+    }
+
+    Menu_MenuNodeCreate(&Menu_Service, "Service", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_Service_SD_SyncMenu, "SyncMenu", SERVICE, Service_SD_SyncMenu, Menu_Service);
+    }
 }
 
 /**
@@ -465,8 +490,8 @@ int Modify_int(int *data, int modify) {
 }
 
 /*
-* Tips: To create a FUNC ,you only need to do 4 steps
-* 1. declear your FUNC
+* Tips: To create a DATA_INT ,you only need to do 4 steps
+* 1. declear your DATA_INT
 * 2. do the range check(which is VERY SERIOUS),and save value
 * 3. if this node manage an I/O, apply the I/O change (Led,Buzz,etc)
 * 4. return you ans,so the menu can show the change
@@ -725,4 +750,20 @@ int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify))
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].NNCU_NormalizeFactor = ans;
     return ans;
+}
+
+/**TODO: Task Declaration*/
+int Task_SD_SaveMenu(int (*action)(int *data,int modify))
+{
+    return 0;
+}
+int Task_SD_LoadMenu(int (*action)(int *data,int modify))
+{
+    return 0;
+}
+
+/**TODO: Service Declaration*/
+int Service_SD_SyncMenu(int (*action)(int *data,int modify))
+{
+    return 0;
 }
