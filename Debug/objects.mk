@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -larm_cortexM7lfdp_math -larm_cortexM7lfsp_math -ltensorflow-lite
+LIBS := -larm_cortexM7lfdp_math -lCppAdd -larm_cortexM7lfsp_math -ltensorflow-lite
 

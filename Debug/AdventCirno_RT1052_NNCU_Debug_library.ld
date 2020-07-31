@@ -6,12 +6,12 @@
  * Generated linker script file for MIMXRT1052xxxxB
  * Created from library.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.23
- * MCUXpresso IDE v11.1.1 [Build 3241] [2020-03-02] on 2020-7-29 23:05:43
+ * MCUXpresso IDE v11.1.1 [Build 3241] [2020-03-02] on 2020-7-31 18:41:02
  */
 
 GROUP (
   "libgcc.a"
   "libc_nano.a"
   "libm.a"
-  "libcr_newlib_none.a"
+  "libcr_newlib_nohost.a"
 )

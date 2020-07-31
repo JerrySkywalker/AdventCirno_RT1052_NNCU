@@ -62,6 +62,7 @@
 #include "ac_lib/AC_Pit.h"
 #include "ac_lib/Image.h"
 #include "nncu/nncu_Config.h"
+#include "arm_math.h"
 
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
 BSS_OC uint8_t heap_heap2[128 * 1024] ALIGN(8);
@@ -186,6 +187,10 @@ void AC_Task(void *pvData)
 		vTaskDelay(10);
 	}
     Flag_ScreenRefresh = -1;
+
+    int sum = cppadd(1, 2);
+    PRINTF("1+2 = %d\n", sum);
+
 
 	/** Logo **/
     {
