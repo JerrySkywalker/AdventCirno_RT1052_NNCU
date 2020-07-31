@@ -47,7 +47,7 @@ pin_labels:
 - {pin_num: B9, pin_signal: GPIO_B0_08, label: 后轮R}
 - {pin_num: C9, pin_signal: GPIO_B0_09, label: 后轮R}
 - {pin_num: E10, pin_signal: GPIO_B0_14, label: BT_CFG10/PD}
-- {pin_num: E11, pin_signal: GPIO_B0_15, label: OLED/RST, identifier: RST}
+- {pin_num: E11, pin_signal: GPIO_B0_15, label: KEY_5D, identifier: D5}
 - {pin_num: L7, pin_signal: PMIC_STBY_REQ, label: 74LV245_OE_B, identifier: PMIC_STBY}
 - {pin_num: J11, pin_signal: GPIO_AD_B1_00, label: 陀螺仪_SCL, identifier: SCL}
 - {pin_num: K11, pin_signal: GPIO_AD_B1_01, label: 陀螺仪_SDA, identifier: SDA}
@@ -114,7 +114,6 @@ WDOG_B:
 - options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
 - pin_list:
   - {pin_num: D14, peripheral: GPIO2, signal: 'gpio_io, 29', pin_signal: GPIO_B1_13, pull_keeper_select: Pull}
-  - {pin_num: E11, peripheral: GPIO2, signal: 'gpio_io, 15', pin_signal: GPIO_B0_15}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -127,9 +126,6 @@ WDOG_B:
 void WDOG_B(void) {
   CLOCK_EnableClock(kCLOCK_Iomuxc);           /* iomuxc clock (iomuxc_clk_enable): 0x03U */
 
-  IOMUXC_SetPinMux(
-      IOMUXC_GPIO_B0_15_GPIO2_IO15,           /* GPIO_B0_15 is configured as GPIO2_IO15 */
-      0U);                                    /* Software Input On Field: Input Path is determined by functionality */
   IOMUXC_SetPinMux(
       IOMUXC_GPIO_B1_13_GPIO2_IO29,           /* GPIO_B1_13 is configured as GPIO2_IO29 */
       0U);                                    /* Software Input On Field: Input Path is determined by functionality */
@@ -452,7 +448,7 @@ xSNVS:
 - pin_list:
   - {pin_num: L6, peripheral: GPIO5, signal: 'gpio_io, 00', pin_signal: WAKEUP, direction: INPUT, pull_up_down_config: Pull_Up_100K_Ohm, open_drain: Enable, drive_strength: R0}
   - {pin_num: K7, peripheral: SNVS, signal: snvs_pmic_on_req, pin_signal: PMIC_ON_REQ}
-  - {pin_num: L7, peripheral: GPIO5, signal: 'gpio_io, 02', pin_signal: PMIC_STBY_REQ}
+  - {pin_num: L7, peripheral: GPIO5, signal: 'gpio_io, 02', pin_signal: PMIC_STBY_REQ, direction: OUTPUT, slew_rate: Fast}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -474,6 +470,15 @@ void xSNVS(void) {
   /* Initialize GPIO functionality on WAKEUP (pin L6) */
   GPIO_PinInit(GPIO5, 0U, &WAKEUP_config);
 
+  /* GPIO configuration of PMIC_STBY on PMIC_STBY_REQ (pin L7) */
+  gpio_pin_config_t PMIC_STBY_config = {
+      .direction = kGPIO_DigitalOutput,
+      .outputLogic = 0U,
+      .interruptMode = kGPIO_NoIntmode
+  };
+  /* Initialize GPIO functionality on PMIC_STBY_REQ (pin L7) */
+  GPIO_PinInit(GPIO5, 2U, &PMIC_STBY_config);
+
   IOMUXC_SetPinMux(
       IOMUXC_SNVS_PMIC_ON_REQ_SNVS_LP_PMIC_ON_REQ,  /* PMIC_ON_REQ is configured as SNVS_LP_PMIC_ON_REQ */
       0U);                                    /* Software Input On Field: Input Path is determined by functionality */
@@ -483,6 +488,16 @@ void xSNVS(void) {
   IOMUXC_SetPinMux(
       IOMUXC_SNVS_WAKEUP_GPIO5_IO00,          /* WAKEUP is configured as GPIO5_IO00 */
       0U);                                    /* Software Input On Field: Input Path is determined by functionality */
+  IOMUXC_SetPinConfig(
+      IOMUXC_SNVS_PMIC_STBY_REQ_GPIO5_IO02,   /* PMIC_STBY_REQ PAD functional properties : */
+      0xA0A1U);                               /* Slew Rate Field: Fast Slew Rate
+                                                 Drive Strength Field: R0/4
+                                                 Speed Field: medium(100MHz)
+                                                 Open Drain Enable Field: Open Drain Disabled
+                                                 Pull / Keep Enable Field: Pull/Keeper Disabled
+                                                 Pull / Keep Select Field: Pull
+                                                 Pull Up / Down Config. Field: 100K Ohm Pull Up
+                                                 Hyst. Enable Field: Hysteresis Disabled */
   IOMUXC_SetPinConfig(
       IOMUXC_SNVS_WAKEUP_GPIO5_IO00,          /* WAKEUP PAD functional properties : */
       0x01B888U);                             /* Slew Rate Field: Slow Slew Rate

@@ -34,7 +34,7 @@ MenuNode_t *Menu_Led_CoreBoard, *Menu_Speed, *Menu_Direction, *Menu_SetMode;
 MenuNode_t *Menu_CB_LED1, *Menu_CB_LED2, *Menu_CB_LED3, *Menu_CB_LED4;
 MenuNode_t *Menu_SetClass, *Menu_SetBuzz, *Menu_SetSpeed, *Menu_SetBoardLed;
 MenuNode_t *Menu_SetSpeedKp_L, *Menu_SetSpeedKi_L, *Menu_SetSpeedKd_L, *Menu_SetSpeedKp_R, *Menu_SetSpeedKi_R, *Menu_SetSpeedKd_R, *Menu_SetSpeedKL, *Menu_SetSpeedKR;
-MenuNode_t *Menu_SetDirKp, *Menu_SetDirKi, *Menu_SetDirKd;
+MenuNode_t *Menu_SetDirKp, *Menu_SetDirKi, *Menu_SetDirKd,*Menu_SetDirKp_z,*Menu_SetDirKi_z,*Menu_SetDirKd_z;
 MenuNode_t *Menu_SetForwardView;
 MenuNode_t *Menu_SetAutoThreshold;
 MenuNode_t *Menu_SetRunningTime;
@@ -454,6 +454,9 @@ void Menu_Init() {
         Menu_MenuNodeCreate(&Menu_SetDirKp, "SetDirKp", DATA_INT, Set_DirKp, Menu_Direction);
         Menu_MenuNodeCreate(&Menu_SetDirKi, "SetDirKi", DATA_INT, Set_DirKi, Menu_Direction);
         Menu_MenuNodeCreate(&Menu_SetDirKd, "SetDirKd", DATA_INT, Set_DirKd, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKp_z, "SetDirKp_z", DATA_INT, Set_DirKp_z, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKi_z, "SetDirKi_z", DATA_INT, Set_DirKi_z, Menu_Direction);
+        Menu_MenuNodeCreate(&Menu_SetDirKd_z, "SetDirKd_z", DATA_INT, Set_DirKd_z, Menu_Direction);
     }
 
     /**@brief Settings for NNCU */
@@ -761,6 +764,30 @@ int Set_DirKd(int (*action)(int *data, int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 30000 ? ans : 30000;
     data[data_identifier].dirkd = ans;
+    return ans;
+}
+int Set_DirKp_z(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].dirkp_z, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].dirkp_z = ans;
+    return ans;
+}
+int Set_DirKi_z(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].dirki_z, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].dirki_z = ans;
+    return ans;
+}
+int Set_DirKd_z(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].dirkd_z, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].dirkd_z = ans;
     return ans;
 }
 int Set_Mode(int (*action)(int *data, int modify))

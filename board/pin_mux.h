@@ -37,11 +37,6 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
-/* GPIO_B0_15 (coord E11), OLED/RST */
-#define WDOG_B_RST_GPIO                                                    GPIO2   /*!< GPIO device name: GPIO2 */
-#define WDOG_B_RST_PORT                                                    GPIO2   /*!< PORT device name: GPIO2 */
-#define WDOG_B_RST_PIN                                                       15U   /*!< GPIO2 pin index: 15 */
-
 
 /*!
  * @brief 

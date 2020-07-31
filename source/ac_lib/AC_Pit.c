@@ -15,12 +15,16 @@ extern Data_t data[10];
 extern int data_identifier;
 extern int Flag_InitComplete;
 extern int16_t g_AD_nncu_Output[3];
-extern float s_speed_left_now, s_speed_right_now;
-extern float s_speed_aim_left, s_speed_aim_right;
+//extern float s_speed_left_now, s_speed_right_now;
+//extern float s_speed_aim_left, s_speed_aim_right;
 
-int Flag_Signal = 0;				//脉冲信号标志
+//extern pwm_t my1;
+//extern pwm_t my2;
+//extern gpio_t OE_B;
 
-uint16_t duty;  //测试舵机用
+//int Flag_Signal = 0;				//脉冲信号标志
+
+//uint16_t duty;  //测试舵机用
 
 /**
  * @brief Init IRQ for AC.
@@ -39,7 +43,7 @@ void AC_Pit(void *pv)
     PIT_Init2(kPIT_Chnl_0, 20 * 1000);	    //Camera & image Process-20ms
     PIT_Init2(kPIT_Chnl_1, 20 * 1000);      //Servo-20ms
     PIT_Init2(kPIT_Chnl_2, 20 * 1000);      //Motor-20ms
-    PIT_Init2(kPIT_Chnl_3, 1500 * 1000);      //NULL
+    PIT_Init2(kPIT_Chnl_3, 20 * 1000);      //NULL
     NVIC_SetPriority(PIT_IRQn, 6);	        //设置pit中断优先级为6
     PIT_StartTimer(PIT, kPIT_Chnl_0);
     PIT_StartTimer(PIT, kPIT_Chnl_1);
@@ -102,11 +106,11 @@ void AC_Pit(void *pv)
 //        			Dir_Control();
 //        		}
 
-        		//Dir_Control();
+        		Dir_Control();
 
 //        	}
 //        Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, 7.5);
-        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor));
+        //PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor));
 
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_2) == kPIT_TimerFlag)
@@ -116,6 +120,16 @@ void AC_Pit(void *pv)
         /*TODO: Motor control sequence here */
 
         Speed_Control();
+
+//        my1.dutyA = 0;
+//        my1.dutyB = 25;
+//        my2.dutyA = 0;
+//        my2.dutyB = 25;
+//
+//        PWM_Change(&my1);
+//        PWM_Change(&my2);
+//
+//        GPIO_Write(&OE_B, 0);//使能缓冲芯片输出
 
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_3) == kPIT_TimerFlag)
@@ -138,18 +152,18 @@ void AC_Pit(void *pv)
 //        PWM_AC_SetServoDuty(duty);
 
     	/*产生阶跃信号，调电机PID用*/
-    	 if (Flag_Signal == 1)
-    	 {
+//    	 if (Flag_Signal == 1)
+//    	 {
 //    	 	Flag_Signal = 0;
 //    	 	s_speed_aim_left = -2;
 //    	 	s_speed_aim_right = -2;
-    	 }
-    	 else if (Flag_Signal == 0)
-    	 {
+//    	 }
+//    	 else if (Flag_Signal == 0)
+//    	 {
 //    	 	Flag_Signal = 1;
 //    	 	s_speed_aim_left = 2;
 //    	 	s_speed_aim_right = 2;
-    	 }
+//    	 }
 
         /*在屏幕上显示编码器返回值*/
 //        float g_speed_now_left = 0;
