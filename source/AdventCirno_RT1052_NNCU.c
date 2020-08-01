@@ -381,9 +381,11 @@ void AC_Task(void *pvData)
 
 #if (AC_FLASH_MANUAL == AC_FLASH_MANUAL_DISABLE)
 
-    g_tflite_error_reporter = AC_TFLite_DNN_Setup();
+    OLED_P6x8Str(10, 7, "-TFLite");
 
 #endif
+
+    g_tflite_error_reporter = AC_TFLite_DNN_Setup();
 
     if(0 == g_tflite_error_reporter)
     {
