@@ -72,11 +72,10 @@
  * @breif Declare the AI Backend for AdventCirno
  */
 
-#define AC_AI_BACKEND_NNCU 1U
-#define AC_AI_BACKEND_TFLite 2U
-#define AC_AI_BACKEND_BOTH 3U
+#define AC_AI_BACKEND_NNCU 0x01
+#define AC_AI_BACKEND_TFLite 0x02
 
-#define AC_AI_BACKEND AC_AI_BACKEND_BOTH
+#define AC_AI_BACKEND (AC_AI_BACKEND_NNCU | AC_AI_BACKEND_TFLite)
 
 /**
  * @breif Manual Flash Operation switch
@@ -161,7 +160,7 @@ extern TaskHandle_t AC_Pit_task_handle;
 extern int16_t middleline_nncu;
 
 
-#if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
+#if(AC_AI_BACKEND & AC_AI_BACKEND_TFLite)
 
 int g_tflite_error_reporter;
 
@@ -348,7 +347,8 @@ void AC_Task(void *pvData)
     }
 
     OLED_P6x8Str(0, 5, "-AI Backend");
-
+    PRINTF("[O K] AC: AI: Starting...\n");
+#if (AC_AI_BACKEND & AC_AI_BACKEND_NNCU)
     PRINTF("[O K] AC: AI: Starting NNCU Backend\r\n");
     OLED_P6x8Str(10, 6, "-NNCU");
 
@@ -357,8 +357,9 @@ void AC_Task(void *pvData)
     /*输出缓存区的指针，必须按照这个格式写*/
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     }
+#endif
 
-#if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
+#if(AC_AI_BACKEND & AC_AI_BACKEND_TFLite)
 
     PRINTF("[O K] AC: AI: Starting Tensorflow Lite Backend\r\n");
 
@@ -370,8 +371,8 @@ void AC_Task(void *pvData)
     }
     else
     {
-        PRINTF("[ERR] AC: AI: TFLite: Model version mismatch!\r\n");
-        PRINTF("[ERR] AC: AI: TFLite: Emergency stop!\r\n");
+        PRINTF("[Err] AC: AI: TFLite: Model version mismatch!\r\n");
+        PRINTF("[Err] AC: AI: TFLite: Emergency stop!\r\n");
         while(1)
         {
             ;
