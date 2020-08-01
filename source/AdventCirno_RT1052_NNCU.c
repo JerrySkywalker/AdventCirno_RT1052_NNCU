@@ -71,7 +71,7 @@
 #define AC_AI_BACKEND_NNCU 0U
 #define AC_AI_BACKEND_TFLite 1U
 
-#define AC_AI_BACKEND AC_AI_BACKEND_NNCU
+#define AC_AI_BACKEND AC_AI_BACKEND_TFLite
 
 
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
