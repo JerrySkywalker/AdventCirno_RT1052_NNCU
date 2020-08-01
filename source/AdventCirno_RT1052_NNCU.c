@@ -60,6 +60,7 @@
 #include "ac_lib/AC_Menu.h"
 #include "ac_lib/AC_Command.h"
 #include "ac_lib/AC_Pit.h"
+#include "ac_lib/AC_SD_Storage.h"
 #include "ac_lib/Image.h"
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
@@ -84,8 +85,8 @@
 #define AC_FLASH_MANUAL_ENABLE 0U
 #define AC_FLASH_MANUAL_DISABLE 1U
 
-//#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
-#define AC_FLASH_MANUAL AC_FLASH_MANUAL_ENABLE
+#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
+//#define AC_FLASH_MANUAL AC_FLASH_MANUAL_ENABLE
 /**
  * @breif Menu storage option
  */
@@ -93,8 +94,8 @@
 #define AC_STORAGE_PLACE_FLASH 0U
 #define AC_STORAGE_PLACE_SD 1U
 
-//#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
-#define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
+#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
+//#define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
 
 
 
@@ -312,6 +313,10 @@ void AC_Task(void *pvData)
 		 * 			- 程序其他地方的任何语句
 		 *			最好方法就是，做好备份，善用Git。大改动前必须保证有一个可用版本。发现问题及时回溯！！
 		 * */
+#else
+        PRINTF("[O K] AC: Flash: Disabled manually\r\n");
+		OLED_P6x8Str(0, 2, (uint8_t *) "-Flash");
+		OLED_P6x8Str(60, 2, (uint8_t *) "Disable");
 #endif
 
         /**@brief Init SD*/
@@ -340,7 +345,18 @@ void AC_Task(void *pvData)
 		memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
 
 #elif (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
-	OLED_Fill(0x00);
+
+		OLED_P6x8Str(60,4,(uint8_t*)"SD");
+
+        if(kStatus_Success!=AC_SD_MenuLoad(ModeBoot))
+        {
+            OLED_P6x8Str(80,4,(uint8_t*)"Err");
+        }
+        else
+        {
+            OLED_P6x8Str(80,4,(uint8_t*)"OK");
+        }
+
 
 #endif
 
@@ -362,6 +378,12 @@ void AC_Task(void *pvData)
 #if(AC_AI_BACKEND & AC_AI_BACKEND_TFLite)
 
     PRINTF("[O K] AC: AI: Starting Tensorflow Lite Backend\r\n");
+
+#if (AC_FLASH_MANUAL == AC_FLASH_MANUAL_DISABLE)
+
+    OLED_P6x8Str(10, 7, "-TFLite");
+
+#endif
 
     g_tflite_error_reporter = AC_TFLite_DNN_Setup();
 
@@ -476,17 +498,25 @@ void AC_Task(void *pvData)
 						assert(0 == FLASH_Prog(FLASH_DATA_ADDR_START + i * FLASH_PAGE_SIZE, g_flash_buff_w+ i * FLASH_PAGE_SIZE));
 					}
                     OLED_P6x8Str(0,0,(uint8_t*)"Flash: Data Saved!");
+#elif (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
+                    OLED_P6x8Str(0,0,(uint8_t*)"SD: Data Saved!");
+
+                    if(kStatus_Success == AC_SD_MenuSave(ModeBoot))
+                    {
+                        OLED_P6x8Rst(0,6,"Success!...");
+                    }
+                    else
+                    {
+                        OLED_P6x8Rst(0,6,"Err!...");
+                    }
+                    OLED_P6x8Str(0,7,"Exiting...");
 #endif
 
-					/*Delete your task  Here*/
+					/*Delete your task Here*/
 					vTaskDelete(AC_Menu_task_handle);
                     PRINTF("[O K] AC: Menu Deleted! \r\n");
 
-                    /**TODO : SDMMC Storage task here*/
-
-
-
-					vTaskDelay(300);
+                    vTaskDelay(500);
 					OLED_Fill(0);
 
 				}
