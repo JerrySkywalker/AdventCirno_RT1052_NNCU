@@ -99,7 +99,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
 
     /** Start **/
 
-    PRINTF("[O K] AC: Menu: Start SD:Save Menu\r\n");
+    PRINTF("[O K] AC: SD: Start task: Save Menu\r\n");
 
     if(mode!=ModeBoot)
     {
@@ -109,19 +109,19 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         if(mode == ModeDefault)
         {
             OLED_P6x8Str(60,1,(uint8_t*)"Default");
-            PRINTF("\r\n[O K] AC: SD: Mode-Default\r\n");
+            PRINTF("[O K] AC: SD: Mode-Default\r\n");
         }
         else if(mode  == ModeSync)
         {
             OLED_P6x8Str(60,1,(uint8_t*)"Sync");
-            PRINTF("\r\n[O K] AC: SD: Mode-Sync\r\n");
+            PRINTF("[O K] AC: SD: Mode-Sync\r\n");
         }
     }
     else{
-        PRINTF("\r\n[O K] AC: SD: Mode-Boot\r\n");
+        PRINTF("[O K] AC: SD: Mode-Boot\r\n");
     }
 
-    PRINTF("[O K] AC: Menu: Set names\r\n");
+    PRINTF("[O K] AC: SD: Set names\r\n");
 
     if(mode == ModeDefault) {
         OLED_P6x8Str(0, 2, (uint8_t *) "Use default name?");
@@ -371,7 +371,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
 
     /** Start **/
 
-    PRINTF("[O K] AC: Menu: Start SD:Load Menu\r\n");
+    PRINTF("[O K] AC: SD: Start task: Load Menu\r\n");
 
     f_mount(&g_fileSystem, driverNumberBuffer, 1U);
 
@@ -383,23 +383,23 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         if(mode == ModeDefault)
         {
             OLED_P6x8Str(60,1,(uint8_t*)"Default");
-            PRINTF("\r\n[O K] AC: SD: Mode-Default\r\n");
+            PRINTF("[O K] AC: SD: Mode-Default\r\n");
         }
         else if(mode  == ModeSync)
         {
             OLED_P6x8Str(60,1,(uint8_t*)"Sync");
-            PRINTF("\r\n[O K] AC: SD: Mode-Sync\r\n");
+            PRINTF("[O K] AC: SD: Mode-Sync\r\n");
         }
     }
     else{
-        PRINTF("\r\n[O K] AC: SD: Mode-Boot\r\n");
+        PRINTF("[O K] AC: SD: Mode-Boot\r\n");
     }
 
 
 
     if(mode==ModeDefault) {
 
-        PRINTF("[O K] AC: Menu: Set names\r\n");
+        PRINTF("[O K] AC: SD: Set names\r\n");
         OLED_P6x8Str(0, 2, (uint8_t *) "Load default?");
         while (true) {
             if ((KEY_P_DOWN == Key_Check(KEY_ENTER)) || (KEY_P_DOWN == Key_Check(KEY_RIGHT))) {
@@ -430,7 +430,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
 
         int temp_Flag_DirReadLoop = 1;
 
-        PRINTF("\r\n[O K] AC: SD: List the file in that directory......\r\n");
+        PRINTF("[O K] AC: SD: List the file in that directory......\r\n");
         if (f_opendir(&directory, "/menu")) {
             PRINTF("[Err] AC: SD: Open directory failed.\r\n");
             OLED_Print_Num(0, 2, "Err - Open Dir");
@@ -444,6 +444,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             /* To the end. */
             if ((error != FR_OK) || (fileInformation.fname[0U] == 0U)) {
                 OLED_P6x8Str(0, 3, "Err - Cancelled");
+                PRINTF("[Err] AC: SD: Cancelled by User.\r\n");
                 return kStatus_Fail;      // 读取失败或者读取完所有条目,取消任务
             }
             if (fileInformation.fname[0] == '.')    // 隐藏文件
@@ -454,8 +455,8 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             {
                 continue;
             } else {
-                Str_Clr(80, 2, 7);
-                OLED_P6x8Str(80, 2, fileInformation.fname);
+                Str_Clr(72, 2, 9);
+                OLED_P6x8Str(72, 2, fileInformation.fname);
 
                 int temp_Flag_DirFilterWaiting = 1;
 
