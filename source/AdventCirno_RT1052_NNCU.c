@@ -64,6 +64,16 @@
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
 
+/**
+ * @breif Declare the AI Backend for AdventCirno
+ */
+
+#define AC_AI_BACKEND_NNCU 0U
+#define AC_AI_BACKEND_TFLite 1U
+
+#define AC_AI_BACKEND AC_AI_BACKEND_TFLite
+
+
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
 BSS_OC uint8_t heap_heap2[128 * 1024] ALIGN(8);
 BSS_SDRAM uint8_t heap_heap3[4 * 1024 * 1024] ALIGN(8);
@@ -124,6 +134,13 @@ int8_t tmp_AD_Input2[9] = {
 extern TaskHandle_t AC_Menu_task_handle;
 extern TaskHandle_t AC_Pit_task_handle;
 
+
+
+#if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
+
+int g_tflite_error_reporter;
+
+#endif
 
 TaskHandle_t LED_task_handle;
 void LED_task(void *pvData)
@@ -188,9 +205,6 @@ void AC_Task(void *pvData)
 	}
     Flag_ScreenRefresh = -1;
 
-    int sum = cppadd(1, 2);
-    PRINTF("1+2 = %d\n", sum);
-
 
 	/** Logo **/
     {
@@ -236,7 +250,7 @@ void AC_Task(void *pvData)
             PRINTF("[O K] AC: Flash: Ready! \r\n");
             OLED_P6x8Str(60, 2, (uint8_t *) "OK!");
 
-            OLED_P6x8Str(20, 3, (uint8_t *) "-Menu");
+            OLED_P6x8Str(10, 3, (uint8_t *) "-Menu");
             assert(0 == FLASH_Read(FLASH_DATA_ADDR_START, g_flash_buff_r, FLASH_SECTOR_SIZE));
             OLED_P6x8Str(60, 3, (uint8_t *) "OK!");
 
@@ -292,17 +306,47 @@ void AC_Task(void *pvData)
                 OLED_P6x8Str(60, 4, "Mounted!");
             }
         }
-
-        /**@brief Init NNCU*/
-		{
-        /*输出缓存区的指针，必须按照这个格式写*/
-        g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
-		}
-
-        delay_ms(2000);
-        OLED_Fill(0);
     }
 
+    OLED_P6x8Str(0, 5, "-AI Backend");
+
+    PRINTF("[O K] AC: AI: Starting NNCU Backend\r\n");
+    OLED_P6x8Str(10, 6, "-NNCU");
+
+    /**@brief Init NNCU*/
+    {
+    /*输出缓存区的指针，必须按照这个格式写*/
+    g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
+    }
+
+#if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
+
+    PRINTF("[O K] AC: AI: Starting Tensorflow Lite Backend\r\n");
+    OLED_P6x8Str(10, 7, "-TFLIte");
+
+    g_tflite_error_reporter = AC_TFLite_DNN_Setup();
+
+    if(0 == g_tflite_error_reporter)
+    {
+        PRINTF("[O K] AC: AI: TFLite: Model loded successfully!\r\n");
+    }
+    else
+    {
+        PRINTF("[ERR] AC: AI: TFLite: Model version mismatch!\r\n");
+        PRINTF("[ERR] AC: AI: TFLite: Emergency stop!\r\n");
+        while(1)
+        {
+            ;
+        }
+    }
+
+#endif
+
+
+
+
+    delay_ms(2000);
+    OLED_Fill(0);
 
     /**@brief Main Loop*/
 	while (1)
