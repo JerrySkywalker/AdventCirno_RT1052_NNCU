@@ -64,14 +64,39 @@
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
 
+/***********************************************************************************************************************
+ * Definitions
+ ***********************************************************************************************************************/
+
 /**
  * @breif Declare the AI Backend for AdventCirno
  */
 
-#define AC_AI_BACKEND_NNCU 0U
-#define AC_AI_BACKEND_TFLite 1U
+#define AC_AI_BACKEND_NNCU 1U
+#define AC_AI_BACKEND_TFLite 2U
+#define AC_AI_BACKEND_BOTH 3U
 
-#define AC_AI_BACKEND AC_AI_BACKEND_TFLite
+#define AC_AI_BACKEND AC_AI_BACKEND_BOTH
+
+/**
+ * @breif Manual Flash Operation switch
+ */
+
+#define AC_FLASH_MANUAL_ENABLE 0U
+#define AC_FLASH_MANUAL_DISABLE 1U
+
+//#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
+#define AC_FLASH_MANUAL AC_FLASH_MANUAL_ENABLE
+/**
+ * @breif Menu storage option
+ */
+
+#define AC_STORAGE_PLACE_FLASH 0U
+#define AC_STORAGE_PLACE_SD 1U
+
+//#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
+#define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
+
 
 
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
@@ -242,70 +267,84 @@ void AC_Task(void *pvData)
 		UART_Init(LPUART4, 115200, 80 * 1000 * 1000);		//蓝牙
 		UART_Init(LPUART6, 9600, 80 * 1000 * 1000);			//总钻风
 
+		/**@brief Init ZZF Camera*/
+		{
+			//ZZF_Init(ZZF_FrameSize120x184, LPUART6);
+			//	capture.format = PixelFormatGray;
+			//	capture.width = 184;
+			//	capture.height = 120;
+			//	CAMERA_SubmitBuff(buff1);
+			//	CAMERA_SubmitBuff(buff2);
+			//	CAMERA_SubmitBuff(buff3);
+			//	CAMERA_SubmitBuff(buff4);
+			//	assert(kStatus_Success == CAMERA_ReceiverStart());
+		}
+
         /**@brief Init Flash*/
-        {
-            PRINTF("[O K] AC: Flash: Init flash test\r\n");
-            OLED_P6x8Str(0, 2, (uint8_t *) "-Flash");
-            test(flash_init, "Test flash", 0, 1, 1);
-            PRINTF("[O K] AC: Flash: Ready! \r\n");
-            OLED_P6x8Str(60, 2, (uint8_t *) "OK!");
 
-            OLED_P6x8Str(10, 3, (uint8_t *) "-Menu");
-            assert(0 == FLASH_Read(FLASH_DATA_ADDR_START, g_flash_buff_r, FLASH_SECTOR_SIZE));
-            OLED_P6x8Str(60, 3, (uint8_t *) "OK!");
+#if (AC_FLASH_MANUAL == AC_FLASH_MANUAL_ENABLE)
 
-            memcpy(&data_identifier, g_flash_buff_r, sizeof(data_identifier));
-            memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
+        PRINTF("[O K] AC: Flash: Init flash test\r\n");
+		OLED_P6x8Str(0, 2, (uint8_t *) "-Flash");
+		test(flash_init, "Test flash", 0, 1, 1);
+		PRINTF("[O K] AC: Flash: Ready! \r\n");
+		OLED_P6x8Str(60, 2, (uint8_t *) "OK!");
 
-            /*
-             * @note: 	有关内存的读取说明。
-             *
-             *   		AC中的内存规划
-             *   		- 分配FLASH_DATA_ADDR_START起始的一个页存放一些单个的固定参数
-             *   		- 分配FLASH_DATA_ADDR_START+FLASH_PAGE_SIZE起始的n个扇区存放菜单参数
-             *
-             *   		采取的读写策略：整体读写；开机整体读一次，后续修改则不停的写Flash
-             *   		- 不同于K66版本的细粒度操作，由于该FLASH封装只支持对于页进行编程，这里的存储实现先利用这个底层进行，也就是说：
-             *   		- 在进程的开始和结束进行整体的读写操作。需要读写的请在全局的flash buffer中进行操作
-             *
-             *   		注意：
-             *   		- 在对页编程之前，必须擦除该页
-             *   		- 读写flash时最好关闭中断（现在的封装中已有这个设计）
-             *   		- 在FreeRTOS 中，读FLASH函数时候应该停止调度器和中断，以免出现错误。现有测试表明停止调度器可避免总先忙的错误。
-             *   		                写FLASH的影响还不明确(至少截至到目前(0702)，写Flash不停调度器没有出现问题)
-             *
-             *   		警告：调试时曾出现玄学的总线忙的严重功能性Bug，具体原因仍有待调查。以下操作可能导致总线忙，使得Flash无法初始化，一定避免
-             *   		- 不要在flash读写过程中，对涉及的地址有任何操作
-             *   		- FLASH读写函数之后的几句(触发范围不清楚)中不要出现PRINTF
-             * 			- 程序其他地方的任何语句
-             *			最好方法就是，做好备份，善用Git。大改动前必须保证有一个可用版本。发现问题及时回溯！！
-             * */
-        }
-
-        /**@brief Init ZZF Camera*/
-        {
-            //ZZF_Init(ZZF_FrameSize120x184, LPUART6);
-            //	capture.format = PixelFormatGray;
-            //	capture.width = 184;
-            //	capture.height = 120;
-            //	CAMERA_SubmitBuff(buff1);
-            //	CAMERA_SubmitBuff(buff2);
-            //	CAMERA_SubmitBuff(buff3);
-            //	CAMERA_SubmitBuff(buff4);
-            //	assert(kStatus_Success == CAMERA_ReceiverStart());
-        }
+		/*
+		 * @note: 	有关内存的读取说明。
+		 *
+		 *   		AC中的内存规划
+		 *   		- 分配FLASH_DATA_ADDR_START起始的一个页存放一些单个的固定参数
+		 *   		- 分配FLASH_DATA_ADDR_START+FLASH_PAGE_SIZE起始的n个扇区存放菜单参数
+		 *
+		 *   		采取的读写策略：整体读写；开机整体读一次，后续修改则不停的写Flash
+		 *   		- 不同于K66版本的细粒度操作，由于该FLASH封装只支持对于页进行编程，这里的存储实现先利用这个底层进行，也就是说：
+		 *   		- 在进程的开始和结束进行整体的读写操作。需要读写的请在全局的flash buffer中进行操作
+		 *
+		 *   		注意：
+		 *   		- 在对页编程之前，必须擦除该页
+		 *   		- 读写flash时最好关闭中断（现在的封装中已有这个设计）
+		 *   		- 在FreeRTOS 中，读FLASH函数时候应该停止调度器和中断，以免出现错误。现有测试表明停止调度器可避免总先忙的错误。
+		 *   		                写FLASH的影响还不明确(至少截至到目前(0702)，写Flash不停调度器没有出现问题)
+		 *
+		 *   		警告：调试时曾出现玄学的总线忙的严重功能性Bug，具体原因仍有待调查。以下操作可能导致总线忙，使得Flash无法初始化，一定避免
+		 *   		- 不要在flash读写过程中，对涉及的地址有任何操作
+		 *   		- FLASH读写函数之后的几句(触发范围不清楚)中不要出现PRINTF
+		 * 			- 程序其他地方的任何语句
+		 *			最好方法就是，做好备份，善用Git。大改动前必须保证有一个可用版本。发现问题及时回溯！！
+		 * */
+#endif
 
         /**@brief Init SD*/
         {
-            OLED_P6x8Str(0, 4, "-SD");
+            OLED_P6x8Str(0, 3, (uint8_t *)"-SD");
             if (kStatus_Success != SD_Mount()) {
-                PRINTF("[ERR] AC: SD: Please insert SD card\r\n");
-                OLED_P6x8Str(60, 4, "No Card!");
-            } else {
+                PRINTF("[Err] AC: SD: Please insert SD card\r\n");
+                OLED_P6x8Str(60, 3, "No Card!");
+            }
+            else
+            {
                 PRINTF("[O K] AC: SD: Mounted Successfully！\r\n");
-                OLED_P6x8Str(60, 4, "Mounted!");
+                OLED_P6x8Str(60, 3,(uint8_t *) "Mounted!");
             }
         }
+
+        /**@brief Init Menu Data*/
+        OLED_P6x8Str(0, 4, (uint8_t *) "-Menu");
+#if((AC_FLASH_MANUAL == AC_FLASH_MANUAL_ENABLE)&&(AC_STORAGE_MENU == AC_STORAGE_PLACE_FLASH))
+
+        PRINTF("[O K] AC: FLASH: Loading menu！\r\n");
+		assert(0 == FLASH_Read(FLASH_DATA_ADDR_START, g_flash_buff_r, FLASH_SECTOR_SIZE));
+		OLED_P6x8Str(60, 4, (uint8_t *) "Flash OK");
+
+		memcpy(&data_identifier, g_flash_buff_r, sizeof(data_identifier));
+		memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
+
+#elif (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
+	OLED_Fill(0x00);
+
+#endif
+
     }
 
     OLED_P6x8Str(0, 5, "-AI Backend");
@@ -420,7 +459,8 @@ void AC_Task(void *pvData)
 					OLED_Fill(0x00);
 					g_Flag_WakeUp = 0;
 					PRINTF("[O K] AC: Screen Locked. \r\n");
-
+					
+#if((AC_FLASH_MANUAL == AC_FLASH_MANUAL_ENABLE)&&(AC_STORAGE_MENU == AC_STORAGE_PLACE_FLASH))
 					/*Assemble Data to buffer*/
 					memset(g_flash_buff_w,0xFFU,FLASH_SECTOR_SIZE);
 					memcpy(g_flash_buff_w, &data_identifier, sizeof(data_identifier));
@@ -434,10 +474,12 @@ void AC_Task(void *pvData)
 					{
 						assert(0 == FLASH_Prog(FLASH_DATA_ADDR_START + i * FLASH_PAGE_SIZE, g_flash_buff_w+ i * FLASH_PAGE_SIZE));
 					}
+                    OLED_P6x8Str(0,0,(uint8_t*)"Flash: Data Saved!");
+#endif
 
 					/*Delete your task  Here*/
 					vTaskDelete(AC_Menu_task_handle);
-					OLED_P6x8Str(0,0,(uint8_t*)"Flash: Data Saved!");
+                    PRINTF("[O K] AC: Menu Deleted! \r\n");
 
                     /**TODO : SDMMC Storage task here*/
 
@@ -445,7 +487,7 @@ void AC_Task(void *pvData)
 
 					vTaskDelay(300);
 					OLED_Fill(0);
-					PRINTF("[O K] AC: Menu Deleted! \r\n");
+
 				}
 			}
 
