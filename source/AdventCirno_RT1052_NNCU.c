@@ -61,42 +61,17 @@
 #include "ac_lib/AC_Command.h"
 #include "ac_lib/AC_Pit.h"
 #include "ac_lib/Image.h"
-#include "ac_lib/AC_SD_Storage.h"
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
-
-/***********************************************************************************************************************
- * Definitions
- ***********************************************************************************************************************/
 
 /**
  * @breif Declare the AI Backend for AdventCirno
  */
 
-#define AC_AI_BACKEND_NNCU 1U
-#define AC_AI_BACKEND_TFLite 2U
-#define AC_AI_BACKEND_BOTH 3U
+#define AC_AI_BACKEND_NNCU 0U
+#define AC_AI_BACKEND_TFLite 1U
 
-#define AC_AI_BACKEND AC_AI_BACKEND_BOTH
-
-/**
- * @breif Manual Flash Operation switch
- */
-
-#define AC_FLASH_MANUAL_ENABLE 0U
-#define AC_FLASH_MANUAL_DISABLE 1U
-
-#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
-
-/**
- * @breif Menu storage option
- */
-
-#define AC_STORAGE_PLACE_FLASH 0U
-#define AC_STORAGE_PLACE_SD 1U
-
-#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
-
+#define AC_AI_BACKEND AC_AI_BACKEND_TFLite
 
 
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
@@ -161,7 +136,7 @@ extern TaskHandle_t AC_Pit_task_handle;
 extern int16_t middleline_nncu;
 
 
-#if ((AC_AI_BACKEND & AC_AI_BACKEND_TFLite)||(AC_AI_BACKEND == AC_AI_BACKEND_BOTH))
+#if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
 
 int g_tflite_error_reporter;
 
@@ -267,21 +242,6 @@ void AC_Task(void *pvData)
 		UART_Init(LPUART4, 115200, 80 * 1000 * 1000);		//蓝牙
 		UART_Init(LPUART6, 9600, 80 * 1000 * 1000);			//总钻风
 
-        /**@brief Init ZZF Camera*/
-        {
-            //ZZF_Init(ZZF_FrameSize120x184, LPUART6);
-            //	capture.format = PixelFormatGray;
-            //	capture.width = 184;
-            //	capture.height = 120;
-            //	CAMERA_SubmitBuff(buff1);
-            //	CAMERA_SubmitBuff(buff2);
-            //	CAMERA_SubmitBuff(buff3);
-            //	CAMERA_SubmitBuff(buff4);
-            //	assert(kStatus_Success == CAMERA_ReceiverStart());
-        }
-
-
-#if (AC_FLASH_MANUAL_ENABLE == AC_FLASH_MANUAL)
         /**@brief Init Flash*/
         {
             PRINTF("[O K] AC: Flash: Init flash test\r\n");
@@ -290,17 +250,13 @@ void AC_Task(void *pvData)
             PRINTF("[O K] AC: Flash: Ready! \r\n");
             OLED_P6x8Str(60, 2, (uint8_t *) "OK!");
 
-#if (AC_STORAGE_MENU == AC_STORAGE_PLACE_FLASH)
-
-            /**@brief Load Menu*/
-
             OLED_P6x8Str(10, 3, (uint8_t *) "-Menu");
             assert(0 == FLASH_Read(FLASH_DATA_ADDR_START, g_flash_buff_r, FLASH_SECTOR_SIZE));
             OLED_P6x8Str(60, 3, (uint8_t *) "OK!");
 
             memcpy(&data_identifier, g_flash_buff_r, sizeof(data_identifier));
             memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
-#endif
+
             /*
              * @note: 	有关内存的读取说明。
              *
@@ -326,7 +282,20 @@ void AC_Task(void *pvData)
              * */
         }
 
-                /**@brief Init SD*/
+        /**@brief Init ZZF Camera*/
+        {
+            //ZZF_Init(ZZF_FrameSize120x184, LPUART6);
+            //	capture.format = PixelFormatGray;
+            //	capture.width = 184;
+            //	capture.height = 120;
+            //	CAMERA_SubmitBuff(buff1);
+            //	CAMERA_SubmitBuff(buff2);
+            //	CAMERA_SubmitBuff(buff3);
+            //	CAMERA_SubmitBuff(buff4);
+            //	assert(kStatus_Success == CAMERA_ReceiverStart());
+        }
+
+        /**@brief Init SD*/
         {
             OLED_P6x8Str(0, 4, "-SD");
             if (kStatus_Success != SD_Mount()) {
@@ -337,61 +306,23 @@ void AC_Task(void *pvData)
                 OLED_P6x8Str(60, 4, "Mounted!");
             }
         }
-#else
-
-        PRINTF("[O K] AC: Flash: Manual operation disabled! \r\n");
-        OLED_P6x8Str(0, 2, (uint8_t *) "-Flash");
-        OLED_P6x8Str(60, 2, (uint8_t *) "Disable");
-
-        /**@brief Init SD*/
-        {
-            OLED_P6x8Str(0, 3, (uint8_t *)"-SD");
-            if (kStatus_Success != SD_Mount()) {
-                PRINTF("[ERR] AC: SD: Please insert SD card\r\n");
-                OLED_P6x8Str(60, 3, (uint8_t *)"No Card!");
-            } else {
-                PRINTF("[O K] AC: SD: Mounted Successfully！\r\n");
-                OLED_P6x8Str(60, 3, (uint8_t *)"Mounted!");
-            }
-        }
-
-        /**@brief Load Menu: using AC_Stroage API*/
-#if (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
-
-        OLED_P6x8Str(10, 4, (uint8_t *)"-Menu");
-
-        if (kStatus_Success != AC_SD_MenuLoad(ModeBoot)){
-            PRINTF("[ERR] AC: SD: Menu Load Failed!\r\n");
-            OLED_P6x8Str(60, 4, (uint8_t *)"Err");
-        }
-        else {
-            PRINTF("[O K] AC: SD: Menu Load Successfully!\r\n");
-            OLED_P6x8Str(60, 3, (uint8_t *)"OK");
-        }
-#endif
-
-#endif
     }
 
+    OLED_P6x8Str(0, 5, "-AI Backend");
 
-    PRINTF("[O K] AC: AI: Starting AI Backend\r\n");
-    OLED_P6x8Str(0, 5, (uint8_t *)"-AI Backend");
-
-#if((AC_AI_BACKEND == AC_AI_BACKEND_NNCU)||(AC_AI_BACKEND == AC_AI_BACKEND_BOTH))
     PRINTF("[O K] AC: AI: Starting NNCU Backend\r\n");
-    OLED_P6x8Str(10, 6, (uint8_t *)"-NNCU");
+    OLED_P6x8Str(10, 6, "-NNCU");
 
     /**@brief Init NNCU*/
     {
     /*输出缓存区的指针，必须按照这个格式写*/
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     }
-#endif
 
-#if ((AC_AI_BACKEND & AC_AI_BACKEND_TFLite)||(AC_AI_BACKEND == AC_AI_BACKEND_BOTH))
+#if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
 
     PRINTF("[O K] AC: AI: Starting Tensorflow Lite Backend\r\n");
-    OLED_P6x8Str(10, 6, (uint8_t *)"-TFLite");
+
     g_tflite_error_reporter = AC_TFLite_DNN_Setup();
 
     if(0 == g_tflite_error_reporter)
@@ -490,19 +421,7 @@ void AC_Task(void *pvData)
 					g_Flag_WakeUp = 0;
 					PRINTF("[O K] AC: Screen Locked. \r\n");
 
-                    /*Delete your task  Here*/
-                    vTaskDelete(AC_Menu_task_handle);
-                    PRINTF("[O K] AC: Menu Deleted! \r\n");
-
-                    /**TODO :Save Menu Data */
-                    PRINTF("[O K] AC: Menu: Saving Data. \r\n");
-                    OLED_P6x8Str(0, 0, (uint8_t *)"Saving data...");
-
-#if((AC_FLASH_MANUAL == AC_FLASH_MANUAL_ENABLE) &&(AC_STORAGE_MENU == AC_STORAGE_PLACE_FLASH))
-
-                    OLED_P6x8Rst(0,1,(uint8_t*)"Flash: Saving");
-
-                    /*Assemble Data to buffer*/
+					/*Assemble Data to buffer*/
 					memset(g_flash_buff_w,0xFFU,FLASH_SECTOR_SIZE);
 					memcpy(g_flash_buff_w, &data_identifier, sizeof(data_identifier));
 					memcpy(g_flash_buff_w + FLASH_PAGE_SIZE, &data, sizeof(data));
@@ -516,22 +435,17 @@ void AC_Task(void *pvData)
 						assert(0 == FLASH_Prog(FLASH_DATA_ADDR_START + i * FLASH_PAGE_SIZE, g_flash_buff_w+ i * FLASH_PAGE_SIZE));
 					}
 
+					/*Delete your task  Here*/
+					vTaskDelete(AC_Menu_task_handle);
+					OLED_P6x8Str(0,0,(uint8_t*)"Flash: Data Saved!");
 
-					OLED_P6x8Rst(0,7,(uint8_t*)"Flash: Data Saved!");
+                    /**TODO : SDMMC Storage task here*/
 
-					vTaskDelay(300);
-					OLED_Fill(0);
-#endif
 
-#if(AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
-
-                    /**@brief Sync data to sd**/
-
-                    AC_SD_MenuSave(ModeSync);
 
 					vTaskDelay(300);
 					OLED_Fill(0);
-#endif
+					PRINTF("[O K] AC: Menu Deleted! \r\n");
 				}
 			}
 
