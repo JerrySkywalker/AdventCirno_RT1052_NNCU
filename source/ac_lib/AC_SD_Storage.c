@@ -74,7 +74,7 @@ SDK_ALIGN(uint8_t g_bufferWrite_Menu[SDK_SIZEALIGN(BUFFER_SIZE_MENU, SDMMC_DATA_
 SDK_ALIGN(uint8_t g_bufferRead_Menu[SDK_SIZEALIGN(BUFFER_SIZE_MENU, SDMMC_DATA_BUFFER_ALIGN_CACHE)],
           MAX(SDMMC_DATA_BUFFER_ALIGN_CACHE, SDMMCHOST_DMA_BUFFER_ADDR_ALIGN));
 
-status_t AC_SD_MenuSave()
+status_t AC_SD_MenuSave(StorageMode_t mode)
 {
     FRESULT error;
     DIR directory; /* Directory object */
@@ -99,34 +99,54 @@ status_t AC_SD_MenuSave()
     /** Start **/
 
     PRINTF("[O K] AC: Menu: Start SD:Save Menu\r\n");
-    OLED_P6x8Str(0,0,"Run Task...");
-    OLED_P6x8Str(0,1,(uint8_t*)"SD:Save Menu");
 
-    PRINTF("[O K] AC: Menu: Set names\r\n");
-    OLED_P6x8Str(0,2,(uint8_t*)"Use default name?");
-    while(true)
+    if(mode!=ModeBoot)
     {
-        if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
+        OLED_P6x8Str(0,0,(uint8_t*)"SD:Load Menu");
+        OLED_P6x8Str(0,1,"Mode");
+
+        if(mode == ModeDefault)
         {
-            delay_ms(10);
-            if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
-            {
-                g_Flag_FileNameDefault = 0;
-                break;
-            }
+            OLED_P6x8Str(60,1,(uint8_t*)"Default");
+            PRINTF("\r\n[O K] AC: SD: Mode-Default\r\n");
         }
-        if(KEY_P_DOWN == Key_Check(KEY_LEFT))
+        else if(mode  == ModeSync)
         {
-            delay_ms(10);
-            if(KEY_P_DOWN == Key_Check(KEY_LEFT))
-            {
-                g_Flag_FileNameDefault = 1;
-                break;
-            }
+            OLED_P6x8Str(60,1,(uint8_t*)"Sync");
+            PRINTF("\r\n[O K] AC: SD: Mode-Sync\r\n");
         }
     }
+    else{
+        PRINTF("\r\n[O K] AC: SD: Mode-Boot\r\n");
+    }
 
-    Str_Clr(0,2,21);
+    PRINTF("[O K] AC: Menu: Set names\r\n");
+
+    if(mode == ModeDefault) {
+        OLED_P6x8Str(0, 2, (uint8_t *) "Use default name?");
+        while (true) {
+            if ((KEY_P_DOWN == Key_Check(KEY_ENTER)) || (KEY_P_DOWN == Key_Check(KEY_RIGHT))) {
+                delay_ms(10);
+                if ((KEY_P_DOWN == Key_Check(KEY_ENTER)) || (KEY_P_DOWN == Key_Check(KEY_RIGHT))) {
+                    g_Flag_FileNameDefault = 0;
+                    break;
+                }
+            }
+            if (KEY_P_DOWN == Key_Check(KEY_LEFT)) {
+                delay_ms(10);
+                if (KEY_P_DOWN == Key_Check(KEY_LEFT)) {
+                    g_Flag_FileNameDefault = 1;
+                    break;
+                }
+            }
+        }
+
+        Str_Clr(0, 2, 21);
+    }
+    else
+    {
+        g_Flag_FileNameDefault = -1;
+    }
 
     if(1 == g_Flag_FileNameDefault)
     {
@@ -189,50 +209,65 @@ status_t AC_SD_MenuSave()
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: Directory exists.\r\n");
-            OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
+            }
         }
         else
         {
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
-            OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+            }
             return kStatus_Fail;
         }
     }
     else
     {
         PRINTF("[O K] AC: SD: Successfully make dir /data.\r\n");
-        OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+        }
     }
 
-
-   if(0==g_Flag_FileNameDefault)
-   {
+    if(-1==g_Flag_FileNameDefault)
+    {
+        error = f_open(&g_fileObject_Menu, _T("/menu/sync"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
+    }
+    else if(0==g_Flag_FileNameDefault)
+    {
        error = f_open(&g_fileObject_Menu, _T("/menu/default"), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
-   }
+    }
     else
-   {
+    {
        sprintf(FullPath,"%s%d",MenuDir,g_Name_MenuFileName);
        error = f_open(&g_fileObject_Menu, _T(FullPath), (FA_WRITE | FA_READ | FA_CREATE_ALWAYS));
-   }
+    }
 
     if (error)
     {
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: File exists.\r\n");
-            OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
+            }
         }
         else
         {
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
-            OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+            }
             return kStatus_Fail;
         }
     }
     else
     {
         PRINTF("[O K] AC: SD: Successfully open file \r\n");
-        OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+        }
     }
 
 
@@ -249,7 +284,9 @@ status_t AC_SD_MenuSave()
     {
         PRINTF("[Err] AC: SD: Write file failed. \r\n");
         failedFlag = true;
-        OLED_P6x8Str(0,4,(uint8_t*)"Err - Write File");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,4,(uint8_t*)"Err - Write File");
+        }
         return kStatus_Fail;
     }
 
@@ -257,7 +294,9 @@ status_t AC_SD_MenuSave()
     if (f_lseek(&g_fileObject_Menu, 0U))
     {
         PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
-        OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
+        }
         failedFlag = true;
         return kStatus_Fail;
     }
@@ -268,7 +307,9 @@ status_t AC_SD_MenuSave()
     if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
     {
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
-        OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+        }
         failedFlag = true;
         return kStatus_Fail;
     }
@@ -277,17 +318,23 @@ status_t AC_SD_MenuSave()
     if (memcmp(g_bufferWrite_Menu, g_bufferRead_Menu, sizeof(g_bufferWrite_Menu)))
     {
         PRINTF("[Err] AC: SD: Compare read/write content isn't consistent.\r\n");
-
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,5,(uint8_t*)"Err - R/W not same");
+        }
         failedFlag = true;
         return kStatus_Fail;
     }
     PRINTF("[O K] AC: SD: The read/write content is consistent.\r\n");
-    OLED_P6x8Str(0,4,(uint8_t*)"O K - Write file");
+    if(mode!=ModeBoot){
+        OLED_P6x8Str(0,4,(uint8_t*)"O K - Write file");
+    }
 
     if (f_close(&g_fileObject_Menu))
     {
         PRINTF("[Err] AC: SD: Close file failed.\r\n");
-        OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+        }
         return kStatus_Fail;
     }
 
@@ -296,7 +343,7 @@ status_t AC_SD_MenuSave()
 }
 
 
-status_t AC_SD_MenuLoad()
+status_t AC_SD_MenuLoad(StorageMode_t mode)
 {
     FRESULT error;
     DIR directory; /* Directory object */
@@ -321,34 +368,56 @@ status_t AC_SD_MenuLoad()
     /** Start **/
 
     PRINTF("[O K] AC: Menu: Start SD:Load Menu\r\n");
-    OLED_P6x8Str(0,0,"Run Task...");
-    OLED_P6x8Str(0,1,(uint8_t*)"SD:Load Menu");
 
-    PRINTF("[O K] AC: Menu: Set names\r\n");
-    OLED_P6x8Str(0,2,(uint8_t*)"Load default?");
-    while(true)
+    if(mode!=ModeBoot)
     {
-        if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
+        OLED_P6x8Str(0,0,(uint8_t*)"SD:Load Menu");
+        OLED_P6x8Str(0,1,"Mode");
+
+        if(mode == ModeDefault)
         {
-            delay_ms(10);
-            if( (KEY_P_DOWN==Key_Check(KEY_ENTER))||(KEY_P_DOWN == Key_Check(KEY_RIGHT)))
-            {
-                g_Flag_FileNameDefault = 0;
-                break;
-            }
+            OLED_P6x8Str(60,1,(uint8_t*)"Default");
+            PRINTF("\r\n[O K] AC: SD: Mode-Default\r\n");
         }
-        if(KEY_P_DOWN == Key_Check(KEY_LEFT))
+        else if(mode  == ModeSync)
         {
-            delay_ms(10);
-            if(KEY_P_DOWN == Key_Check(KEY_LEFT))
-            {
-                g_Flag_FileNameDefault = 1;
-                break;
-            }
+            OLED_P6x8Str(60,1,(uint8_t*)"Sync");
+            PRINTF("\r\n[O K] AC: SD: Mode-Sync\r\n");
         }
     }
+    else{
+        PRINTF("\r\n[O K] AC: SD: Mode-Boot\r\n");
+    }
 
-    Str_Clr(0,2,21);
+
+
+    if(mode==ModeDefault) {
+
+        PRINTF("[O K] AC: Menu: Set names\r\n");
+        OLED_P6x8Str(0, 2, (uint8_t *) "Load default?");
+        while (true) {
+            if ((KEY_P_DOWN == Key_Check(KEY_ENTER)) || (KEY_P_DOWN == Key_Check(KEY_RIGHT))) {
+                delay_ms(10);
+                if ((KEY_P_DOWN == Key_Check(KEY_ENTER)) || (KEY_P_DOWN == Key_Check(KEY_RIGHT))) {
+                    g_Flag_FileNameDefault = 0;
+                    break;
+                }
+            }
+            if (KEY_P_DOWN == Key_Check(KEY_LEFT)) {
+                delay_ms(10);
+                if (KEY_P_DOWN == Key_Check(KEY_LEFT)) {
+                    g_Flag_FileNameDefault = 1;
+                    break;
+                }
+            }
+        }
+
+        Str_Clr(0, 2, 21);
+    }
+    else if(mode ==ModeSync)
+    {
+        g_Flag_FileNameDefault = -1;
+    }
 
     if(1 == g_Flag_FileNameDefault) {
         OLED_P6x8Str(0, 2, (uint8_t *) "Src Name?");
@@ -410,23 +479,50 @@ status_t AC_SD_MenuLoad()
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: Directory exists.\r\n");
-            OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,2,(uint8_t*)"O K - Dir exist");
+            }
+        }
+        else if(error == FR_NO_FILESYSTEM){
+        	PRINTF("[ERR] AC: SD: No valid file system for FatFs.Ready to make  a New Filesystem...\r\n");
+
+        	PRINTF("[O K] AC: SD: Press WAKEUP key to Start Reformat...\r\n");
+			gpio_t wakeUp = {XSNVS_WAKEUP_GPIO, XSNVS_WAKEUP_PIN, 0};
+			while (GPIO_Read(&wakeUp))
+			{
+				delay_ms(10);
+			}
+
+			PRINTF("[O K] AC: SD: Make file system......The time may be long if the card capacity is big.\r\n");
+			if (f_mkfs(driverNumberBuffer, FM_ANY, 0U, work, sizeof work))
+			{
+				PRINTF("[Err] AC: SD: Make filesystem failed.\r\n");
+				return kStatus_Fail;
+			}
         }
         else
         {
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
-            OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+            }
             return kStatus_Fail;
         }
     }
     else
     {
         PRINTF("[O K] AC: SD: Successfully make dir /data.\r\n");
-        OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,2,(uint8_t*)"O K - Mk Dir");
+        }
     }
 
 
-    if(0==g_Flag_FileNameDefault)
+    if(-1 == g_Flag_FileNameDefault)
+    {
+        error = f_open(&g_fileObject_Menu, _T("/MENU/SYNC"), (FA_READ));
+    }
+    else if(0==g_Flag_FileNameDefault)
     {
         error = f_open(&g_fileObject_Menu, _T("/MENU/DEFAULT"), (FA_READ));
     }
@@ -440,51 +536,55 @@ status_t AC_SD_MenuLoad()
         if (error == FR_EXIST)
         {
             PRINTF("[O K] AC: SD: File exists.\r\n");
-            OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,3,(uint8_t*)"O K - File exist");
+            }
         }
         else
         {
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
-            OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+            if(mode!=ModeBoot){
+                OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+            }
             return kStatus_Fail;
         }
     }
     else
     {
         PRINTF("[O K] AC: SD: Successfully open file \r\n");
-        OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,3,(uint8_t*)"O K - File opened");
+        }
     }
 
-//        /* Move the file pointer */
-//    if (f_lseek(&g_fileObject_Menu, 0U))
-//    {
-//        PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
-//        OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
-//        failedFlag = true;
-//        return kStatus_Fail;
-//    }
+
 
     PRINTF("[O K] AC: SD: Read from above created file.\r\n");
     memset(g_bufferRead_Menu, 0U, sizeof(g_bufferRead_Menu));
 
-    //g_fileObject_Menu.obj.objsize = sizeof(g_bufferRead_Menu);
 
     error = f_read(&g_fileObject_Menu, g_bufferRead_Menu, sizeof(g_bufferRead_Menu), &bytesRead);
     if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
     {
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
-        OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+        }
         failedFlag = true;
         return kStatus_Fail;
     }
 
     memcpy(data,g_bufferRead_Menu,sizeof(data));
-    OLED_P6x8Str(0,4,(uint8_t*)"O K - Read file");
+    if(mode!=ModeBoot){
+        OLED_P6x8Str(0,4,(uint8_t*)"O K - Read file");
+    }
 
     if (f_close(&g_fileObject_Menu))
     {
         PRINTF("[Err] AC: SD: Close file failed.\r\n");
-        OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+        if(mode!=ModeBoot){
+            OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+        }
         return kStatus_Fail;
     }
 
