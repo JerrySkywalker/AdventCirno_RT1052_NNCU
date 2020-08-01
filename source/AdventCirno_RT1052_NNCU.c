@@ -133,7 +133,7 @@ int8_t tmp_AD_Input2[9] = {
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
 extern TaskHandle_t AC_Pit_task_handle;
-
+extern int16_t middleline_nncu;
 
 
 #if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
@@ -394,7 +394,11 @@ void AC_Task(void *pvData)
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 		g_time_us= TimerUsGet();
-		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&g_AD_Data);
+        for(int i = 0;i<9;i++)
+        {
+            g_AD_Data[i] ++;
+        }
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 		g_time_duration_us = TimerUsGet() - g_time_us;
 
@@ -484,7 +488,7 @@ void AC_Task(void *pvData)
 				OLED_Print_Num1(60,3, g_AD_Data[7]);
 				OLED_Print_Num1(60,4, g_AD_Data[8]);
 			}
-        	if(1==g_Boma[1])
+        	else if(1==g_Boma[1])
 			{
 				if(0!=Flag_ScreenRefresh)
                 {
@@ -509,7 +513,7 @@ void AC_Task(void *pvData)
             OLED_P6x8Str(0,2,(uint8_t*)"Servo");
             OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
             OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-            OLED_P6x8Str(0,5,(uint8_t*)"AD-0");
+            OLED_P6x8Str(0,5,(uint8_t*)"middleline");
             OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
 
             Str_Clr(60,1,10);
@@ -528,8 +532,8 @@ void AC_Task(void *pvData)
 
             OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
             OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
-            OLED_Print_Num(60,4,g_time_duration_us);
-            OLED_Print_Num(60,5,g_AD_Data[0]);
+            OLED_Print_Num1(60,4,g_time_duration_us);
+            OLED_Print_Num1(60,5,middleline_nncu);
             OLED_Print_Num(60,6,g_AD_Data[6]);
 
             //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
@@ -583,7 +587,7 @@ void LPUART2_IRQHandler(void)
         /*Get AD Data*/
         for(int i = 0;i<9;i++)
         {
-            g_AD_Data[i] = temp_COM_data_buffer[i+3] + 128;
+            g_AD_Data[i] = temp_COM_data_buffer[i+3];
         }
 
         /*Get Boma Data*/

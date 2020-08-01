@@ -2,9 +2,9 @@
 #define _IMAGE_H
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 //#include "cv.h"
 //#include "highgui.h"
-#include <math.h>
 #include "ac_lib/AC_Menu.h"
 #include <stdint.h>
 #include "smartcar/sc_ac_delay.h"

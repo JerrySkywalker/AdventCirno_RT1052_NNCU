@@ -52,9 +52,9 @@ int16_t ENC_Dateget(ENC_Type *base)
 	return (int16_t)ENC_GetHoldPositionDifferenceValue(base);
 }
 //得到位置
-uint32_t ENC_Positionget(ENC_Type *base)
+int16_t ENC_Positionget(ENC_Type *base)
 {
-	return ENC_GetPositionValue(base);
+	return (int16_t)ENC_GetPositionValue(base);
 }
 //得到转的圈数
 int16_t ENC_Revolutionget(ENC_Type *base)

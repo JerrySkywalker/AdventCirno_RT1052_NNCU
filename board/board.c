@@ -73,7 +73,7 @@ uint32_t BOARD_DebugConsoleSrcFreq(void) {
 
 
 void BOARD_InitDebugConsole(void) {
-    /*int result =*/ DbgConsole_Init(1, 115200, kSerialPort_Uart, BOARD_DebugConsoleSrcFreq());
+    /*int result =*/ DbgConsole_Init(1, 1152000, kSerialPort_Uart, BOARD_DebugConsoleSrcFreq());
 }
 
 

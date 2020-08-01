@@ -54,7 +54,9 @@ typedef struct Data
     int dirkp;
     int dirki;
     int dirkd;
-
+    int dirkp_z;
+    int dirki_z;
+    int dirkd_z;
     /**Mode for Camera/EM Control*/
     int mode;
 
@@ -168,6 +170,9 @@ int Set_Class(int (*action)(int *data,int modify));
 int Set_DirKp(int (*action)(int *data,int modify));
 int Set_DirKi(int (*action)(int *data,int modify));
 int Set_DirKd(int (*action)(int *data,int modify));
+int Set_DirKp_z(int (*action)(int *data,int modify));
+int Set_DirKi_z(int (*action)(int *data,int modify));
+int Set_DirKd_z(int (*action)(int *data,int modify));
 int Set_Mode(int (*action)(int *data,int modify));
 int Set_ForwardView(int (*action)(int *data,int modify));
 int Set_AutoThreshold(int (*action)(int *data,int modify));

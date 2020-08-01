@@ -318,7 +318,12 @@
                      </pin_features>
                   </pin>
                   <pin peripheral="SNVS" signal="snvs_pmic_on_req" pin_num="K7" pin_signal="PMIC_ON_REQ"/>
-                  <pin peripheral="GPIO5" signal="gpio_io, 02" pin_num="L7" pin_signal="PMIC_STBY_REQ"/>
+                  <pin peripheral="GPIO5" signal="gpio_io, 02" pin_num="L7" pin_signal="PMIC_STBY_REQ">
+                     <pin_features>
+                        <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="slew_rate" value="Fast"/>
+                     </pin_features>
+                  </pin>
                </pins>
             </function>
             <function name="__camera">
@@ -1661,7 +1666,7 @@
             <component name="system" uuid="aaff4d3f-7874-4344-9e1a-8772bc692a39" type_id="system_54b53072540eeeb8f8e9343e71f28176">
                <config_set_global name="global_system_definitions"/>
             </component>
-            <component name="msg" uuid="60992b05-c1cb-44e6-a639-f811aa283d02" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
+            <component name="msg" uuid="28492e87-1bf7-47ce-bfb8-20178188446f" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
                <config_set_global name="global_messages"/>
             </component>
          </components>
