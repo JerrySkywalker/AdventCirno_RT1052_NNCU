@@ -322,7 +322,6 @@ void AC_Task(void *pvData)
 #if(AC_AI_BACKEND == AC_AI_BACKEND_TFLite)
 
     PRINTF("[O K] AC: AI: Starting Tensorflow Lite Backend\r\n");
-    OLED_P6x8Str(10, 7, "-TFLIte");
 
     g_tflite_error_reporter = AC_TFLite_DNN_Setup();
 
