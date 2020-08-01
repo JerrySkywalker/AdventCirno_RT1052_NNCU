@@ -60,6 +60,7 @@
 #include "ac_lib/AC_Menu.h"
 #include "ac_lib/AC_Command.h"
 #include "ac_lib/AC_Pit.h"
+#include "ac_lib/AC_SD_Storage.h"
 #include "ac_lib/Image.h"
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
@@ -344,7 +345,17 @@ void AC_Task(void *pvData)
 		memcpy(&data, g_flash_buff_r + FLASH_PAGE_SIZE, sizeof(data));
 
 #elif (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
+
 		OLED_P6x8Str(60,4,(uint8_t*)"SD");
+
+        if(kStatus_Success!=AC_SD_MenuLoad(ModeBoot))
+        {
+            OLED_P6x8Str(80,4,(uint8_t*)"Err");
+        }
+        else
+        {
+            OLED_P6x8Str(80,4,(uint8_t*)"OK");
+        }
 
 
 #endif
@@ -368,7 +379,11 @@ void AC_Task(void *pvData)
 
     PRINTF("[O K] AC: AI: Starting Tensorflow Lite Backend\r\n");
 
+#if (AC_FLASH_MANUAL == AC_FLASH_MANUAL_DISABLE)
+
     g_tflite_error_reporter = AC_TFLite_DNN_Setup();
+
+#endif
 
     if(0 == g_tflite_error_reporter)
     {
@@ -484,7 +499,15 @@ void AC_Task(void *pvData)
 #elif (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
                     OLED_P6x8Str(0,0,(uint8_t*)"SD: Data Saved!");
 
-
+                    if(kStatus_Success == AC_SD_MenuSave(ModeBoot))
+                    {
+                        OLED_P6x8Rst(0,6,"Success!...");
+                    }
+                    else
+                    {
+                        OLED_P6x8Rst(0,6,"Err!...");
+                    }
+                    OLED_P6x8Str(0,7,"Exiting...");
 #endif
 
 					/*Delete your task Here*/
