@@ -87,6 +87,8 @@
 
 //#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
 #define AC_FLASH_MANUAL AC_FLASH_MANUAL_ENABLE
+
+
 /**
  * @breif Menu storage option
  */
@@ -97,7 +99,20 @@
 //#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
 #define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
 
+/**
+ * @breif FUNCTION option
+ */
 
+#define AC_FUNCTION_ON 1U
+#define AC_FUNCTION_OFF 0U
+
+#define AC_FUNCTION_SERVICE AC_FUNCTION_ON
+
+
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
 
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
 BSS_OC uint8_t heap_heap2[128 * 1024] ALIGN(8);
@@ -167,6 +182,10 @@ int g_tflite_error_reporter;
 
 #endif
 
+
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
 TaskHandle_t LED_task_handle;
 void LED_task(void *pvData)
 {
@@ -513,13 +532,35 @@ void AC_Task(void *pvData)
                     OLED_P6x8Str(0,7,"Exiting...");
 #endif
 
-					/*Delete your task Here*/
+					/**TODO: Delete your task Here**/
 					vTaskDelete(AC_Menu_task_handle);
                     PRINTF("[O K] AC: Menu Deleted! \r\n");
 
                     vTaskDelay(500);
 					OLED_Fill(0);
 
+                    /**TODO: Background Service Here**/
+#if (AC_FUNCTION_SERVICE==AC_FUNCTION_ON)
+
+                    OLED_Fill(0);
+
+#if (AC_STORAGE_MENU != AC_STORAGE_PLACE_SD)
+
+                    if(kStatus_Success == AC_SD_MenuSave(ModeSync))
+                    {
+                        OLED_P6x8Rst(0,6,"Success!...");
+                    }
+                    else
+                    {
+                        OLED_P6x8Rst(0,6,"Err!...");
+                    }
+                    OLED_P6x8Str(0,7,"Exiting...");
+
+                    vTaskDelay(500);
+                    OLED_Fill(0);
+#endif
+
+#endif
 				}
 			}
 
