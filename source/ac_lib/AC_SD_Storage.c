@@ -104,7 +104,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
     if(mode!=ModeBoot)
     {
         OLED_P6x8Str(0,0,(uint8_t*)"SD:Load Menu");
-        OLED_P6x8Str(0,1,"Mode");
+        OLED_P6x8Str(0,1,(uint8_t*)"Mode");
 
         if(mode == ModeDefault)
         {
@@ -154,7 +154,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         OLED_P6x8Str(0,2,(uint8_t*)"Dst Name?");
 
         Str_Clr(PRINT_START_MULTIPLICATOR, 0, PRINT_LENGTH_DATA + 1);
-        OLED_P6x8Str(PRINT_START_MULTIPLICATOR, 0, "X");
+        OLED_P6x8Str(PRINT_START_MULTIPLICATOR, 0, (uint8_t*)"X");
         OLED_Print_Num(PRINT_START_DATA, 0, multiplicator);
 
         OLED_Print_Num(PRINT_START_DATA,2,g_Name_MenuFileName);
@@ -395,7 +395,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
     if(mode!=ModeBoot)
     {
         OLED_P6x8Str(0,0,(uint8_t*)"SD:Load Menu");
-        OLED_P6x8Str(0,1,"Mode");
+        OLED_P6x8Str(0,1,(uint8_t*)"Mode");
 
         if(mode == ModeDefault)
         {
@@ -450,9 +450,9 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         int temp_Flag_DirReadLoop = 1;
 
         PRINTF("[O K] AC: SD: List the file in that directory......\r\n");
-        if (f_opendir(&directory, "/menu")) {
+        if (f_opendir(&directory, "/MENU")) {
             PRINTF("[Err] AC: SD: Open directory failed.\r\n");
-            OLED_Print_Num(0, 2, "Err - Open Dir");
+            OLED_Print_Num(0, 2, (uint8_t*)"Err - Open Dir");
             SD_ExitCritical();
             return kStatus_Fail;
         }
@@ -463,7 +463,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
 
             /* To the end. */
             if ((error != FR_OK) || (fileInformation.fname[0U] == 0U)) {
-                OLED_P6x8Str(0, 3, "Err - Cancelled");
+                OLED_P6x8Str(0, 3, (uint8_t*)"Err - Cancelled");
                 PRINTF("[Err] AC: SD: Cancelled by User.\r\n");
 
                 SD_ExitCritical();
@@ -478,7 +478,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
                 continue;
             } else {
                 Str_Clr(72, 2, 9);
-                OLED_P6x8Str(72, 2, fileInformation.fname);
+                OLED_P6x8Str(72, 2, (uint8_t*)fileInformation.fname);
 
                 int temp_Flag_DirFilterWaiting = 1;
 
