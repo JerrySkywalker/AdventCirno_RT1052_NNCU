@@ -25,7 +25,7 @@ float s_speed_aim_left = 0, s_speed_aim_right = 0;
 float s_error_left = 0, s_error_right = 0;
 float Differencial = 0;
 
-uint8_t EM_AD[NUMBER_INDUCTORS];
+extern uint8_t EM_AD[NUMBER_INDUCTORS];
 int16_t middleline_nncu;
 int16_t MID_Sample[MID_CollectTimes];
 int16_t MID_Temp;
@@ -62,34 +62,33 @@ void Dir_Control(void)
     float s_error_S;
     float dir_angle = 0;
 
-    /*摄像头模式*/
+    /*摄像头&AI模式*/
     if (data[data_identifier].mode == 0)
     {
     	/*PID*/
         //s_error = CAMERA_M - mid_line[data[data_identifier].forward_view];
     	middleline_nncu = (g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor)+20;
-    	if (middleline_nncu > 188)	middleline_nncu = 188;
-    	else if (middleline_nncu < 0) middleline_nncu = 0;
+    	if (middleline_nncu > 160)	middleline_nncu = 160;
+    	else if (middleline_nncu < 28) middleline_nncu = 28;
     	//Middleline_Filter();
     	s_error = CAMERA_M - middleline_nncu;
         s_dir = 0.0001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
         g_dir_error_1 = s_error;
+
+        /*舵机限幅保护*/
+        Servo_Protect(&s_dir);
+
         /*获取差速系数*/
-//        dir_angle = s_dir;    				//暂时以占空比的变化当作舵机偏角
-//        Differencial = 0.01*SIZE_CONSTANT*tan(dir_angle);
+        dir_angle = s_dir;    				//以占空比的变化当作舵机偏角
+        Differencial = 0.01*SIZE_CONSTANT*tan(dir_angle);
+
         /*输出占空比*/
-        //Servo_Protect(&s_dir); 			//舵机限幅保护(已经在sc_ac_pwm.c中)
         PWM_AC_SetServoDuty((uint16_t)(100*(DIR_M + s_dir)));
     }
 
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-    	/*将g_AD_Data转成EM_AD*/
-    	for (uint8_t i=0; i<NUMBER_INDUCTORS; i++)
-    	{
-    		EM_AD[i] = g_AD_Data[i] - 128;
-    	}
 
     	/**/
         if (EM_AD[0] + EM_AD[6] != 0)
@@ -162,19 +161,12 @@ void Dir_Control(void)
 //        g_dir_error_1 = s_error;
 
         /*获取差速系数*/
-        Servo_Protect(&s_dir);				//已集成在PWM_AC_SetServoDuty()中
+        Servo_Protect(&s_dir);
         dir_angle = s_dir;    				//以占空比的变化当作舵机偏角
         Differencial = 0.01*SIZE_CONSTANT*tan(dir_angle);
 
-        /*出赛道保护&输出占空比*/
-        if (EM_AD[0] <= 5 || EM_AD[6] <= 5) //电磁出赛道保护
-        {
-        	PWM_AC_SetServoDuty((uint16_t)(100*DIR_M));
-        }
-        else
-        {
-        	PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + 100*s_dir));
-        }
+        /*输出占空比*/
+        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + 100*s_dir));
     }
 }
 
@@ -193,27 +185,42 @@ void Speed_Control(void)
     s_speed_left_now = ENC_Positionget(ENC3) * FTM_CONSTANT;
     s_speed_right_now = -ENC_Positionget(ENC2) * FTM_CONSTANT;
 
-    /*目标速度*/
-    if ((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50) && (EM_AD[3] >= 70)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))
+    /*摄像头&AI模式*/
+    if (data[data_identifier].mode == 0)
     {
-      s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        if (g_AD_Data[0] <= -123 || g_AD_Data[6] <= -123)
+        {
+          s_speed_aim = 0;
+        }
+        else
+        {
+          s_speed_aim = 0.1 * data[data_identifier].speed;
+        }
     }
-    else if (EM_AD[0] <= 5 || EM_AD[6] <= 5)
+
+    /*电磁模式*/
+    else if (data[data_identifier].mode == 1)
     {
-      s_speed_aim=0;
-    }
-    else if ((((s_dir / 0.8) * 255)>180)&&(EM_AD[3]<data[data_identifier].yuzhi))
-    {
-      s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-    }
-    else
-    {
-      s_speed_aim = 0.1 * data[data_identifier].speed;
+        if ((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50) && (EM_AD[3] >= 70)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))
+        {
+          s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        }
+        else if (EM_AD[0] <= 5 || EM_AD[6] <= 5)
+        {
+        	s_speed_aim=0;
+        }
+        else if ((((s_dir / 0.8) * 255)>180)&&(EM_AD[3]<data[data_identifier].yuzhi))
+        {
+          s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        }
+        else
+        {
+          s_speed_aim = 0.1 * data[data_identifier].speed;
+        }
     }
 
     s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
     s_speed_aim_right = s_speed_aim*(1+data[data_identifier].speedkr*Differencial);
-
 
     /*PID*/
     s_error_left = s_speed_aim_left - s_speed_left_now;
@@ -233,7 +240,7 @@ void Speed_Control(void)
 
     Speed_Judge(s_speed_left, s_speed_right);
 
-    //Send_Variable();
+    Send_Variable();
 
     ENC_Dateclear(ENC2);
     ENC_Dateclear(ENC3);
