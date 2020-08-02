@@ -218,6 +218,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         }
         else
         {
+            PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
@@ -262,6 +263,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         }
         else
         {
+            PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
@@ -290,6 +292,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
     error = f_write(&g_fileObject_Menu, g_bufferWrite_Menu, sizeof(g_bufferWrite_Menu), &bytesWritten);
     if ((error) || (bytesWritten != sizeof(g_bufferWrite_Menu)))
     {
+        PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
         PRINTF("[Err] AC: SD: Write file failed. \r\n");
         failedFlag = true;
         if(mode!=ModeBoot){
@@ -302,6 +305,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
     /* Move the file pointer */
     if (f_lseek(&g_fileObject_Menu, 0U))
     {
+        PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
         PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
@@ -317,6 +321,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
     error = f_read(&g_fileObject_Menu, g_bufferRead_Menu, sizeof(g_bufferRead_Menu), &bytesRead);
     if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
     {
+        PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
@@ -510,7 +515,8 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             }
         }
         else if(error == FR_NO_FILESYSTEM){
-        	PRINTF("[ERR] AC: SD: No valid file system for FatFs.Ready to make  a New Filesystem...\r\n");
+            PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
+            PRINTF("[ERR] AC: SD: No valid file system for FatFs.Ready to make  a New Filesystem...\r\n");
 
         	PRINTF("[O K] AC: SD: Press WAKEUP key to Start Reformat...\r\n");
 			gpio_t wakeUp = {XSNVS_WAKEUP_GPIO, XSNVS_WAKEUP_PIN, 0};
@@ -529,6 +535,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         }
         else
         {
+            PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
@@ -574,6 +581,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         }
         else
         {
+            PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
@@ -599,6 +607,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
     error = f_read(&g_fileObject_Menu, g_bufferRead_Menu, sizeof(g_bufferRead_Menu), &bytesRead);
     if ((error) || (bytesRead != sizeof(g_bufferRead_Menu)))
     {
+        PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
