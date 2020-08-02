@@ -222,6 +222,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+                OLED_Print_Num(80,6,error);
             }
             SD_ExitCritical();
             return kStatus_Fail;
@@ -267,6 +268,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+                OLED_Print_Num(80,6,error);
             }
             SD_ExitCritical();
             return kStatus_Fail;
@@ -297,18 +299,21 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         failedFlag = true;
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Write File");
+            OLED_Print_Num(80,6,error);
         }
         SD_ExitCritical();
         return kStatus_Fail;
     }
 
     /* Move the file pointer */
-    if (f_lseek(&g_fileObject_Menu, 0U))
+    error = f_lseek(&g_fileObject_Menu, 0U);
+    if (error)
     {
         PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
         PRINTF("[Err] AC: SD: Set file pointer position failed. \r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
+            OLED_Print_Num(80,6,error);
         }
         failedFlag = true;
 
@@ -325,6 +330,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+            OLED_Print_Num(80,6,error);
         }
         failedFlag = true;
 
@@ -349,11 +355,13 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         OLED_P6x8Str(0,4,(uint8_t*)"O K - Write file");
     }
 
-    if (f_close(&g_fileObject_Menu))
+    error = f_close(&g_fileObject_Menu);
+    if (error)
     {
         PRINTF("[Err] AC: SD: Close file failed.\r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+            OLED_Print_Num(80,6,error);
         }
         SD_ExitCritical();
         return kStatus_Fail;
@@ -450,9 +458,12 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         int temp_Flag_DirReadLoop = 1;
 
         PRINTF("[O K] AC: SD: List the file in that directory......\r\n");
-        if (f_opendir(&directory, "/MENU")) {
+        error = f_opendir(&directory, "/MENU");
+        if (error) {
+            PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
             PRINTF("[Err] AC: SD: Open directory failed.\r\n");
             OLED_Print_Num(0, 2, (uint8_t*)"Err - Open Dir");
+            OLED_Print_Num(80,6,error);
             SD_ExitCritical();
             return kStatus_Fail;
         }
@@ -516,6 +527,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         }
         else if(error == FR_NO_FILESYSTEM){
             PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
+            OLED_Print_Num(80,6,error);
             PRINTF("[ERR] AC: SD: No valid file system for FatFs.Ready to make  a New Filesystem...\r\n");
 
         	PRINTF("[O K] AC: SD: Press WAKEUP key to Start Reformat...\r\n");
@@ -526,12 +538,18 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
 			}
 
 			PRINTF("[O K] AC: SD: Make file system......The time may be long if the card capacity is big.\r\n");
-			if (f_mkfs(driverNumberBuffer, FM_ANY, 0U, work, sizeof work))
+            error = f_mkfs(driverNumberBuffer, FM_ANY, 0U, work, sizeof work);
+			if (error)
 			{
 				PRINTF("[Err] AC: SD: Make filesystem failed.\r\n");
+                PRINTF("[Err] AC: SD: Error Code %d\r\n",error);
+				OLED_Print_Num(80,6,error);
                 SD_ExitCritical();
 				return kStatus_Fail;
 			}
+
+            PRINTF("[Err] AC: SD: Make filesystem success.\r\n");
+            return kStatus_Success;
         }
         else
         {
@@ -539,6 +557,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             PRINTF("[Err] AC: SD: Make directory failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
+                OLED_Print_Num(80,6,error);
             }
 
             SD_ExitCritical();
@@ -585,6 +604,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             PRINTF("[Err] AC: SD: Open file failed.\r\n");
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
+                OLED_Print_Num(80,6,error);
             }
             SD_ExitCritical();
             return kStatus_Fail;
@@ -611,6 +631,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         PRINTF("[Err] AC: SD: Read file failed. \r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
+            OLED_Print_Num(80,6,error);
         }
         failedFlag = true;
         SD_ExitCritical();
@@ -622,11 +643,13 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         OLED_P6x8Str(0,4,(uint8_t*)"O K - Read file");
     }
 
-    if (f_close(&g_fileObject_Menu))
+    error = f_close(&g_fileObject_Menu);
+    if (error)
     {
         PRINTF("[Err] AC: SD: Close file failed.\r\n");
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
+            OLED_Print_Num(80,6,error);
         }
         SD_ExitCritical();
         return kStatus_Fail;

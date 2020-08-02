@@ -883,7 +883,7 @@ int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify))
 /**TODO: Task Declaration*/
 int Task_SD_SaveMenu(int (*action)(int *data,int modify))
 {
-	OLED_P6x8Str(0,1,(uint8_t*)"SD:Save Menu");
+	//OLED_P6x8Str(0,1,(uint8_t*)"SD:Save Menu");
 	PRINTF("[O K] AC: Menu: Start SD: Save Menu\r\n");
 
 	int err = AC_SD_MenuSave(ModeDefault);
@@ -891,7 +891,7 @@ int Task_SD_SaveMenu(int (*action)(int *data,int modify))
 }
 int Task_SD_LoadMenu(int (*action)(int *data,int modify))
 {
-    OLED_P6x8Str(0,1,(uint8_t*)"SD:Load Menu");
+    //OLED_P6x8Str(0,1,(uint8_t*)"SD:Load Menu");
     PRINTF("[O K] AC: Menu: Start SD: Load Menu\r\n");
 
     int err = AC_SD_MenuLoad(ModeDefault);
