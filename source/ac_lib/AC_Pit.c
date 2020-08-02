@@ -22,7 +22,7 @@ extern int16_t g_AD_nncu_Output[3];
 //extern pwm_t my2;
 //extern gpio_t OE_B;
 
-//int Flag_Signal = 0;				//脉冲信号标志
+int Flag_Signal = 0;				//脉冲信号标志
 
 //uint16_t duty;  //测试舵机用
 
@@ -152,18 +152,18 @@ void AC_Pit(void *pv)
 //        PWM_AC_SetServoDuty(duty);
 
     	/*产生阶跃信号，调电机PID用*/
-//    	 if (Flag_Signal == 1)
-//    	 {
+    	 if (Flag_Signal == 1)
+    	 {
 //    	 	Flag_Signal = 0;
 //    	 	s_speed_aim_left = -2;
 //    	 	s_speed_aim_right = -2;
-//    	 }
-//    	 else if (Flag_Signal == 0)
-//    	 {
+    	 }
+    	 else if (Flag_Signal == 0)
+    	 {
 //    	 	Flag_Signal = 1;
 //    	 	s_speed_aim_left = 2;
 //    	 	s_speed_aim_right = 2;
-//    	 }
+    	 }
 
         /*在屏幕上显示编码器返回值*/
 //        float g_speed_now_left = 0;
