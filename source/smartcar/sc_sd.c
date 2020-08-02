@@ -40,6 +40,15 @@ static const sdmmchost_pwr_card_t s_sdCardPwrCtrl = {
         .powerOffDelay_ms = 0U,
 };
 
+
+/**
+ * @breif SD卡临界区操作
+ * **/
+volatile int _SD_ICacheIsDisable = 0;
+volatile int _SD_DCacheIsDisable = 0;
+volatile int _SD_CriticalNesting = 0;
+
+
 uint32_t USDHC1_ClkFreqGet(void) {
     uint32_t freq;
     int div = CLOCK_GetDiv(kCLOCK_Usdhc1Div);
