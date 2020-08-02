@@ -33,7 +33,10 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-
+volatile int _FLASH_ICacheIsDisable;
+volatile int _FLASH_DCacheIsDisable;
+volatile int _FLASH_CriticalNesting;
+volatile uint32_t _FLASH_regPrimask;
 
 flexspi_device_config_t deviceconfig = {
         .flexspiRootClk = 1000 * (1000 * 2160 / 17),
