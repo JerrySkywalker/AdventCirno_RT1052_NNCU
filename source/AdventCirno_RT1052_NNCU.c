@@ -76,7 +76,7 @@
 #define AC_AI_BACKEND_NNCU 0x01
 #define AC_AI_BACKEND_TFLite 0x02
 
-#define AC_AI_BACKEND (AC_AI_BACKEND_NNCU | AC_AI_BACKEND_TFLite)
+#define AC_AI_BACKEND (AC_AI_BACKEND_NNCU)
 
 /**
  * @breif Manual Flash Operation switch
