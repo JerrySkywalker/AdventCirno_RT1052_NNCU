@@ -65,7 +65,9 @@ typedef struct Data
     int running_time;
     int Weight_x;
     int Weight_y;
-
+    int yuzhi;
+    int jia_speed;
+    int jian_speed;
     /**@brief NNCU NormalizeFactor
      *
      *  In the use of nncu selfinf code, we must use a normalize factor to justify the outcome. Usually the real outcome
@@ -179,6 +181,9 @@ int Set_AutoThreshold(int (*action)(int *data,int modify));
 int Set_RunningTime(int (*action)(int *data,int modify));
 int Set_Weight_x(int (*action)(int *data,int modify));
 int Set_Weight_y(int (*action)(int *data,int modify));
+int Set_jia_speed(int (*action)(int *data,int modify));
+int Set_jian_speed(int (*action)(int *data,int modify));
+int Set_yuzhi(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));
 

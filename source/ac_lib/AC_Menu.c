@@ -41,7 +41,9 @@ MenuNode_t *Menu_SetRunningTime;
 MenuNode_t *Menu_SetSetupTime;
 MenuNode_t *Menu_Weight_x;
 MenuNode_t *Menu_Weight_y;
-
+MenuNode_t *Menu_jia_speed;
+MenuNode_t *Menu_jian_speed;
+MenuNode_t *Menu_yuzhi;
 /**NNCU Data*/
 MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
 
@@ -476,6 +478,9 @@ void Menu_Init() {
     // Menu_MenuNodeCreate(&Menu_SetSetupTime, "SetSetupTime", DATA_INT, Set_SetupTime, root);
     Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", DATA_INT, Set_Weight_x, root);
     Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", DATA_INT, Set_Weight_y, root);
+    Menu_MenuNodeCreate(&Menu_jia_speed, "jia_speed",  DATA_INT, Set_jia_speed, root);
+    Menu_MenuNodeCreate(&Menu_jian_speed, "jian_speed", DATA_INT, Set_jian_speed, root);
+    Menu_MenuNodeCreate(&Menu_yuzhi, "yuzhi",  DATA_INT, Set_yuzhi, root);
 
     Menu_MenuNodeCreate(&Menu_Task, "Task", MID, NULL, root);
     {
@@ -838,8 +843,30 @@ int Set_Weight_y(int (*action)(int *data,int modify))
     data[data_identifier].Weight_y = ans;
     return ans;
 }
-
-
+int Set_yuzhi(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].yuzhi, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].yuzhi = ans;
+    return ans;
+}
+int Set_jia_speed(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].jia_speed, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].jia_speed = ans;
+    return ans;
+}
+int Set_jian_speed(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].jian_speed, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].jian_speed = ans;
+    return ans;
+}
 /**
  * @brief NNCU_NormalizeFactor Callback
  * @since v1.0

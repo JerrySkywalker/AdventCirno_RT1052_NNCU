@@ -105,7 +105,7 @@ uint32_t g_time_duration_us = 0;
 /*TODO: Buffer declaration here*/
 uint8_t g_flash_buff_r[FLASH_SECTOR_SIZE];
 uint8_t g_flash_buff_w[FLASH_SECTOR_SIZE];
-int8_t g_AD_Data[9];
+int8_t g_AD_Data[NUMBER_INDUCTORS];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
 int16_t *g_AD_nncu_OutBuffer;
@@ -350,10 +350,6 @@ void AC_Task(void *pvData)
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 		g_time_us= TimerUsGet();
-        for(int i = 0;i<9;i++)
-        {
-            g_AD_Data[i] ++;
-        }
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 		g_time_duration_us = TimerUsGet() - g_time_us;
@@ -543,7 +539,7 @@ void LPUART2_IRQHandler(void)
         /*Get AD Data*/
         for(int i = 0;i<9;i++)
         {
-            g_AD_Data[i] = temp_COM_data_buffer[i+3];
+            g_AD_Data[i] = temp_COM_data_buffer[i+3] + 128;
         }
 
         /*Get Boma Data*/

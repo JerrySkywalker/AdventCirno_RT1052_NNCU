@@ -14,7 +14,7 @@ extern int data_identifier;
 extern int Boma2_flag;
 extern int Control_timenow;
 extern int Control_time;
-extern uint8_t g_AD_Data[12];
+extern int8_t g_AD_Data[NUMBER_INDUCTORS];
 extern int16_t g_AD_nncu_Output[3];
 
 float g_dir_error_1 = 0, g_dir_error_sum = 0, s_dir = 0;
@@ -25,7 +25,10 @@ float s_speed_aim_left = 0, s_speed_aim_right = 0;
 float s_error_left = 0, s_error_right = 0;
 float Differencial = 0;
 
+uint8_t EM_AD[NUMBER_INDUCTORS];
 int16_t middleline_nncu;
+int16_t MID_Sample[MID_CollectTimes];
+int16_t MID_Temp;
 float Huandao_zhongzhi_figure;
 int Huandao_shibie_flag = 0;
 int Zhidao_shibie_flag = 0; //0表示非弯道，1表示识别
@@ -33,6 +36,7 @@ int Shizi_shibie_flag = 0;
 int Shexingwan_jishi_flag = 0;
 int Shexingwan_tuolijishi_flag;
 int Wandao_shibie_huicha_flag = 0;
+float s_error_yuanshi_H;     //横电感的原始偏差
 
 pwm_t my1 = {PWM2, kPWM_Module_0, 20 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 20 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
@@ -58,23 +62,6 @@ void Dir_Control(void)
     float s_error_S;
     float dir_angle = 0;
 
-    if (g_AD_Data[0] + g_AD_Data[6] != 0)
-    {
-      AD_fenmu_H = g_AD_Data[0] + g_AD_Data[6];
-    }
-    else
-    {
-      AD_fenmu_H = 200; //防止分母为零
-    }
-    if (g_AD_Data[2] + g_AD_Data[4] != 0)
-    {
-      AD_fenmu_S = g_AD_Data[2] + g_AD_Data[4];
-    }
-    else
-    {
-      AD_fenmu_S = 200; //防止分母为零
-    }
-
     /*摄像头模式*/
     if (data[data_identifier].mode == 0)
     {
@@ -83,6 +70,7 @@ void Dir_Control(void)
     	middleline_nncu = (g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor)+20;
     	if (middleline_nncu > 188)	middleline_nncu = 188;
     	else if (middleline_nncu < 0) middleline_nncu = 0;
+    	//Middleline_Filter();
     	s_error = CAMERA_M - middleline_nncu;
         s_dir = 0.0001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
         g_dir_error_1 = s_error;
@@ -97,10 +85,34 @@ void Dir_Control(void)
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
+    	/*将g_AD_Data转成EM_AD*/
+    	for (uint8_t i=0; i<NUMBER_INDUCTORS; i++)
+    	{
+    		EM_AD[i] = g_AD_Data[i] - 128;
+    	}
+
+    	/**/
+        if (EM_AD[0] + EM_AD[6] != 0)
+        {
+        	AD_fenmu_H = EM_AD[0] + EM_AD[6];
+        }
+        else
+        {
+        	AD_fenmu_H = 200; //防止分母为零
+        }
+        if (EM_AD[2] + EM_AD[4] != 0)
+        {
+        	AD_fenmu_S = EM_AD[2] + EM_AD[4];
+        }
+        else
+        {
+        	AD_fenmu_S = 200; //防止分母为零
+        }
+
     	Dir_Control_Huandao_Shibie();
 
     	/*十字识别*/
-        if ((g_AD_Data[1] >= 20) && (g_AD_Data[5] >= 20))
+        if ((EM_AD[1] >= 40) && (EM_AD[5] >= 40))
         {
         	Shizi_shibie_flag = 1;
         }
@@ -112,30 +124,40 @@ void Dir_Control(void)
         /*判据选择*/
         if ((Shizi_shibie_flag == 1) || (Huandao_shibie_flag == 1)) //十字特殊通过方法
         {
-        	s_error = 0.0001*(g_AD_Data[0] - g_AD_Data[6]) / (g_AD_Data[0] + g_AD_Data[6] + 1); //中间的横电感是反的
+        	s_error = 0.0001*(EM_AD[0] - EM_AD[6]) / (EM_AD[0] + EM_AD[6] + 1); //中间的横电感是反的
         	//s_error = 0.5 * s_error_1 + 0.5 * s_error;
         }
         else
         {
-        	s_error_H = ((g_AD_Data[0] - g_AD_Data[6]) / AD_fenmu_H);
-        	s_error_S = ((g_AD_Data[2] - g_AD_Data[4]) / AD_fenmu_S);
+        	s_error_H = ((EM_AD[0] - EM_AD[6]) / AD_fenmu_H);
+        	s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
         	s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
         }
+        int a = 0;
+        if (s_error > 0)
+        {
+        	a = 1;
+        }
+        else
+        {
+        	a = -1;
+        }
+        s_error = a * s_error * s_error;//偏差平方
 
         /*PID*/
         if ((Shizi_shibie_flag == 1) || (Huandao_shibie_flag == 1))
         {
-        	s_dir = 0.01*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
+        	s_dir = 0.001*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
         	g_dir_error_1 = s_error;
         }
         else
         {
-        	s_dir = 0.0001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+        	s_dir = 0.000001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
         	g_dir_error_1 = s_error;
         }
 
     	/*PID Old*/
-//        s_error = ((g_AD_Data[0]+128) - (g_AD_Data[6]+128)) / ((g_AD_Data[0]+128) * (g_AD_Data[6]+128)+1);
+//        s_error = ((EM_AD[0]+128) - (EM_AD[6]+128)) / ((EM_AD[0]+128) * (EM_AD[6]+128)+1);
 //        s_dir = 10 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
 //        g_dir_error_1 = s_error;
 
@@ -144,10 +166,16 @@ void Dir_Control(void)
         dir_angle = s_dir;    				//以占空比的变化当作舵机偏角
         Differencial = 0.01*SIZE_CONSTANT*tan(dir_angle);
 
-        /*输出占空比*/
-    	PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + 100*s_dir));
+        /*出赛道保护&输出占空比*/
+        if (EM_AD[0] <= 5 || EM_AD[6] <= 5) //电磁出赛道保护
+        {
+        	PWM_AC_SetServoDuty((uint16_t)(100*DIR_M));
+        }
+        else
+        {
+        	PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + 100*s_dir));
+        }
     }
-
 }
 
 void Speed_Control(void)
@@ -155,7 +183,6 @@ void Speed_Control(void)
     //Running_Time();
 
     float s_speed_aim = 0;
-
 
     /*当前速度*/
 //    if (ENC_Positionget(ENC3) > 11550)	s_speed_left_now = 0;
@@ -167,16 +194,26 @@ void Speed_Control(void)
     s_speed_right_now = -ENC_Positionget(ENC2) * FTM_CONSTANT;
 
     /*目标速度*/
-    s_speed_aim = 0.1*data[data_identifier].speed;
+    if ((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50) && (EM_AD[3] >= 70)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))
+    {
+      s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+    }
+    else if (EM_AD[0] <= 5 || EM_AD[6] <= 5)
+    {
+      s_speed_aim=0;
+    }
+    else if ((((s_dir / 0.8) * 255)>180)&&(EM_AD[3]<data[data_identifier].yuzhi))
+    {
+      s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+    }
+    else
+    {
+      s_speed_aim = 0.1 * data[data_identifier].speed;
+    }
+
     s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
     s_speed_aim_right = s_speed_aim*(1+data[data_identifier].speedkr*Differencial);
 
-    /*出赛道保护*/
-//    if (g_AD_Data[0] <= 5 || g_AD_Data[6] <= 5) //电磁出赛道保护
-//    {
-//    	s_speed_aim_left = 0;
-//    	s_speed_aim_right = 0;
-//    }
 
     /*PID*/
     s_error_left = s_speed_aim_left - s_speed_left_now;
@@ -196,7 +233,7 @@ void Speed_Control(void)
 
     Speed_Judge(s_speed_left, s_speed_right);
 
-    Send_Variable();
+    //Send_Variable();
 
     ENC_Dateclear(ENC2);
     ENC_Dateclear(ENC3);
@@ -340,7 +377,7 @@ void Dir_Control_Huandao_Shibie(void)
 {
   int figure_ad;
   float s_error;
-  figure_ad = g_AD_Data[3];
+  figure_ad = EM_AD[3];
   //if(figure_ad > 1.4*Huandao_zhongzhi_figure)
   if (figure_ad > 130)
   {
@@ -354,8 +391,60 @@ void Dir_Control_Huandao_Shibie(void)
 
 void Dir_Control_Zhongxian_Biaoding(void)
 {
-  if (g_AD_Data[3] > Huandao_zhongzhi_figure)
+  if (EM_AD[3] > Huandao_zhongzhi_figure)
   {
-    Huandao_zhongzhi_figure = g_AD_Data[3];
+    Huandao_zhongzhi_figure = EM_AD[3];
   }
 }
+
+////////////////////////////////////////////////////////////
+//作用：中值滤波
+//输入：NULL
+//输出：NULL
+////////////////////////////////////////////////////////////
+void Middleline_Filter(void)
+{
+	for (uint8_t i = 0; i <= MID_CollectTimes - 1; i++)
+	{
+		MID_Sample[i] = (g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor)+10;
+	}
+	for (uint8_t i = 0; i <= MID_CollectTimes - 1; i++)
+	{
+	      if (MID_Sample[i] > 188)
+	      {
+	        MID_Sample[i] = 188;
+	      }
+	      if (MID_Sample[i] < 0)
+	      {
+	        MID_Sample[i] = 0;
+	      }
+	}
+    for (uint8_t i = 0; i <= MID_CollectTimes - 2; i++)
+    {
+    	for (uint8_t j = i + 1; j <= MID_CollectTimes - 1; j++)
+    	{
+    		if (MID_Sample[i] > MID_Sample[j])
+    			swap(&MID_Sample[i], &MID_Sample[j]);
+    	}
+    }
+    MID_Temp = 0;
+    for (uint8_t i = 3; i <= MID_CollectTimes - 4; i++)
+    {
+    	MID_Temp += MID_Sample[i];
+    }
+    MID_Temp = MID_Temp / (MID_CollectTimes - 6);
+    middleline_nncu = MID_Temp;
+}//Middleline_Filter()
+
+////////////////////////////////////////////////////////////
+//作用：交换函数
+//输入：NULL
+//输出：NULL
+////////////////////////////////////////////////////////////
+void swap(uint16_t* x,uint16_t* y)
+{
+    uint16_t temp=0;
+    temp=*x;
+    *x=*y;
+    *y=temp;
+}//swap
