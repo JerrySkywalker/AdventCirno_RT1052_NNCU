@@ -94,8 +94,8 @@
 #define AC_STORAGE_PLACE_FLASH 0U
 #define AC_STORAGE_PLACE_SD 1U
 
-//#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
-#define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
+#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
+//#define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
 
 
 
@@ -502,7 +502,7 @@ void AC_Task(void *pvData)
 #elif (AC_STORAGE_MENU == AC_STORAGE_PLACE_SD)
                     OLED_P6x8Str(0,0,(uint8_t*)"SD: Data Saved!");
 
-                    if(kStatus_Success == AC_SD_MenuSave(ModeBoot))
+                    if(kStatus_Success == AC_SD_MenuSave(ModeSync))
                     {
                         OLED_P6x8Rst(0,6,"Success!...");
                     }
