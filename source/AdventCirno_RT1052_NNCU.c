@@ -76,7 +76,7 @@
 #define AC_AI_BACKEND_NNCU 0x01
 #define AC_AI_BACKEND_TFLite 0x02
 
-#define AC_AI_BACKEND (AC_AI_BACKEND_NNCU | AC_AI_BACKEND_TFLite)
+#define AC_AI_BACKEND (AC_AI_BACKEND_NNCU)
 
 /**
  * @breif Manual Flash Operation switch
@@ -96,6 +96,19 @@
 
 //#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
 #define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
+
+/**
+ * @breif FUNCTION option
+ */
+
+#define AC_FUNCTION_ON 1U
+#define AC_FUNCTION_OFF 0U
+
+#define AC_FUNCTION_SERVICE AC_FUNCTION_ON
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
 
 
 
@@ -516,6 +529,29 @@ void AC_Task(void *pvData)
 					/*Delete your task Here*/
 					vTaskDelete(AC_Menu_task_handle);
                     PRINTF("[O K] AC: Menu Deleted! \r\n");
+
+#if (AC_FUNCTION_SERVICE==AC_FUNCTION_ON)
+
+                    OLED_Fill(0);
+
+#if (AC_STORAGE_MENU != AC_STORAGE_PLACE_SD)
+
+                    if(kStatus_Success == AC_SD_MenuSave(ModeSync))
+                    {
+                        OLED_P6x8Rst(0,6,"Success!...");
+                    }
+                    else
+                    {
+                        OLED_P6x8Rst(0,6,"Err!...");
+                    }
+                    OLED_P6x8Str(0,7,"Exiting...");
+
+                    vTaskDelay(500);
+                    OLED_Fill(0);
+#endif
+
+#endif
+
 
                     vTaskDelay(500);
 					OLED_Fill(0);
