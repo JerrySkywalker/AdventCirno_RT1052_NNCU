@@ -204,6 +204,8 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
 
     Str_Clr(0,2,23);
 
+    SD_EnterCritical();
+
     error = f_mkdir(_T("/menu"));
     if (error)
     {
@@ -220,6 +222,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
             }
+            SD_ExitCritical();
             return kStatus_Fail;
         }
     }
@@ -263,6 +266,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
             }
+            SD_ExitCritical();
             return kStatus_Fail;
         }
     }
@@ -291,6 +295,7 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Write File");
         }
+        SD_ExitCritical();
         return kStatus_Fail;
     }
 
@@ -302,6 +307,8 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Mv pointer");
         }
         failedFlag = true;
+
+        SD_ExitCritical();
         return kStatus_Fail;
     }
 
@@ -315,6 +322,8 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
         }
         failedFlag = true;
+
+        SD_ExitCritical();
         return kStatus_Fail;
     }
 
@@ -326,6 +335,8 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
             OLED_P6x8Str(0,5,(uint8_t*)"Err - R/W not same");
         }
         failedFlag = true;
+
+        SD_ExitCritical();
         return kStatus_Fail;
     }
     PRINTF("[O K] AC: SD: The read/write content is consistent.\r\n");
@@ -339,10 +350,11 @@ status_t AC_SD_MenuSave(StorageMode_t mode)
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
         }
+        SD_ExitCritical();
         return kStatus_Fail;
     }
 
-
+    SD_ExitCritical();
     return kStatus_Success;
 }
 
@@ -425,6 +437,8 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         g_Flag_FileNameDefault = -1;
     }
 
+    SD_EnterCritical();
+
     if(1 == g_Flag_FileNameDefault) {
         OLED_P6x8Str(0, 2, (uint8_t *) "Src Name?");
 
@@ -434,6 +448,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         if (f_opendir(&directory, "/menu")) {
             PRINTF("[Err] AC: SD: Open directory failed.\r\n");
             OLED_Print_Num(0, 2, "Err - Open Dir");
+            SD_ExitCritical();
             return kStatus_Fail;
         }
 
@@ -445,6 +460,8 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             if ((error != FR_OK) || (fileInformation.fname[0U] == 0U)) {
                 OLED_P6x8Str(0, 3, "Err - Cancelled");
                 PRINTF("[Err] AC: SD: Cancelled by User.\r\n");
+
+                SD_ExitCritical();
                 return kStatus_Fail;      // 读取失败或者读取完所有条目,取消任务
             }
             if (fileInformation.fname[0] == '.')    // 隐藏文件
@@ -506,6 +523,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
 			if (f_mkfs(driverNumberBuffer, FM_ANY, 0U, work, sizeof work))
 			{
 				PRINTF("[Err] AC: SD: Make filesystem failed.\r\n");
+                SD_ExitCritical();
 				return kStatus_Fail;
 			}
         }
@@ -515,6 +533,8 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,2,(uint8_t*)"Err - Mk Dir");
             }
+
+            SD_ExitCritical();
             return kStatus_Fail;
         }
     }
@@ -558,6 +578,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             if(mode!=ModeBoot){
                 OLED_P6x8Str(0,3,(uint8_t*)"Err - Open File");
             }
+            SD_ExitCritical();
             return kStatus_Fail;
         }
     }
@@ -583,6 +604,7 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
             OLED_P6x8Str(0,4,(uint8_t*)"Err - Read file");
         }
         failedFlag = true;
+        SD_ExitCritical();
         return kStatus_Fail;
     }
 
@@ -597,8 +619,10 @@ status_t AC_SD_MenuLoad(StorageMode_t mode)
         if(mode!=ModeBoot){
             OLED_P6x8Str(0,5,(uint8_t*)"Err - Close file");
         }
+        SD_ExitCritical();
         return kStatus_Fail;
     }
 
+    SD_ExitCritical();
     return kStatus_Success;
 }
