@@ -37,6 +37,8 @@ int Shexingwan_jishi_flag = 0;
 int Shexingwan_tuolijishi_flag;
 int Wandao_shibie_huicha_flag = 0;
 float s_error_yuanshi_H;     //横电感的原始偏差
+int s_dir_flag=0;
+int s_dir_1_flag=0;
 
 pwm_t my1 = {PWM2, kPWM_Module_0, 20 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 20 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
@@ -188,7 +190,7 @@ void Speed_Control(void)
     /*摄像头&AI模式*/
     if (data[data_identifier].mode == 0)
     {
-        if (g_AD_Data[0] <= -123 || g_AD_Data[6] <= -123)
+        if (g_AD_Data[0] <= -123 && g_AD_Data[6] <= -123)
         {
           s_speed_aim = 0;
         }
@@ -201,21 +203,25 @@ void Speed_Control(void)
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-        if ((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50) && (EM_AD[3] >= 70)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))
+        if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
         {
-          s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        	s_dir_flag =1;
         }
-        else if (EM_AD[0] <= 5 || EM_AD[6] <= 5)
+        else if (EM_AD[0] <= 5 && EM_AD[6] <= 5)
         {
         	s_speed_aim=0;
         }
-        else if ((((s_dir / 0.8) * 255)>180)&&(EM_AD[3]<data[data_identifier].yuzhi))
+        else if (((EM_AD[8]-EM_AD[7]>60)||(EM_AD[8]-EM_AD[7]<-60))&&(EM_AD[3]<data[data_identifier].yuzhi))
         {
-          s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        	s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        	s_dir_1_flag =1;
         }
         else
         {
-          s_speed_aim = 0.1 * data[data_identifier].speed;
+        	s_speed_aim = 0.1 * data[data_identifier].speed;
+        	s_dir_flag=0;
+        	s_dir_1_flag=0;
         }
     }
 
