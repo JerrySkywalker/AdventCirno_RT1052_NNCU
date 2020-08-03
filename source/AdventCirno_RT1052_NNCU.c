@@ -162,6 +162,10 @@ uint8_t g_Boma_Compressed;
 int16_t *g_AD_nncu_OutBuffer;
 int16_t g_AD_nncu_Output[3];
 
+/**NNCU : Road Type Detection **/
+int16_t *g_AD_nncu_ClassificationOutBuffer;
+int16_t g_AD_nncu_ClassificationOutput[5];
+
 /*两个测试数据*/
 int8_t tmp_AD_Input[9] = {
         0xC2, 0x8E, 0x90, 0xC9, 0xDB, 0x94, 0xF2, 0xCD, 0x0C
@@ -392,6 +396,7 @@ void AC_Task(void *pvData)
     {
     /*输出缓存区的指针，必须按照这个格式写*/
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
+    g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
     }
 #endif
 
@@ -479,6 +484,9 @@ void AC_Task(void *pvData)
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 		g_time_duration_us = TimerUsGet() - g_time_us;
+
+		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
+		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
 
 		if (0 == GPIO_Read(&wakeUp))
 		{
@@ -605,8 +613,31 @@ void AC_Task(void *pvData)
                 {
                     Flag_ScreenRefresh = 0;
 				    OLED_Fill(0x00);
+				    OLED_P6x8Str(0,0,(uint8_t*)"#Road Type");
+
+				    OLED_P6x8Str(60,1,(uint8_t*)"Straight");
+				    OLED_P6x8Str(60,2,(uint8_t*)"Curve");
+				    OLED_P6x8Str(60,3,(uint8_t*)"S-Curve");
+				    OLED_P6x8Str(60,4,(uint8_t*)"Cross");
+				    OLED_P6x8Str(60,5,(uint8_t*)"Round");
+
                 }
         		/* TODO: Your Code */
+
+
+
+				Str_Clr(0,1,8);
+				Str_Clr(0,2,8);
+				Str_Clr(0,3,8);
+				Str_Clr(0,4,8);
+				Str_Clr(0,5,8);
+
+				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
+				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
+				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
+				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
+				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
+
 
 			}
 			else
