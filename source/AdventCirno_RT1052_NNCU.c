@@ -216,12 +216,12 @@ void start_task(void *pvData)
 	}
 
 	//test(oled, "Test oled", 0, 1, 0); /*二代主控：OK*/ /*一代主控：OK*/
-	//test(key_5d, "Test key_5D", 0, 1, 0);				/*二代主控：OK*//*一代主控：硬件设计缺陷（非致命），“向左”键恒为低电平，Boot电路下拉导致*/
+	test(key_5d, "Test key_5D", 0, 1, 0);				/*二代主控：OK*//*一代主控：硬件设计缺陷（非致命），“向左”键恒为低电平，Boot电路下拉导致*/
 	//test(uart,"Test uart",0,1,0);
 	//test(adc, "adc", 0, 1, 1);						/*一代主控：未测试，没有电感板子*/
 	//test(camera, "camera ov7725", 0, 0, 0);			/*二代主控：ING*//*一代主控：硬件设计缺陷（致命），共用boot引脚，未测试，没有摄像头*/
 	//test(camera, "camera zzf", 0, 0, 0);              /*二代主控：ING*//*一代主控：硬件设计缺陷（致命），共用boot引脚，未测试，没有摄像头/
-	test(enc, "enc", 0, 1, 1);						/*一代主控：硬件设计缺陷（致命）：电阻多焊*/
+	//test(enc, "enc", 0, 1, 1);						/*一代主控：硬件设计缺陷（致命）：电阻多焊*/
 	//test(flash, "Test flash", 0, 1, 1); /*二代主控：OK*/ /*一代主控：OK*/
 	//test(flash_lfs, "Test flash_lfs", 1000, 0, 1);		/*二代主控：OK*//*一代主控：OK*/
 	//test(keypad, "keypad", 0, 1, 1);					/*二代主控：NULL*//*一代主控：未测试，采用替代方案-五向按键*/

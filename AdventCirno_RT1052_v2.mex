@@ -59,7 +59,7 @@
                <pin_label pin_num="B9" pin_signal="GPIO_B0_08" label="后轮R"/>
                <pin_label pin_num="C9" pin_signal="GPIO_B0_09" label="后轮R"/>
                <pin_label pin_num="E10" pin_signal="GPIO_B0_14" label="BT_CFG10/PD" identifier=""/>
-               <pin_label pin_num="E11" pin_signal="GPIO_B0_15" label="KEY_5D" identifier="D5"/>
+               <pin_label pin_num="E11" pin_signal="GPIO_B0_15" label="OLED_RST" identifier="EST"/>
                <pin_label pin_num="L7" pin_signal="PMIC_STBY_REQ" label="74LV245_OE_B" identifier="PMIC_STBY"/>
                <pin_label pin_num="J11" pin_signal="GPIO_AD_B1_00" label="陀螺仪_SCL" identifier="SCL"/>
                <pin_label pin_num="K11" pin_signal="GPIO_AD_B1_01" label="陀螺仪_SDA" identifier="SDA"/>
@@ -679,6 +679,7 @@
                   <pin peripheral="GPIO2" signal="gpio_io, 24" pin_num="A12" pin_signal="GPIO_B1_08"/>
                   <pin peripheral="GPIO2" signal="gpio_io, 25" pin_num="A13" pin_signal="GPIO_B1_09"/>
                   <pin peripheral="GPIO2" signal="gpio_io, 26" pin_num="B13" pin_signal="GPIO_B1_10"/>
+                  <pin peripheral="GPIO2" signal="gpio_io, 15" pin_num="E11" pin_signal="GPIO_B0_15"/>
                </pins>
             </function>
             <function name="AC_KEY_5D">
@@ -1666,7 +1667,7 @@
             <component name="system" uuid="aaff4d3f-7874-4344-9e1a-8772bc692a39" type_id="system_54b53072540eeeb8f8e9343e71f28176">
                <config_set_global name="global_system_definitions"/>
             </component>
-            <component name="msg" uuid="28492e87-1bf7-47ce-bfb8-20178188446f" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
+            <component name="msg" uuid="66b3b851-2562-4b90-9b86-3d2e5020ba97" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
                <config_set_global name="global_messages"/>
             </component>
          </components>

@@ -47,10 +47,10 @@ qq：512924543
 #define OLED_D1_PIN 25U
 #endif // !OLED_D1_GPIO
 
-//#ifndef OLED_RES_GPIO
-//#define OLED_RES_GPIO GPIO2
-//#define OLED_RES_PIN 15U
-//#endif // !OLED_RES_GPIO
+#ifndef OLED_RES_GPIO
+#define OLED_RES_GPIO GPIO2
+#define OLED_RES_PIN 15U
+#endif // !OLED_RES_GPIO
 
 #if defined(OLED_RES_GPIO)&&defined(OLED_RES_PIN) //复位线
 #define OLED_RES_SET() GPIO_PortSet(OLED_RES_GPIO,1<<OLED_RES_PIN)

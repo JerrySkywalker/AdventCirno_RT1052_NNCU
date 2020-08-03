@@ -47,7 +47,7 @@ pin_labels:
 - {pin_num: B9, pin_signal: GPIO_B0_08, label: 后轮R}
 - {pin_num: C9, pin_signal: GPIO_B0_09, label: 后轮R}
 - {pin_num: E10, pin_signal: GPIO_B0_14, label: BT_CFG10/PD}
-- {pin_num: E11, pin_signal: GPIO_B0_15, label: KEY_5D, identifier: D5}
+- {pin_num: E11, pin_signal: GPIO_B0_15, label: OLED_RST, identifier: EST}
 - {pin_num: L7, pin_signal: PMIC_STBY_REQ, label: 74LV245_OE_B, identifier: PMIC_STBY}
 - {pin_num: J11, pin_signal: GPIO_AD_B1_00, label: 陀螺仪_SCL, identifier: SCL}
 - {pin_num: K11, pin_signal: GPIO_AD_B1_01, label: 陀螺仪_SDA, identifier: SDA}
@@ -967,6 +967,7 @@ AC_OLED:
   - {pin_num: A12, peripheral: GPIO2, signal: 'gpio_io, 24', pin_signal: GPIO_B1_08}
   - {pin_num: A13, peripheral: GPIO2, signal: 'gpio_io, 25', pin_signal: GPIO_B1_09}
   - {pin_num: B13, peripheral: GPIO2, signal: 'gpio_io, 26', pin_signal: GPIO_B1_10}
+  - {pin_num: E11, peripheral: GPIO2, signal: 'gpio_io, 15', pin_signal: GPIO_B0_15}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -979,6 +980,9 @@ AC_OLED:
 void AC_OLED(void) {
   CLOCK_EnableClock(kCLOCK_Iomuxc);           /* iomuxc clock (iomuxc_clk_enable): 0x03U */
 
+  IOMUXC_SetPinMux(
+      IOMUXC_GPIO_B0_15_GPIO2_IO15,           /* GPIO_B0_15 is configured as GPIO2_IO15 */
+      0U);                                    /* Software Input On Field: Input Path is determined by functionality */
   IOMUXC_SetPinMux(
       IOMUXC_GPIO_B1_08_GPIO2_IO24,           /* GPIO_B1_08 is configured as GPIO2_IO24 */
       0U);                                    /* Software Input On Field: Input Path is determined by functionality */

@@ -234,6 +234,11 @@ void GPIO(void);
  */
 void AC_UART(void);
 
+/* GPIO_B0_15 (coord E11), OLED_RST */
+#define AC_OLED_EST_GPIO                                                   GPIO2   /*!< GPIO device name: GPIO2 */
+#define AC_OLED_EST_PORT                                                   GPIO2   /*!< PORT device name: GPIO2 */
+#define AC_OLED_EST_PIN                                                      15U   /*!< GPIO2 pin index: 15 */
+
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
