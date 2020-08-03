@@ -596,16 +596,16 @@ void AC_Task(void *pvData)
 				Str_Clr(60,3,8);
 				Str_Clr(60,4,8);
 
-				OLED_Print_Num1(0,1, g_AD_Data[0]);
-				OLED_Print_Num1(0,2, g_AD_Data[1]);
-				OLED_Print_Num1(0,3, g_AD_Data[2]);
-				OLED_Print_Num1(0,4, g_AD_Data[3]);
-				OLED_Print_Num1(0,5, g_AD_Data[4]);
-				OLED_Print_Num1(0,6, g_AD_Data[5]);
-				OLED_Print_Num1(60,1, g_AD_Data[6]);
+				OLED_Print_Num(0,1, EM_AD[0]);
+				OLED_Print_Num(0,2, EM_AD[1]);
+				OLED_Print_Num(0,3, EM_AD[2]);
+				OLED_Print_Num(0,4, EM_AD[3]);
+				OLED_Print_Num(0,5, EM_AD[4]);
+				OLED_Print_Num(0,6, EM_AD[5]);
+				OLED_Print_Num(60,1, EM_AD[6]);
 
-				OLED_Print_Num1(60,3, g_AD_Data[7]);
-				OLED_Print_Num1(60,4, g_AD_Data[8]);
+				OLED_Print_Num(60,3, EM_AD[7]);
+				OLED_Print_Num(60,4, EM_AD[8]);
 			}
         	else if(1==g_Boma[1])
 			{
@@ -676,7 +676,7 @@ void AC_Task(void *pvData)
             OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
             OLED_Print_Num1(60,4,g_time_duration_us);
             OLED_Print_Num1(60,5,middleline_nncu);
-            OLED_Print_Num(60,6,g_AD_Data[6]);
+            OLED_Print_Num1(60,6,g_AD_Data[6]);
 
             //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 			}
