@@ -148,6 +148,7 @@ int Boma2_flag = 0;
 int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
 int Flag_ScreenRefresh;
+uint8_t Stop_Flag;		//干簧管停车标志
 
 uint32_t g_time_us = 0;
 uint32_t g_time_duration_us = 0;
@@ -159,6 +160,7 @@ int8_t g_AD_Data[NUMBER_INDUCTORS];
 uint8_t EM_AD[NUMBER_INDUCTORS];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
+uint8_t g_Switch_Data = 0;
 int16_t *g_AD_nncu_OutBuffer;
 int16_t g_AD_nncu_Output[3];
 
@@ -648,37 +650,43 @@ void AC_Task(void *pvData)
                     Flag_ScreenRefresh = -1;
                     OLED_Fill(0x00);
                 }
-            OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+                OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
 
-            /** @note: just a NNCU demo*/
-            OLED_P6x8Str(0,1,(uint8_t*)"Boma");
-            OLED_P6x8Str(0,2,(uint8_t*)"Servo");
-            OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
-            OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-            OLED_P6x8Str(0,5,(uint8_t*)"middleline");
-            OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
+                /** @note: just a NNCU demo*/
+                OLED_P6x8Str(0,1,(uint8_t*)"Boma");
+                OLED_P6x8Str(0,2,(uint8_t*)"Servo");
+                OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
+                OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+                OLED_P6x8Str(0,5,(uint8_t*)"middleline");
+                OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
 
-            Str_Clr(60,1,10);
-            Str_Clr(60,2,8);
-            Str_Clr(60,3,8);
-            Str_Clr(60,4,8);
-            Str_Clr(60,5,8);
-            Str_Clr(60,6,8);
+                Str_Clr(60,1,10);
+                Str_Clr(60,2,8);
+                Str_Clr(60,3,8);
+                Str_Clr(60,4,8);
+                Str_Clr(60,5,8);
+                Str_Clr(60,6,8);
 
-            OLED_Print_Num(60,1,g_Boma[0]);
-            OLED_Print_Num(66,1,g_Boma[1]);
-            OLED_Print_Num(72,1,g_Boma[2]);
-            OLED_Print_Num(78,1,g_Boma[3]);
-            OLED_Print_Num(84,1,g_Boma[4]);
-            OLED_Print_Num(90,1,g_Boma[5]);
+                OLED_Print_Num(60,1,g_Boma[0]);
+                OLED_Print_Num(66,1,g_Boma[1]);
+                OLED_Print_Num(72,1,g_Boma[2]);
+                OLED_Print_Num(78,1,g_Boma[3]);
+                OLED_Print_Num(84,1,g_Boma[4]);
+                OLED_Print_Num(90,1,g_Boma[5]);
 
-            OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
-            OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
-            OLED_Print_Num1(60,4,g_time_duration_us);
-            OLED_Print_Num1(60,5,middleline_nncu);
-            OLED_Print_Num1(60,6,g_AD_Data[6]);
+                OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
+                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
+                OLED_Print_Num1(60,4,g_time_duration_us);
+                OLED_Print_Num1(60,5,middleline_nncu);
+                OLED_Print_Num1(60,6,g_AD_Data[6]);
 
-            //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
+                //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
+
+                if (g_Switch_Data == 1)
+                {
+                	vTaskDelay(300);
+                	Stop_Flag = 1;
+                }
 			}
         }
 	}
@@ -717,14 +725,14 @@ int main(void)
 
 void LPUART2_IRQHandler(void)
 {
-    uint8_t temp_COM_data_buffer[16];
+    uint8_t temp_COM_data_buffer[17];
     /* If new data arrived. */
     if ((kLPUART_RxDataRegFullFlag)&LPUART_GetStatusFlags(LPUART2))
     {
-        LPUART_ReadBlocking(LPUART2,temp_COM_data_buffer,16);
+        LPUART_ReadBlocking(LPUART2,temp_COM_data_buffer,17);
 
 #ifdef DEBUG_K66_OUTPUT
-        LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,16);
+        LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,17);
 #endif
         /*Get AD Data*/
         for(int i = 0;i<9;i++)
@@ -740,6 +748,9 @@ void LPUART2_IRQHandler(void)
             g_Boma[i] = g_Boma_Compressed % 2;
             g_Boma_Compressed /= 2;
         }
+
+        /*Get Seitch Data*/
+        g_Switch_Data = temp_COM_data_buffer[13];
 
     }
 }

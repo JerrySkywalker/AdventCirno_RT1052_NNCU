@@ -138,6 +138,8 @@ void AC_Pit(void *pv)
 
         /*TODO: Test code*/
 
+        Send_Variable();
+
         /*测试舵机打角连续性*/
 //		if (0 == GPIO_PinRead(GPIO2, 0U))
 //		{

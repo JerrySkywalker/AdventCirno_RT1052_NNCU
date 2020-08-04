@@ -15,7 +15,9 @@ extern int Boma2_flag;
 extern int Control_timenow;
 extern int Control_time;
 extern int8_t g_AD_Data[NUMBER_INDUCTORS];
+extern uint8_t g_Switch_Data;
 extern int16_t g_AD_nncu_Output[3];
+extern uint8_t Stop_Flag;
 
 float g_dir_error_1 = 0, g_dir_error_sum = 0, s_dir = 0;
 
@@ -113,7 +115,7 @@ void Dir_Control(void)
     	Dir_Control_Huandao_Shibie();
 
     	/*十字识别*/
-        if ((EM_AD[1] >= 40) && (EM_AD[5] >= 40))
+        if ((EM_AD[1] >= 150) && (EM_AD[5] >= 150))
         {
         	Shizi_shibie_flag = 1;
         }
@@ -190,7 +192,11 @@ void Speed_Control(void)
     /*摄像头&AI模式*/
     if (data[data_identifier].mode == 0)
     {
-        if (g_AD_Data[0] <= -123 && g_AD_Data[6] <= -123)
+        if (Stop_Flag == 1)
+        {
+        	s_speed_aim=0;
+        }
+        else if (g_AD_Data[0] <= -123 && g_AD_Data[6] <= -123)
         {
           s_speed_aim = 0;
         }
@@ -198,19 +204,24 @@ void Speed_Control(void)
         {
           s_speed_aim = 0.1 * data[data_identifier].speed;
         }
+
     }
 
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-        if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
+        if (Stop_Flag == 1)
         {
-        	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        	s_dir_flag =1;
+        	s_speed_aim=0;
         }
         else if (EM_AD[0] <= 5 && EM_AD[6] <= 5)
         {
         	s_speed_aim=0;
+        }
+        else if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
+        {
+        	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        	s_dir_flag =1;
         }
         else if (((EM_AD[8]-EM_AD[7]>60)||(EM_AD[8]-EM_AD[7]<-60))&&(EM_AD[3]<data[data_identifier].yuzhi))
         {
@@ -223,6 +234,7 @@ void Speed_Control(void)
         	s_dir_flag=0;
         	s_dir_1_flag=0;
         }
+
     }
 
     s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
@@ -246,7 +258,7 @@ void Speed_Control(void)
 
     Speed_Judge(s_speed_left, s_speed_right);
 
-    Send_Variable();
+    //Send_Variable();
 
     ENC_Dateclear(ENC2);
     ENC_Dateclear(ENC3);
