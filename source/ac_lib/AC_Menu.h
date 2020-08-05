@@ -66,6 +66,11 @@ typedef struct Data
     int Weight_x;
     int Weight_y;
     int yuzhi;
+    int zhidao_yuzhi;
+    int wandao_yuzhi;
+    int shexingwan_yuzhi;
+    int shizi_yuzhi;
+    int huandao_yuzhi;
     int jia_speed;
     int jian_speed;
     /**@brief NNCU NormalizeFactor
@@ -184,6 +189,11 @@ int Set_Weight_y(int (*action)(int *data,int modify));
 int Set_jia_speed(int (*action)(int *data,int modify));
 int Set_jian_speed(int (*action)(int *data,int modify));
 int Set_yuzhi(int (*action)(int *data,int modify));
+int Set_zhidao_yuzhi(int (*action)(int *data,int modify));
+int Set_wandao_yuzhi(int (*action)(int *data,int modify));
+int Set_shexingwan_yuzhi(int (*action)(int *data,int modify));
+int Set_shizi_yuzhi(int (*action)(int *data,int modify));
+int Set_huandao_yuzhi(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));
 

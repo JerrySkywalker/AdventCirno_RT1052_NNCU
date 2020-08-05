@@ -234,6 +234,33 @@ void Speed_Control(void)
         	s_dir_flag=0;
         	s_dir_1_flag=0;
         }
+        /////////////a是代表直道概率b代表弯道概率c代表蛇形弯概率d代表十字概率e代表环岛概率
+        /*
+        if (a>=data[data_identifier].zhidao_yuzhi)
+        {
+            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        }
+        else if(b>=data[data_identifier].wandao_yuzhi)
+        {
+            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+
+        }
+        else if(b>=data[data_identifier].shexingwan_yuzhi)
+        {
+            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+
+        }
+        else if(b>=data[data_identifier].shizi_yuzhi)
+        {
+            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+
+        }
+        else if(b>=data[data_identifier].huandao_yuzhi)
+        {
+            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+
+        }
+        */
 
     }
 

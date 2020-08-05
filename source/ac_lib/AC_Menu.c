@@ -44,6 +44,11 @@ MenuNode_t *Menu_Weight_y;
 MenuNode_t *Menu_jia_speed;
 MenuNode_t *Menu_jian_speed;
 MenuNode_t *Menu_yuzhi;
+MenuNode_t *Menu_zhidao_yuzhi;
+MenuNode_t *Menu_wandao_yuzhi;
+MenuNode_t *Menu_shexingwan_yuzhi;
+MenuNode_t *Menu_shizi_yuzhi;
+MenuNode_t *Menu_huandao_yuzhi;
 /**NNCU Data*/
 MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
 
@@ -481,6 +486,11 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_jia_speed, "jia_speed",  DATA_INT, Set_jia_speed, root);
     Menu_MenuNodeCreate(&Menu_jian_speed, "jian_speed", DATA_INT, Set_jian_speed, root);
     Menu_MenuNodeCreate(&Menu_yuzhi, "yuzhi",  DATA_INT, Set_yuzhi, root);
+    Menu_MenuNodeCreate(&Menu_zhidao_yuzhi, "zhidao_yuzhi",  DATA_INT, Set_zhidao_yuzhi, root);
+    Menu_MenuNodeCreate(&Menu_wandao_yuzhi, "wandao_yuzhi",  DATA_INT, Set_wandao_yuzhi, root);
+    Menu_MenuNodeCreate(&Menu_shexingwan_yuzhi, "shexingwan_yuzhi",  DATA_INT, Set_shexingwan_yuzhi, root);
+    Menu_MenuNodeCreate(&Menu_shizi_yuzhi, "shizi_yuzhi",  DATA_INT, Set_shizi_yuzhi, root);
+    Menu_MenuNodeCreate(&Menu_huandao_yuzhi, "huandao_yuzhi",  DATA_INT, Set_huandao_yuzhi, root);
 
     Menu_MenuNodeCreate(&Menu_Task, "Task", MID, NULL, root);
     {
@@ -849,6 +859,46 @@ int Set_yuzhi(int (*action)(int *data, int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 30000 ? ans : 30000;
     data[data_identifier].yuzhi = ans;
+    return ans;
+}
+int Set_zhidao_yuzhi(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].zhidao_yuzhi, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].zhidao_yuzhi = ans;
+    return ans;
+}
+int Set_wandao_yuzhi(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].wandao_yuzhi, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].wandao_yuzhi = ans;
+    return ans;
+}
+int Set_shexingwan_yuzhi(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].shexingwan_yuzhi, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].shexingwan_yuzhi = ans;
+    return ans;
+}
+int Set_shizi_yuzhi(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].shizi_yuzhi, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].shizi_yuzhi = ans;
+    return ans;
+}
+int Set_huandao_yuzhi(int (*action)(int *data, int modify))
+{
+    int ans = action(&data[data_identifier].huandao_yuzhi, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 30000 ? ans : 30000;
+    data[data_identifier].huandao_yuzhi = ans;
     return ans;
 }
 int Set_jia_speed(int (*action)(int *data,int modify))
