@@ -167,6 +167,7 @@ int16_t g_AD_nncu_Output[3];
 /**NNCU : Road Type Detection **/
 int16_t *g_AD_nncu_ClassificationOutBuffer;
 int16_t g_AD_nncu_ClassificationOutput[5];
+int g_AD_nncu_RoadType = 0;
 
 /*两个测试数据*/
 int8_t tmp_AD_Input[9] = {
@@ -639,6 +640,15 @@ void AC_Task(void *pvData)
 				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
 				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
 				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
+
+				int16_t temp = g_AD_nncu_ClassificationOutput[0];
+				for(int i = 1 ;i<=4;i++)
+				{
+					if(g_AD_nncu_ClassificationOutput[i]>temp)
+						g_AD_nncu_RoadType = i;
+				}
+
+				OLED_P6x8Str(42,g_AD_nncu_RoadType,(uint8_t*)"*");
 
 
 			}
