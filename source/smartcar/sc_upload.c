@@ -29,8 +29,7 @@ extern float s_speed_left_now;
 extern float s_speed_right_now;
 extern float s_speed_aim_left;
 extern float s_speed_aim_right;
-extern int Huandao_shibie_flag;
-extern int Shizi_shibie_flag;
+extern float g_error;
 
 /**********************************************************************************************************************
 *  @brief      向上位机发送一个字节
@@ -73,8 +72,8 @@ void  Send_Variable(void)//发送实时变量
   Variable[1] = s_speed_right_now;
   Variable[2] = s_speed_aim_left;
   Variable[3] = s_speed_aim_left;
-  Variable[4] = Shizi_shibie_flag;
-  Variable[5] = Huandao_shibie_flag;
+  Variable[4] = g_error;
+  Variable[5] = 5;
   Putchar(0x55);
   Putchar(0xaa);
   Putchar(0x11);

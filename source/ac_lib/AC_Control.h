@@ -35,7 +35,6 @@ void Speed_Control(void);
 void Servo_Protect(float *dir);
 void Motor_Protect(float *speed);
 void Speed_Judge(float speed_L, float speed_R);
-void Dir_Control_Huandao_Shibie(void);
 void Dir_Control_Zhongxian_Biaoding(void);
 void Jishi_Time(void);
 void Middleline_Filter(void);
