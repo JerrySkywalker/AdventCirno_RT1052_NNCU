@@ -634,16 +634,17 @@ void AC_Task(void *pvData)
 				Str_Clr(0,4,8);
 				Str_Clr(0,5,8);
 
-				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]/100);
-				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]/100);
-				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]/100);
-				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]/100);
-				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]/100);
+				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
+				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
+				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
+				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
+				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
 
 
 			}
 			else
 			{
+
                 if(-1!=Flag_ScreenRefresh)
                 {
                     Flag_ScreenRefresh = -1;
