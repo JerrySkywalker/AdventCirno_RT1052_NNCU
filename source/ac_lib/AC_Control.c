@@ -42,6 +42,13 @@ float s_error_yuanshi_H;     //横电感的原始偏差
 int s_dir_flag=0;
 int s_dir_1_flag=0;
 
+
+int flag_zhidao=0;
+int flag_wandao=0;
+int flag_shexingwan=0;
+int flag_shizi=0;
+int flag_huandao=0;
+
 pwm_t my1 = {PWM2, kPWM_Module_0, 20 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 20 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
 gpio_t OE_B = {GPIO5,02U,0 };										//L7 74LVC245_OE_B, 电机PWM相关，低电平有效
@@ -127,7 +134,7 @@ void Dir_Control(void)
         /*判据选择*/
         if ((Shizi_shibie_flag == 1) || (Huandao_shibie_flag == 1)) //十字特殊通过方法
         {
-        	s_error = 0.0001*(EM_AD[0] - EM_AD[6]) / (EM_AD[0] + EM_AD[6] + 1); //中间的横电感是反的
+        	s_error = (EM_AD[0] - EM_AD[6]) / (EM_AD[0] + EM_AD[6] + 1); 
         	//s_error = 0.5 * s_error_1 + 0.5 * s_error;
         }
         else
@@ -158,6 +165,72 @@ void Dir_Control(void)
         	s_dir = 0.000001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
         	g_dir_error_1 = s_error;
         }
+
+
+
+        /*
+        s_error_H = ((EM_AD[0] - EM_AD[6]) / AD_fenmu_H);
+        s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
+        s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
+        if(a>=data[data_identifier].zhidao_yuzhi)//直道
+        {
+            s_error=s_error_H;
+            s_dir = 0.001*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
+        	g_dir_error_1 = s_error;
+            flag_zhidao=1;
+            flag_wandao=0;
+            flag_shexingwan=0;
+            flag_shizi=0
+            flag_huandao=0;
+        }
+        else if ((b>=data[data_identifier].wandao_yuzhi)&&(a>=))//弯前减速,注意多种判据组合
+        {
+            s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
+            s_dir = 0.001*data[data_identifier].dirkp_w * s_error + data[data_identifier].dirki_w * g_dir_error_sum + data[data_identifier].dirkd_w * (s_error - g_dir_error_1);
+        	g_dir_error_1 = s_error;
+            flag_zhidao=0;
+            flag_wandao=1;
+            flag_shexingwan=0;
+            flag_shizi=0
+            flag_huandao=0;
+
+        }
+        else if(c>=data[data_identifier].shexingwan_yuzhi)
+        {
+            s_error=s_error_S;
+            s_dir = 0.001*data[data_identifier].dirkp_sw * s_error + data[data_identifier].dirki_sw * g_dir_error_sum + data[data_identifier].dirkd_sw * (s_error - g_dir_error_1);
+        	g_dir_error_1 = s_error;
+            flag_zhidao=0;
+            flag_wandao=0;
+            flag_shexingwan=1;
+            flag_shizi=0;
+            flag_huandao=0;
+
+        }
+        else if (d>=data[data_identifier].shizi_yuzhi||e>=data[data_identifier].huandao_yuzhi)
+        {
+            s_error=s_error_H;
+            s_dir = 0.001*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
+        	g_dir_error_1 = s_error;
+            flag_zhidao=0;
+            flag_wandao=0;
+            flag_shexingwan=0;
+            flag_shizi=1;
+            flag_huandao=1;
+
+        }
+        else
+        {
+            s_error = s_error_H ;
+            s_dir = 0.001*data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1);
+        	g_dir_error_1 = s_error;
+            flag_zhidao=0;
+            flag_wandao=0;
+            flag_shexingwan=0;
+            flag_shizi=0;
+            flag_huandao=0;
+        }
+        */
 
     	/*PID Old*/
 //        s_error = ((EM_AD[0]+128) - (EM_AD[6]+128)) / ((EM_AD[0]+128) * (EM_AD[6]+128)+1);
@@ -234,33 +307,35 @@ void Speed_Control(void)
         	s_dir_flag=0;
         	s_dir_1_flag=0;
         }
+
         /////////////a是代表直道概率b代表弯道概率c代表蛇形弯概率d代表十字概率e代表环岛概率
-        /*
-        if (a>=data[data_identifier].zhidao_yuzhi)
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        }
-        else if(b>=data[data_identifier].wandao_yuzhi)
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        
+        // if (/* condition */)//弯前减速
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
 
-        }
-        else if(b>=data[data_identifier].shexingwan_yuzhi)
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-
-        }
-        else if(b>=data[data_identifier].shizi_yuzhi)
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-
-        }
-        else if(b>=data[data_identifier].huandao_yuzhi)
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-
-        }
-        */
+        // }
+        // else if (flag_zhidao==1)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // }
+        // else if(flag_wandao==1)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed  );
+        // }
+        // else if(flag_shexingwan==1)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        // }
+        // else if(( flag_huandao==1)||( flag_shizi==1))
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // }
+        // else
+        // {
+        //     s_speed_aim=s_speed_aim;
+        // }
+        
 
     }
 
