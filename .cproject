@@ -466,6 +466,46 @@
 							<inputType id="com.crt.advproject.compiler.input.690967556" superClass="com.crt.advproject.compiler.input"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.debug.597543778.452583060" name="model_smartcar_ad_run.c" rcbsApplicability="disable" resourcePath="source/nncu/Network/DenseClassification_0806/model_smartcar_ad_run.c" toolsToInvoke="com.crt.advproject.gcc.exe.debug.315271459.320743993">
+						<tool id="com.crt.advproject.gcc.exe.debug.315271459.320743993" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.debug.315271459">
+							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1705256211" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/xip}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/drivers}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source/fsl_ram_disk}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/amazon-freertos/freertos_kernel/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/amazon-freertos/freertos_kernel/portable/GCC/ARM_CM4F}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/sdmmc/port}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source/fsl_sd_disk}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/phy}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CMSIS}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/osa}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CMSIS/NN/Include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/littlefs}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/serial_manager}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/lists}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/generated}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/sdmmc/inc}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/utilities}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/uart}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/device}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/class}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/ehci}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/khci}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/lpcip3511}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tensorflow-lite}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tensorflow-lite/third_party/flatbuffers/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/board}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/nncu}&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1087583333" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.crt.advproject.config.exe.debug.597543778.1162481840" name="model_smartcar_ad_run.c" rcbsApplicability="disable" resourcePath="source/nncu/Network/Dense_Simple/model_smartcar_ad_run.c" toolsToInvoke="com.crt.advproject.gcc.exe.debug.315271459.1942969714">
 						<tool id="com.crt.advproject.gcc.exe.debug.315271459.1942969714" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.debug.315271459">
 							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1876721161" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
@@ -628,7 +668,7 @@
 					</fileInfo>
 					<fileInfo id="com.crt.advproject.config.exe.debug.597543778.1608520405" name="model_smartcar_ad_run.c" rcbsApplicability="disable" resourcePath="source/nncu/Network/DenseClassification_Manual_Improved/model_smartcar_ad_run.c" toolsToInvoke="com.crt.advproject.gcc.exe.debug.315271459.976549344">
 						<tool id="com.crt.advproject.gcc.exe.debug.315271459.976549344" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.debug.315271459">
-							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1249270182" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1249270182" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/xip}&quot;"/>
 								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/drivers}&quot;"/>
 								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source/fsl_ram_disk}&quot;"/>
@@ -679,7 +719,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="littlefs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="sdmmc"/>
-						<entry excluding="nncu/Network/DenseClassification_Manual|nncu/Network/Dense_Vertical_74_38|nncu/Network/Dense_Simple_Plus|nncu/Network/Dense_Complex_200_Round|nncu/Network/Dense_10MB_Plus_70_158|nncu/Network/Dense_10MB_Servo|nncu/Network/Dense_10MB_M_70_60|nncu/Network/Dense_10MB_M_60_120|nncu/Network/Dense_10MB_72_70|nncu/Network/Dense_Simple_CNN|nncu/Network/Dense_Simple_4Layer|nncu/Network/Dense_Complex_Pro|nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Simple|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/aiann/aia_cmsisnn_ext.h|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.h|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
+						<entry excluding="nncu/Network/DenseClassification_Manual_Improved|nncu/Network/DenseClassification_Manual|nncu/Network/Dense_Vertical_74_38|nncu/Network/Dense_Simple_Plus|nncu/Network/Dense_Complex_200_Round|nncu/Network/Dense_10MB_Plus_70_158|nncu/Network/Dense_10MB_Servo|nncu/Network/Dense_10MB_M_70_60|nncu/Network/Dense_10MB_M_60_120|nncu/Network/Dense_10MB_72_70|nncu/Network/Dense_Simple_CNN|nncu/Network/Dense_Simple_4Layer|nncu/Network/Dense_Complex_Pro|nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Simple|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/aiann/aia_cmsisnn_ext.h|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.h|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tensorflow-lite"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="usb"/>
@@ -1095,6 +1135,46 @@
 							<inputType id="com.crt.advproject.compiler.input.532771911" superClass="com.crt.advproject.compiler.input"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.1641015707.891612338" name="model_smartcar_ad_run.c" rcbsApplicability="disable" resourcePath="source/nncu/Network/DenseClassification_0806/model_smartcar_ad_run.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.729575308.954530483">
+						<tool id="com.crt.advproject.gcc.exe.release.729575308.954530483" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.729575308">
+							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1230305774" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/xip}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/drivers}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source/fsl_ram_disk}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/amazon-freertos/freertos_kernel/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/amazon-freertos/freertos_kernel/portable/GCC/ARM_CM4F}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/sdmmc/port}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source/fsl_sd_disk}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/phy}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CMSIS}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/osa}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CMSIS/NN/Include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/littlefs}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/serial_manager}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/lists}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/generated}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/sdmmc/inc}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/utilities}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/component/uart}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/device}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/class}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/ehci}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/khci}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/usb/device/source/lpcip3511}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tensorflow-lite}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tensorflow-lite/third_party/flatbuffers/include}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/board}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/}&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/source/nncu}&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1001962860" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.crt.advproject.config.exe.release.1641015707.1336686925" name="model_smartcar_ad_run.c" rcbsApplicability="disable" resourcePath="source/nncu/Network/Dense_10MB_60_38/model_smartcar_ad_run.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.729575308.1241340257">
 						<tool id="com.crt.advproject.gcc.exe.release.729575308.1241340257" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.729575308">
 							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1879030211" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
@@ -1137,7 +1217,7 @@
 					</fileInfo>
 					<fileInfo id="com.crt.advproject.config.exe.release.1641015707.244955368" name="model_smartcar_ad_run.c" rcbsApplicability="disable" resourcePath="source/nncu/Network/DenseClassification_Manual_Improved/model_smartcar_ad_run.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.729575308.1814649760">
 						<tool id="com.crt.advproject.gcc.exe.release.729575308.1814649760" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.729575308">
-							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1158088105" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+							<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1158088105" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/xip}&quot;"/>
 								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/drivers}&quot;"/>
 								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/fatfs/source/fsl_ram_disk}&quot;"/>
@@ -1186,7 +1266,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="littlefs"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="sdmmc"/>
-						<entry excluding="nncu/Network/DenseClassification_Manual|nncu/Network/Dense_Vertical_74_38|nncu/Network/Dense_Simple_Plus|nncu/Network/Dense_Complex_200_Round|nncu/Network/Dense_10MB_Plus_70_158|nncu/Network/Dense_10MB_Servo|nncu/Network/Dense_10MB_M_70_60|nncu/Network/Dense_10MB_M_60_120|nncu/Network/Dense_Simple_CNN|nncu/Network/Dense_Simple_4Layer|nncu/Network/Dense_Complex_Pro|nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/Network/Dense_Complex/model_smartcar_ad_weit.c|nncu/Network/Dense_Simple|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
+						<entry excluding="nncu/Network/DenseClassification_Manual_Improved|nncu/Network/DenseClassification_Manual|nncu/Network/Dense_Vertical_74_38|nncu/Network/Dense_Simple_Plus|nncu/Network/Dense_Complex_200_Round|nncu/Network/Dense_10MB_Plus_70_158|nncu/Network/Dense_10MB_Servo|nncu/Network/Dense_10MB_M_70_60|nncu/Network/Dense_10MB_M_60_120|nncu/Network/Dense_Simple_CNN|nncu/Network/Dense_Simple_4Layer|nncu/Network/Dense_Complex_Pro|nncu/Network/Dense_Simple_SE|nncu/Network/Dense_Complex|nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c|nncu/Network/Dense_Complex/model_smartcar_ad_weit.c|nncu/Network/Dense_Simple|tv.nctv.c|model.nncu.c|smartcar/sc_lcd.c|semihost_hardfault.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="tensorflow-lite"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="usb"/>
