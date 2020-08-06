@@ -15,6 +15,8 @@ extern Data_t data[10];
 extern int data_identifier;
 extern int Flag_InitComplete;
 extern int16_t g_AD_nncu_Output[3];
+extern int flag_jishi;
+extern int flag_shijian;
 //extern float s_speed_left_now, s_speed_right_now;
 //extern float s_speed_aim_left, s_speed_aim_right;
 
@@ -120,7 +122,16 @@ void AC_Pit(void *pv)
         /*TODO: Motor control sequence here */
 
         Speed_Control();
-
+        // if (flag_jishi==1)
+        // {
+        //     Jishi_Time();
+        // }
+        // else
+        // {
+        //     flag_shijian=0;//计时清零
+        // }
+        
+        
 //        my1.dutyA = 0;
 //        my1.dutyB = 25;
 //        my2.dutyA = 0;

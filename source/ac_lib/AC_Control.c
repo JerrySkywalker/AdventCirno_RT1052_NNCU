@@ -18,7 +18,7 @@ extern int8_t g_AD_Data[NUMBER_INDUCTORS];
 extern uint8_t g_Switch_Data;
 extern int16_t g_AD_nncu_Output[3];
 extern uint8_t Stop_Flag;
-
+extern int g_AD_nncu_RoadType;
 float g_dir_error_1 = 0, g_dir_error_sum = 0, s_dir = 0;
 
 float g_speed_error_left_1 = 0, g_speed_error_right_1 = 0, g_speed_error_left_2 = 0, g_speed_error_right_2 = 0;
@@ -37,7 +37,7 @@ int Zhidao_shibie_flag = 0; //0表示非弯道，1表示识别
 int Shizi_shibie_flag = 0;
 int Shexingwan_jishi_flag = 0;
 int Shexingwan_tuolijishi_flag;
-int Wandao_shibie_huicha_flag = 0;
+
 float s_error_yuanshi_H;     //横电感的原始偏差
 int s_dir_flag=0;
 int s_dir_1_flag=0;
@@ -48,7 +48,12 @@ int flag_wandao=0;
 int flag_shexingwan=0;
 int flag_shizi=0;
 int flag_huandao=0;
-
+int flag_zhuangtai;
+int flag_zhuangtai_former;
+int flag_jishi=0;//1计时开始
+int flag_shijian = 0;
+int flag_wandao_panduan=0;
+int flag_wandao_zhixing=0;
 pwm_t my1 = {PWM2, kPWM_Module_0, 20 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 20 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
 gpio_t OE_B = {GPIO5,02U,0 };										//L7 74LVC245_OE_B, 电机PWM相关，低电平有效
@@ -283,60 +288,92 @@ void Speed_Control(void)
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-        if (Stop_Flag == 1)
-        {
-        	s_speed_aim=0;
-        }
-        else if (EM_AD[0] <= 5 && EM_AD[6] <= 5)
-        {
-        	s_speed_aim=0;
-        }
-        else if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
-        {
-        	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        	s_dir_flag =1;
-        }
-        else if (((EM_AD[8]-EM_AD[7]>60)||(EM_AD[8]-EM_AD[7]<-60))&&(EM_AD[3]<data[data_identifier].yuzhi))
-        {
-        	s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        	s_dir_1_flag =1;
-        }
-        else
-        {
-        	s_speed_aim = 0.1 * data[data_identifier].speed;
-        	s_dir_flag=0;
-        	s_dir_1_flag=0;
-        }
-
-        /////////////a是代表直道概率b代表弯道概率c代表蛇形弯概率d代表十字概率e代表环岛概率
-        
-        // if (/* condition */)//弯前减速
+        // if (Stop_Flag == 1)
         // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-
+        // 	s_speed_aim=0;
         // }
-        // else if (flag_zhidao==1)
+        // else if (EM_AD[0] <= 5 && EM_AD[6] <= 5)
         // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // 	s_speed_aim=0;
         // }
-        // else if(flag_wandao==1)
+        // else if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
         // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed  );
+        // 	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // 	s_dir_flag =1;
         // }
-        // else if(flag_shexingwan==1)
+        // else if (((EM_AD[8]-EM_AD[7]>60)||(EM_AD[8]-EM_AD[7]<-60))&&(EM_AD[3]<data[data_identifier].yuzhi))
         // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        // }
-        // else if(( flag_huandao==1)||( flag_shizi==1))
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // 	s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        // 	s_dir_1_flag =1;
         // }
         // else
         // {
-        //     s_speed_aim=s_speed_aim;
+        // 	s_speed_aim = 0.1 * data[data_identifier].speed;
+        // 	s_dir_flag=0;
+        // 	s_dir_1_flag=0;
+        // }
+
+        /////////////a是代表直道概率b代表弯道概率c代表蛇形弯概率d代表十字概率e代表环岛概率
+        if(g_AD_nncu_RoadType==1||g_AD_nncu_RoadType==2)
+        {
+        	flag_wandao_panduan++;
+        }
+        else
+        {
+        	flag_wandao_panduan=0;
+        }
+        if(flag_wandao_panduan>=4)
+        {
+        	flag_wandao_zhixing=1;
+        }
+        else
+        {
+        	flag_wandao_zhixing=0;
+        }
+//        if (g_AD_nncu_RoadType==1||g_AD_nncu_RoadType==2)//弯前减速
+//        {
+//            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+//        }
+//        else if (g_AD_nncu_RoadType==0)
+//        {
+//            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+//        }
+        // else if(g_AD_nncu_RoadType==2)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed  );
+        // }
+        // else if(g_AD_nncu_RoadType==3)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        // }
+        // else if(g_AD_nncu_RoadType==4)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // }
+        // else if(g_AD_nncu_RoadType==4)
+        // {
+        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+        // }
+        if (flag_wandao_zhixing==1)//弯前减速
+        {
+            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        }
+        else
+        {
+            s_speed_aim=s_speed_aim;
+        }
+        ////////////////////////减速程序
+        // if (flag_zhuangtai==flag_zhuangtai_former)
+        // {
+        //     flag_jishi=0;
+        // }
+        // else
+        // {
+        //     flag_jishi=1;
         // }
         
-
+        
+        ///////////////////////////
     }
 
     s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
@@ -492,7 +529,7 @@ void Running_Time(void)
 
 void Jishi_Time(void)
 {
-  Wandao_shibie_huicha_flag++;
+  flag_shijian++;
   //Control_time = data[data_identifier].running_time * 50;
   // if (Wandao_shibie_huicha_flag > 20)
   // {

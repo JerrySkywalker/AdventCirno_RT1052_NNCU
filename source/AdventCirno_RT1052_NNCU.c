@@ -629,11 +629,11 @@ void AC_Task(void *pvData)
 
 
 
-				Str_Clr(0,1,8);
-				Str_Clr(0,2,8);
-				Str_Clr(0,3,8);
-				Str_Clr(0,4,8);
-				Str_Clr(0,5,8);
+				Str_Clr(0,1,10);
+				Str_Clr(0,2,10);
+				Str_Clr(0,3,10);
+				Str_Clr(0,4,10);
+				Str_Clr(0,5,10);
 
 				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
 				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
