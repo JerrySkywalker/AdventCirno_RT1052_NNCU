@@ -642,13 +642,14 @@ void AC_Task(void *pvData)
 				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
 
 				int16_t temp = g_AD_nncu_ClassificationOutput[0];
+				g_AD_nncu_RoadType = 0;
 				for(int i = 1 ;i<=4;i++)
 				{
 					if(g_AD_nncu_ClassificationOutput[i]>temp)
 						g_AD_nncu_RoadType = i;
 				}
 
-				OLED_P6x8Str(42,g_AD_nncu_RoadType,(uint8_t*)"*");
+				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
 
 
 			}
