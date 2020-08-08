@@ -255,7 +255,7 @@ void AC_Task(void *pvData)
 	{
 		vTaskDelay(10);
 	}
-    Flag_ScreenRefresh = -10;		//init flag can be any number except [-1,63]
+    Flag_ScreenRefresh = -1;
 
 
 	/** Logo **/
@@ -612,9 +612,9 @@ void AC_Task(void *pvData)
 			}
         	else if(1==g_Boma[1])
 			{
-				if(1!=Flag_ScreenRefresh)
+				if(0!=Flag_ScreenRefresh)
                 {
-                    Flag_ScreenRefresh = 1;
+                    Flag_ScreenRefresh = 0;
 				    OLED_Fill(0x00);
 				    OLED_P6x8Str(0,0,(uint8_t*)"#Road Type");
 
@@ -664,18 +664,16 @@ void AC_Task(void *pvData)
                 {
                     Flag_ScreenRefresh = -1;
                     OLED_Fill(0x00);
-
-                    OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
-
-                    /** @note: just a NNCU demo*/
-                    OLED_P6x8Str(0,1,(uint8_t*)"Boma");
-                    OLED_P6x8Str(0,2,(uint8_t*)"Servo");
-                    OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
-                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-                    OLED_P6x8Str(0,5,(uint8_t*)"middleline");
-                    OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
-
                 }
+                OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+
+                /** @note: just a NNCU demo*/
+                OLED_P6x8Str(0,1,(uint8_t*)"Boma");
+                OLED_P6x8Str(0,2,(uint8_t*)"Servo");
+                OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
+                OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+                OLED_P6x8Str(0,5,(uint8_t*)"middleline");
+                OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
 
                 Str_Clr(60,1,10);
                 Str_Clr(60,2,8);
