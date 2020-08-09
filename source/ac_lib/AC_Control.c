@@ -289,91 +289,9 @@ void Speed_Control(void)
     else if (data[data_identifier].mode == 1)
     {
         // if (Stop_Flag == 1)
-        // {
-        // 	s_speed_aim=0;
-        // }
-        // else if (EM_AD[0] <= 5 && EM_AD[6] <= 5)
-        // {
-        // 	s_speed_aim=0;
-        // }
-        // else if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
-        // {
-        // 	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        // 	s_dir_flag =1;
-        // }
-        // else if (((EM_AD[8]-EM_AD[7]>60)||(EM_AD[8]-EM_AD[7]<-60))&&(EM_AD[3]<data[data_identifier].yuzhi))
-        // {
-        // 	s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        // 	s_dir_1_flag =1;
-        // }
-        // else
-        // {
-        // 	s_speed_aim = 0.1 * data[data_identifier].speed;
-        // 	s_dir_flag=0;
-        // 	s_dir_1_flag=0;
-        // }
 
-        /////////////a是代表直道概率b代表弯道概率c代表蛇形弯概率d代表十字概率e代表环岛概率
-        if(g_AD_nncu_RoadType==1||g_AD_nncu_RoadType==2)
-        {
-        	flag_wandao_panduan++;
-        }
-        else
-        {
-        	flag_wandao_panduan=0;
-        }
-        if(flag_wandao_panduan>=4)
-        {
-        	flag_wandao_zhixing=1;
-        }
-        else
-        {
-        	flag_wandao_zhixing=0;
-        }
-//        if (g_AD_nncu_RoadType==1||g_AD_nncu_RoadType==2)//弯前减速
-//        {
-//            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-//        }
-//        else if (g_AD_nncu_RoadType==0)
-//        {
-//            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-//        }
-        // else if(g_AD_nncu_RoadType==2)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed  );
-        // }
-        // else if(g_AD_nncu_RoadType==3)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        // }
-        // else if(g_AD_nncu_RoadType==4)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        // }
-        // else if(g_AD_nncu_RoadType==4)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        // }
-        if (flag_wandao_zhixing==1)//弯前减速
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        }
-        else
-        {
-            s_speed_aim=s_speed_aim;
-        }
-        ////////////////////////减速程序
-        // if (flag_zhuangtai==flag_zhuangtai_former)
-        // {
-        //     flag_jishi=0;
-        // }
-        // else
-        // {
-        //     flag_jishi=1;
-        // }
-        
-        
-        ///////////////////////////
+            s_speed_aim=0.1 * data[data_identifier].speed;
+
     }
 
     s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
