@@ -288,7 +288,6 @@ void Speed_Control(void)
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-        // if (Stop_Flag == 1)
 
             s_speed_aim=0.1 * data[data_identifier].speed;
 
