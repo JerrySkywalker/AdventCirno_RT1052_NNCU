@@ -7,6 +7,7 @@
 #include "smartcar/sc_upload.h"
 #include "AC_Control.h"
 #include "AC_Menu.h"
+#include "AC_Command.h"
 #include "Image.h"
 
 TaskHandle_t AC_Pit_task_handle;
@@ -17,6 +18,8 @@ extern int Flag_InitComplete;
 extern int16_t g_AD_nncu_Output[3];
 extern int flag_jishi;
 extern int flag_shijian;
+extern int8_t g_ENC_L_Data;
+extern int8_t g_ENC_R_Data;
 //extern float s_speed_left_now, s_speed_right_now;
 //extern float s_speed_aim_left, s_speed_aim_right;
 
@@ -79,8 +82,13 @@ void AC_Pit(void *pv)
     {
         PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
 
-        /*TODO: Image Capture & Process sequence here */
-
+        /*TODO: Command */
+		if (g_ENC_L_Data > 10 && g_ENC_R_Data > 10){
+			COM_BT_Upload();
+		}
+    	else{
+			/**Do nothing*/
+		}
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_1) == kPIT_TimerFlag)
     {
@@ -149,7 +157,7 @@ void AC_Pit(void *pv)
 
         /*TODO: Test code*/
 
-        Send_Variable();
+        //Send_Variable();
 
         /*测试舵机打角连续性*/
 //		if (0 == GPIO_PinRead(GPIO2, 0U))
@@ -161,22 +169,22 @@ void AC_Pit(void *pv)
 //			duty -= 1;
 //		}
 //        OLED_Fill(0x00);
-//        OLED_Print_Num(0, 0, duty);
+//        OLED_Print_Num(4, 0, duty);
 //        PWM_AC_SetServoDuty(duty);
 
     	/*产生阶跃信号，调电机PID用*/
-//    	 if (Flag_Signal == 1)
-//    	 {
+    	 if (Flag_Signal == 1)
+    	 {
 ////    	 	Flag_Signal = 0;
 ////    	 	s_speed_aim_left = -2;
 ////    	 	s_speed_aim_right = -2;
-//    	 }
-//    	 else if (Flag_Signal == 0)
-//    	 {
+    	 }
+    	 else if (Flag_Signal == 0)
+    	 {
 ////    	 	Flag_Signal = 1;
 ////    	 	s_speed_aim_left = 2;
 ////    	 	s_speed_aim_right = 2;
-//    	 }
+    	 }
 
         /*在屏幕上显示编码器返回值*/
 //        float g_speed_now_left = 0;

@@ -54,8 +54,9 @@
 #include "smartcar/sc_oled.h"
 #include "smartcar/sc_flash.h"
 #include "smartcar/sc_pwm.h"
-#include"smartcar/sc_sd.h"
+#include "smartcar/sc_sd.h"
 #include "smartcar/status.h"
+#include "smartcar/sc_gpio.h"
 #include "ac_lib/AC_Control.h"
 #include "ac_lib/AC_Menu.h"
 #include "ac_lib/AC_Command.h"
@@ -135,6 +136,8 @@ extern Data_t data[10];
 extern int data_identifier;
 extern uint8_t image_Buffer_0[CAMERA_H][CAMERA_W];
 extern float s_dir;
+extern int Cross_flag;
+extern int Round_flag;
 
 //clock_t start, stop; //clock_t是clock（）函数返回的变量类型
 double duration;
@@ -149,6 +152,7 @@ int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
 int Flag_ScreenRefresh;
 uint8_t Stop_Flag;		//干簧管停车标志
+bee_t Bee_GPIO = {GPIO2, 20U, 1};
 
 uint32_t g_time_us = 0;
 uint32_t g_time_duration_us = 0;
@@ -156,7 +160,13 @@ uint32_t g_time_duration_us = 0;
 /*TODO: Buffer declaration here*/
 uint8_t g_flash_buff_r[FLASH_SECTOR_SIZE];
 uint8_t g_flash_buff_w[FLASH_SECTOR_SIZE];
-int8_t g_AD_Data[NUMBER_INDUCTORS];
+volatile int8_t g_AD_Data[NUMBER_INDUCTORS];
+volatile int8_t g_Servo_Data;
+volatile int8_t g_Motor_L_Data;
+volatile int8_t g_Motor_R_Data;
+volatile int8_t g_Image_Data[10];
+volatile int8_t g_ENC_L_Data;
+volatile int8_t g_ENC_R_Data;
 uint8_t EM_AD[NUMBER_INDUCTORS];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
@@ -276,6 +286,9 @@ void AC_Task(void *pvData)
     {
         OLED_P6x8Str(0, 0, (uint8_t*)"# AdventCirno v1.0.0");
         OLED_P6x8Str(0, 1, (uint8_t*)"Boot Check...");
+
+        /**@brief Init Beep*/
+        BEE_Init(&Bee_GPIO);
 
         /**@brief Init ENC*/
         ENC_Init_t(ENC2);    //R
@@ -626,9 +639,7 @@ void AC_Task(void *pvData)
 
                 }
         		/* TODO: Your Code */
-
-
-
+				
 				Str_Clr(0,1,10);
 				Str_Clr(0,2,10);
 				Str_Clr(0,3,10);
@@ -654,8 +665,6 @@ void AC_Task(void *pvData)
 				}
 
 				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
-
-
 			}
 			else
 			{
@@ -734,6 +743,10 @@ int main(void)
 	LPUART_EnableInterrupts(LPUART2, kLPUART_RxDataRegFullInterruptEnable);
 	EnableIRQ(LPUART2_IRQn);
 
+	UART_Init(LPUART1,1152000,80000000);	//K66
+	LPUART_EnableInterrupts(LPUART1, kLPUART_RxDataRegFullInterruptEnable);
+	EnableIRQ(LPUART1_IRQn);
+
 	vTaskStartScheduler();
 	return 0;
 }
@@ -770,3 +783,29 @@ void LPUART2_IRQHandler(void)
     }
 }
 
+void LPUART1_IRQHandler(void)
+{
+    uint8_t temp_COM_data_buffer[21];
+
+    /* If new data arrived. */
+    if ((kLPUART_RxDataRegFullFlag)&LPUART_GetStatusFlags(LPUART1))
+    {
+        LPUART_ReadBlocking(LPUART1,temp_COM_data_buffer,21);
+
+        /*Get Servo Data*/
+        g_Servo_Data = temp_COM_data_buffer[3] + 128;
+
+		/*Get Motor Data*/
+        g_Motor_L_Data = temp_COM_data_buffer[4] + 128;
+        g_Motor_R_Data = temp_COM_data_buffer[5] + 128;
+
+        /*Get Image Data*/
+        for(int i = 0;i<10;i++) {
+        	g_Image_Data[i] = temp_COM_data_buffer[6+i];
+        }
+
+        /*Get ENC Data*/
+        g_ENC_L_Data = temp_COM_data_buffer[16];
+        g_ENC_R_Data = temp_COM_data_buffer[17];
+    }
+}

@@ -29,8 +29,12 @@ extern float s_speed_left_now;
 extern float s_speed_right_now;
 extern float s_speed_aim_left;
 extern float s_speed_aim_right;
-extern int Huandao_shibie_flag;
-extern int Shizi_shibie_flag;
+extern float g_error;
+extern int Round_flag;
+extern int Straight_Flag;
+extern int Cross_flag;
+extern int State_Change_Flag;
+extern uint32_t g_roll_sigma;
 
 /**********************************************************************************************************************
 *  @brief      向上位机发送一个字节
@@ -69,12 +73,12 @@ void  Send_Variable(void)//发送实时变量
   uint8_t i=0,ch=0;
   float temp=0;
   Send_Begin();
-  Variable[0] = s_speed_left_now;			//此处将需要发送的变量赋值到Variable
-  Variable[1] = s_speed_right_now;
-  Variable[2] = s_speed_aim_left;
-  Variable[3] = s_speed_aim_left;
-  Variable[4] = Shizi_shibie_flag;
-  Variable[5] = Huandao_shibie_flag;
+  Variable[0] = Round_flag;			//此处将需要发送的变量赋值到Variable
+  Variable[1] = Cross_flag;
+  Variable[2] = State_Change_Flag;
+  Variable[3] = g_roll_sigma;
+  Variable[4] = g_error;
+  Variable[5] = 5;
   Putchar(0x55);
   Putchar(0xaa);
   Putchar(0x11);

@@ -97,7 +97,7 @@ static inline uint16_t PWM_GetComplementU16(uint16_t value) {
 void
 PWM_UpdatePwmDutycycle2(PWM_Type *base, pwm_submodule_t subModule, pwm_channels_t pwmSignal, pwm_mode_t currPwmMode,
                         float dutyCyclePercent) {
-    assert(dutyCyclePercent <= 100U);
+    if (dutyCyclePercent > 100U) dutyCyclePercent = 100U;
     assert((uint16_t) pwmSignal < 2U);
     uint16_t pulseCnt = 0, pwmHighPulse = 0;
     uint16_t modulo = 0;

@@ -29,7 +29,7 @@ const int CURSOR_SUP = 1, CURSOR_INF = 7;
 /*Menu Root: The main root of the menu tree*/
 MenuNode_t *root;
 
-MenuNode_t *Menu_Led_CoreBoard, *Menu_Speed, *Menu_Direction, *Menu_SetMode;
+MenuNode_t *Menu_Led_CoreBoard, *Menu_Speed, *Menu_Direction, *Menu_SetMode,*Menu_Weight;
 
 MenuNode_t *Menu_CB_LED1, *Menu_CB_LED2, *Menu_CB_LED3, *Menu_CB_LED4;
 MenuNode_t *Menu_SetClass, *Menu_SetBuzz, *Menu_SetSpeed, *Menu_SetBoardLed;
@@ -39,8 +39,7 @@ MenuNode_t *Menu_SetForwardView;
 MenuNode_t *Menu_SetAutoThreshold;
 MenuNode_t *Menu_SetRunningTime;
 MenuNode_t *Menu_SetSetupTime;
-MenuNode_t *Menu_Weight_x;
-MenuNode_t *Menu_Weight_y;
+MenuNode_t *Menu_Weight_x,*Menu_Weight_y,*Menu_Weight_e,*Menu_Weight_x_c,*Menu_Weight_y_c,*Menu_Weight_e_c;;
 MenuNode_t *Menu_jia_speed;
 MenuNode_t *Menu_jian_speed;
 MenuNode_t *Menu_yuzhi;
@@ -454,7 +453,15 @@ void Menu_Init() {
         Menu_MenuNodeCreate(&Menu_SetSpeedKL, "SetSpeedKL", DATA_INT, Set_SpeedKL, Menu_Speed);
         Menu_MenuNodeCreate(&Menu_SetSpeedKR, "SetSpeedKR", DATA_INT, Set_SpeedKR, Menu_Speed);
     }
-
+    Menu_MenuNodeCreate(&Menu_Weight, "Weight", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", DATA_INT, Set_Weight_x, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", DATA_INT, Set_Weight_y, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_e, "Weight_e", DATA_INT, Set_Weight_e, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_x_c, "Weight_x_c", DATA_INT, Set_Weight_x_c, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_y_c, "Weight_y_c", DATA_INT, Set_Weight_y_c, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_e_c, "Weight_e_c", DATA_INT, Set_Weight_e_c, Menu_Weight);
+    }
     /**@brief Settings for Direction PID */
     Menu_MenuNodeCreate(&Menu_Direction, "Direction", MID, NULL, root);
     {
@@ -481,8 +488,7 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_SetAutoThreshold, "SetAutoTH", DATA_INT, Set_AutoThreshold, root);
     Menu_MenuNodeCreate(&Menu_SetRunningTime, "SetRunTime", DATA_INT, Set_RunningTime, root);
     // Menu_MenuNodeCreate(&Menu_SetSetupTime, "SetSetupTime", DATA_INT, Set_SetupTime, root);
-    Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", DATA_INT, Set_Weight_x, root);
-    Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", DATA_INT, Set_Weight_y, root);
+
     Menu_MenuNodeCreate(&Menu_jia_speed, "jia_speed",  DATA_INT, Set_jia_speed, root);
     Menu_MenuNodeCreate(&Menu_jian_speed, "jian_speed", DATA_INT, Set_jian_speed, root);
     Menu_MenuNodeCreate(&Menu_yuzhi, "yuzhi",  DATA_INT, Set_yuzhi, root);
@@ -670,6 +676,13 @@ int Set_Speed(int (*action)(int *data, int modify)) {
     data[data_identifier].speed = ans;
     return ans;
 }
+int Set_Weight(int (*action)(int *data, int modify)) {
+    int ans = action(&data[data_identifier].Weight, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 100 ? ans : 100;
+    data[data_identifier].Weight = ans;
+    return ans;
+}
 
 int Set_Class(int (*action)(int *data, int modify)) {
     int *p = &data_identifier;
@@ -845,12 +858,46 @@ int Set_Weight_x(int (*action)(int *data,int modify))
     data[data_identifier].Weight_x = ans;
     return ans;
 }
+
 int Set_Weight_y(int (*action)(int *data,int modify))
 {
     int ans = action(&data[data_identifier].Weight_y, multiplicator);
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].Weight_y = ans;
+    return ans;
+}
+int Set_Weight_e(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Weight_e, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Weight_e = ans;
+    return ans;
+}
+int Set_Weight_x_c(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Weight_x_c, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Weight_x_c = ans;
+    return ans;
+}
+
+int Set_Weight_y_c(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Weight_y_c, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Weight_y_c = ans;
+    return ans;
+}
+int Set_Weight_e_c(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Weight_e_c, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Weight_e_c = ans;
     return ans;
 }
 int Set_yuzhi(int (*action)(int *data, int modify))

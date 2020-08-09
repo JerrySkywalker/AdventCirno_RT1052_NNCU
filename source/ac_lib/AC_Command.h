@@ -12,7 +12,10 @@
 
 #include "MIMXRT1052.h"
 
-void COM_CommandRead();
-void COM_CommandSend();
+#define BT_UART LPUART4
+#define NUMBER_FORESIGHT 10
+
+void COM_BT_Putchar(char temp);
+void COM_BT_Upload();
 
 #endif
