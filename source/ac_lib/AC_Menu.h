@@ -76,6 +76,7 @@ typedef struct Data
     int huandao_yuzhi;
     int jia_speed;
     int jian_speed;
+    int s_dir;
     /**@brief NNCU NormalizeFactor
      *
      *  In the use of nncu selfinf code, we must use a normalize factor to justify the outcome. Usually the real outcome
@@ -199,6 +200,7 @@ int Set_zhidao_yuzhi(int (*action)(int *data,int modify));
 int Set_wandao_yuzhi(int (*action)(int *data,int modify));
 int Set_shizi_yuzhi(int (*action)(int *data,int modify));
 int Set_huandao_yuzhi(int (*action)(int *data,int modify));
+int Set_s_dir(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));
 

@@ -196,7 +196,8 @@ int8_t tmp_AD_Input2[9] = {
 extern TaskHandle_t AC_Menu_task_handle;
 extern TaskHandle_t AC_Pit_task_handle;
 extern int16_t middleline_nncu;
-
+extern int s_dir_flag;
+extern int s_dir_1_flag;
 
 #if(AC_AI_BACKEND & AC_AI_BACKEND_TFLite)
 
@@ -625,7 +626,8 @@ void AC_Task(void *pvData)
 
 				Str_Clr(60,3,8);
 				Str_Clr(60,4,8);
-
+				Str_Clr(60,5,8);
+				Str_Clr(60,6,8);
 				OLED_Print_Num(0,1, EM_AD[0]);
 				OLED_Print_Num(0,2, EM_AD[1]);
 				OLED_Print_Num(0,3, EM_AD[2]);
@@ -636,6 +638,9 @@ void AC_Task(void *pvData)
 
 				OLED_Print_Num(60,3, EM_AD[7]);
 				OLED_Print_Num(60,4, EM_AD[8]);
+				OLED_Print_Num(60,5, s_dir_flag);
+				OLED_Print_Num(60,6, s_dir_1_flag);
+
 			}
         	else if(1==g_Boma[1])
 			{
@@ -679,6 +684,14 @@ void AC_Task(void *pvData)
 				}
 
 				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
+			}
+        	else if(1==g_Boma[2])
+			{
+        		if (g_Switch_Data == 1)
+                {
+                	vTaskDelay(200);
+                	Stop_Flag = 1;
+                }
 			}
 			else
 			{
@@ -725,11 +738,6 @@ void AC_Task(void *pvData)
 
                 //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 
-                if (g_Switch_Data == 1)
-                {
-                	vTaskDelay(300);
-                	Stop_Flag = 1;
-                }
 			}
         }
 	}
