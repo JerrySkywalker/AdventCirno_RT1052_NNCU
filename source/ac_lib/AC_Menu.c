@@ -47,6 +47,7 @@ MenuNode_t *Menu_zhidao_yuzhi;
 MenuNode_t *Menu_wandao_yuzhi;
 MenuNode_t *Menu_shizi_yuzhi;
 MenuNode_t *Menu_huandao_yuzhi;
+MenuNode_t *Menu_s_dir;
 /**NNCU Data*/
 MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
 
@@ -495,7 +496,7 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_wandao_yuzhi, "wandao_yuzhi",  DATA_INT, Set_wandao_yuzhi, root);
     Menu_MenuNodeCreate(&Menu_shizi_yuzhi, "shizi_yuzhi",  DATA_INT, Set_shizi_yuzhi, root);
     Menu_MenuNodeCreate(&Menu_huandao_yuzhi, "huandao_yuzhi",  DATA_INT, Set_huandao_yuzhi, root);
-
+    Menu_MenuNodeCreate(&Menu_s_dir, "s_dir",  DATA_INT, Set_s_dir, root);
     Menu_MenuNodeCreate(&Menu_Task, "Task", MID, NULL, root);
     {
         Menu_MenuNodeCreate(&Menu_Task_SD_SaveMeu, "SaveMenu", TASK, Task_SD_SaveMenu, Menu_Task);
@@ -936,6 +937,14 @@ int Set_jian_speed(int (*action)(int *data,int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].jian_speed = ans;
+    return ans;
+}
+int Set_s_dir(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].s_dir, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].s_dir = ans;
     return ans;
 }
 /**

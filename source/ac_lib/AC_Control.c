@@ -132,7 +132,7 @@ void Dir_Control(void)
         if (Shizi_shibie_flag == 1)		 	{s_error = 105 - EM_AD[3];}
         else if(Huandao_shibie_flag == 1)	{s_error = (EM_AD[1] - EM_AD[5]) / (EM_AD[1] + EM_AD[5]);}
         else								{s_error_H = ((EM_AD[0] - EM_AD[6]) / AD_fenmu_H);
-        									s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
+											s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
         									s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
         									}
         if(Shizi_shibie_flag == 1)
@@ -141,7 +141,19 @@ void Dir_Control(void)
         	else						{a=-1;}
             s_error = a * s_error * s_error;//偏差平方
         }
-
+        else
+        {
+        if(data[data_identifier].s_dir==0)
+        {
+        	s_error=s_error;
+        }
+        else if(data[data_identifier].s_dir==1)
+        {
+        	if (s_error > 0)				{a = 1;}
+        	else							{a = -1;}
+        	s_error = a * s_error * s_error;//偏差平方
+        }
+        }
         /*PID*/
         if (Huandao_shibie_flag == 1)
         {
@@ -155,9 +167,18 @@ void Dir_Control(void)
         }
         else
         {
-        	s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
-        	//s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
-        	g_dir_error_1 = s_error;
+            if(data[data_identifier].s_dir==0)
+            {
+            	s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+            	//s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+            	g_dir_error_1 = s_error;
+            }
+            else if(data[data_identifier].s_dir==1)
+            {
+            	s_dir = 0.000001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+            	//s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+            	g_dir_error_1 = s_error;
+            }
         }
 
 
@@ -207,20 +228,39 @@ void Speed_Control(void)
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-
-    	if (Shizi_shibie_flag == 1)
+    	if((Stop_Flag == 1)||((EM_AD[0]<5)&&(EM_AD[6]<5)))
+    	{
+    		s_speed_aim = 0;
+    	}
+    	else if (Shizi_shibie_flag == 1)
         {
           s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+          s_dir_flag=0;
+          s_dir_1_flag=1;
         }
         else if(Huandao_shibie_flag==1)
         {
-            s_speed_aim = 0.1 * (data[data_identifier].speed + 15 );
+            s_speed_aim = 0.1 * (data[data_identifier].speed + 5 );
+            s_dir_flag=1;
+            s_dir_1_flag=0;
+        }
+    	else if ((EM_AD[3]<=70)||(EM_AD[2]>130)||(EM_AD[4]>130))
+        {
+          s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+          s_dir_flag=0;
+          s_dir_1_flag=1;
+        }
+        else if((EM_AD[3]>=90)&&(abs(EM_AD[2]-EM_AD[4])<=20)&&(abs(EM_AD[0]-EM_AD[6])<=20)&&(abs(EM_AD[7]-EM_AD[8])<=20))
+        {
+            s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
+            s_dir_flag=1;
+            s_dir_1_flag=0;
         }
         else
         {
             s_speed_aim=0.1*data[data_identifier].speed;
-
-
+            s_dir_flag=0;
+            s_dir_1_flag=0;
         }
     }
 
