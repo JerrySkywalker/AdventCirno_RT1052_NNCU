@@ -66,7 +66,7 @@
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
 
-#define DEBUG_K66_OUTPUT
+
 /***********************************************************************************************************************
  * Definitions
  ***********************************************************************************************************************/
@@ -110,8 +110,10 @@
 
 #define AC_FUNCTION_SERVICE AC_FUNCTION_ON
 
+//#define DEBUG_K66_OUTPUT
 
-
+#define NNCU_DENOISE
+#define NNCU_DENOISE_MAX_VARIATION 200
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -179,6 +181,9 @@ int16_t *g_AD_nncu_SP_OutBuffer;		//ServoProspect
 int16_t *g_AD_nncu_MP_OutBuffer;		//MotorProspect
 int16_t g_AD_nncu_Output[3];
 
+/**@note limitation on variation rate of nncu output**/
+int16_t g_AD_nncu_SP_History[2];
+
 /**NNCU : Road Type Detection **/
 int16_t *g_AD_nncu_ClassificationOutBuffer;
 int16_t g_AD_nncu_ClassificationOutput[5];
@@ -206,7 +211,8 @@ int g_tflite_error_reporter;
 
 #endif
 
-
+/**A timer to record the boot time. used for service that needed to "start delayed" **/
+uint16_t g_BootTime = 0;
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -516,6 +522,25 @@ void AC_Task(void *pvData)
 
 		g_time_duration_us = TimerUsGet() - g_time_us;
 
+#ifdef NNCU_DENOISE
+
+        int16_t temp_nncu_SPVarRate = g_AD_nncu_SP_History[1] - g_AD_nncu_SP_History[0];
+
+        /**Give it a delayed start**/
+        if(g_BootTime>1000)
+        {
+            /**Set a safe limitation**/
+            if(abs(g_AD_nncu_Output[0] - g_AD_nncu_SP_History[1])> NNCU_DENOISE_MAX_VARIATION)
+            {
+                g_AD_nncu_Output[0] = g_AD_nncu_SP_History[1]+temp_nncu_SPVarRate;
+            }
+        }
+
+        /**Update history**/
+        g_AD_nncu_SP_History[0] = g_AD_nncu_SP_History[1];
+        g_AD_nncu_SP_History[1] = g_AD_nncu_Output[0];
+
+#endif
 
 		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
 		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
