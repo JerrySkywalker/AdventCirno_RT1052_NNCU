@@ -171,7 +171,11 @@ uint8_t EM_AD[NUMBER_INDUCTORS];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
 uint8_t g_Switch_Data = 0;
+
+/**NNCU : Direct AD-Servo, AD-ServoProspect,AD-MotorProspect relationship prediction buffer **/
 int16_t *g_AD_nncu_OutBuffer;
+int16_t *g_AD_nncu_SP_OutBuffer;		//ServoProspect
+int16_t *g_AD_nncu_MP_OutBuffer;		//MotorProspect
 int16_t g_AD_nncu_Output[3];
 
 /**NNCU : Road Type Detection **/
@@ -265,7 +269,7 @@ void AC_Task(void *pvData)
 	{
 		vTaskDelay(10);
 	}
-    Flag_ScreenRefresh = -1;
+    Flag_ScreenRefresh = -10;
 
 
 	/** Logo **/
@@ -412,6 +416,8 @@ void AC_Task(void *pvData)
     {
     /*输出缓存区的指针，必须按照这个格式写*/
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
+    g_AD_nncu_SP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
+    g_AD_nncu_MP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
     }
 #endif
@@ -497,9 +503,17 @@ void AC_Task(void *pvData)
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 		g_time_us= TimerUsGet();
-		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
-		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+//		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
+//		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+
+		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
+		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+
+		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
+		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+
 		g_time_duration_us = TimerUsGet() - g_time_us;
+
 
 		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
 		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
@@ -625,7 +639,7 @@ void AC_Task(void *pvData)
 			}
         	else if(1==g_Boma[1])
 			{
-				if(0!=Flag_ScreenRefresh)
+				if(1!=Flag_ScreenRefresh)
                 {
                     Flag_ScreenRefresh = 0;
 				    OLED_Fill(0x00);
@@ -673,16 +687,19 @@ void AC_Task(void *pvData)
                 {
                     Flag_ScreenRefresh = -1;
                     OLED_Fill(0x00);
-                }
-                OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
 
-                /** @note: just a NNCU demo*/
-                OLED_P6x8Str(0,1,(uint8_t*)"Boma");
-                OLED_P6x8Str(0,2,(uint8_t*)"Servo");
-                OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
-                OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-                OLED_P6x8Str(0,5,(uint8_t*)"middleline");
-                OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
+                    OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+
+                    /** @note: just a NNCU demo*/
+                    OLED_P6x8Str(0,1,(uint8_t*)"Boma");
+                    OLED_P6x8Str(0,2,(uint8_t*)"Servo");
+//                    OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
+//                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+					OLED_P6x8Str(0,3,(uint8_t*)"nncu-SP");
+					OLED_P6x8Str(0,4,(uint8_t*)"nncu-MP");
+                    OLED_P6x8Str(0,5,(uint8_t*)"middleline");
+                    OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
+                }
 
                 Str_Clr(60,1,10);
                 Str_Clr(60,2,8);
@@ -699,8 +716,10 @@ void AC_Task(void *pvData)
                 OLED_Print_Num(90,1,g_Boma[5]);
 
                 OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
-                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
-                OLED_Print_Num1(60,4,g_time_duration_us);
+//                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
+//                OLED_Print_Num1(60,4,g_time_duration_us);
+                OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
+                OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
                 OLED_Print_Num1(60,5,middleline_nncu);
                 OLED_Print_Num1(60,6,g_AD_Data[6]);
 
