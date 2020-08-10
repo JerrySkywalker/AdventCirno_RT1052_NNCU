@@ -57,23 +57,21 @@ typedef struct Data
     int dirkp_z;
     int dirki_z;
     int dirkd_z;
+    int dirkp_s;
+    int dirki_s;
+    int dirkd_s;
     /**Mode for Camera/EM Control*/
     int mode;
 
     int forward_view;
     int auto_threshold;
     int running_time;
-    int Weight;
     int Weight_x;
     int Weight_y;
-    int Weight_e;
-    int Weight_x_c;
-    int Weight_y_c;
-    int Weight_e_c;
+
     int yuzhi;
     int zhidao_yuzhi;
     int wandao_yuzhi;
-    int shexingwan_yuzhi;
     int shizi_yuzhi;
     int huandao_yuzhi;
     int jia_speed;
@@ -185,23 +183,20 @@ int Set_DirKd(int (*action)(int *data,int modify));
 int Set_DirKp_z(int (*action)(int *data,int modify));
 int Set_DirKi_z(int (*action)(int *data,int modify));
 int Set_DirKd_z(int (*action)(int *data,int modify));
+int Set_DirKp_s(int (*action)(int *data,int modify));
+int Set_DirKi_s(int (*action)(int *data,int modify));
+int Set_DirKd_s(int (*action)(int *data,int modify));
 int Set_Mode(int (*action)(int *data,int modify));
 int Set_ForwardView(int (*action)(int *data,int modify));
 int Set_AutoThreshold(int (*action)(int *data,int modify));
 int Set_RunningTime(int (*action)(int *data,int modify));
-int Set_Weight(int (*action)(int *data,int modify));
 int Set_Weight_x(int (*action)(int *data,int modify));
 int Set_Weight_y(int (*action)(int *data,int modify));
-int Set_Weight_e(int (*action)(int *data,int modify));
-int Set_Weight_x_c(int (*action)(int *data,int modify));
-int Set_Weight_y_c(int (*action)(int *data,int modify));
-int Set_Weight_e_c(int (*action)(int *data,int modify));
 int Set_jia_speed(int (*action)(int *data,int modify));
 int Set_jian_speed(int (*action)(int *data,int modify));
 int Set_yuzhi(int (*action)(int *data,int modify));
 int Set_zhidao_yuzhi(int (*action)(int *data,int modify));
 int Set_wandao_yuzhi(int (*action)(int *data,int modify));
-int Set_shexingwan_yuzhi(int (*action)(int *data,int modify));
 int Set_shizi_yuzhi(int (*action)(int *data,int modify));
 int Set_huandao_yuzhi(int (*action)(int *data,int modify));
 

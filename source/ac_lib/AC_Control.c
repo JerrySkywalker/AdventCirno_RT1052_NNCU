@@ -54,8 +54,9 @@ int flag_jishi=0;//1计时开始
 int flag_shijian = 0;
 int flag_wandao_panduan=0;
 int flag_wandao_zhixing=0;
-pwm_t my1 = {PWM2, kPWM_Module_0, 20 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
-pwm_t my2 = {PWM2, kPWM_Module_1, 20 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
+int a;
+pwm_t my1 = {PWM2, kPWM_Module_0, 16 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
+pwm_t my2 = {PWM2, kPWM_Module_1, 16 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
 gpio_t OE_B = {GPIO5,02U,0 };										//L7 74LVC245_OE_B, 电机PWM相关，低电平有效
 
 void Control_Init()
@@ -106,28 +107,20 @@ void Dir_Control(void)
     else if (data[data_identifier].mode == 1)
     {
 
-    	/**/
-        if (EM_AD[0] + EM_AD[6] != 0)
-        {
-        	AD_fenmu_H = EM_AD[0] + EM_AD[6];
-        }
-        else
-        {
-        	AD_fenmu_H = 200; //防止分母为零
-        }
-        if (EM_AD[2] + EM_AD[4] != 0)
-        {
-        	AD_fenmu_S = EM_AD[2] + EM_AD[4];
-        }
-        else
-        {
-        	AD_fenmu_S = 200; //防止分母为零
-        }
-
+    	s_error_yuanshi_H = EM_AD[0] - EM_AD[6];
+        if (EM_AD[0] + EM_AD[6] != 0)				{AD_fenmu_H = EM_AD[0] + EM_AD[6];}
+        else										{AD_fenmu_H = 200; }//防止分母为零
+        if (EM_AD[2] + EM_AD[4] != 0)				{AD_fenmu_S = EM_AD[2] + EM_AD[4];}
+        else										{AD_fenmu_S = 200; }//防止分母为零
+//        if (EM_AD[0] + EM_AD[6] != 0)				{AD_fenmu_H = EM_AD[0] * EM_AD[6];}
+//        else										{AD_fenmu_H = 200; }//防止分母为零
+//        if (EM_AD[2] + EM_AD[4] != 0)				{AD_fenmu_S = EM_AD[2] * EM_AD[4];}
+//        else										{AD_fenmu_S = 200; }//防止分母为零
     	Dir_Control_Huandao_Shibie();
-
     	/*十字识别*/
-        if ((EM_AD[1] >= 150) && (EM_AD[5] >= 150))
+        if (((EM_AD[1] >= data[data_identifier].shizi_yuzhi) && (EM_AD[5] >= data[data_identifier].shizi_yuzhi))/*正入十字*/
+        	||((EM_AD[1] > 120/*200*/ && EM_AD[5] > 120/*200*/) && (EM_AD[0] + EM_AD[3] + EM_AD[6] > 320))	/*斜入十字*/
+        )
         {
         	Shizi_shibie_flag = 1;
         }
@@ -135,112 +128,38 @@ void Dir_Control(void)
         {
         	Shizi_shibie_flag = 0;
         }
-
-        /*判据选择*/
-        if ((Shizi_shibie_flag == 1) || (Huandao_shibie_flag == 1)) //十字特殊通过方法
+        /*判据选择十字特殊通过方法*/
+        if (Shizi_shibie_flag == 1)		 	{s_error = 105 - EM_AD[3];}
+        else if(Huandao_shibie_flag == 1)	{s_error = (EM_AD[1] - EM_AD[5]) / (EM_AD[1] + EM_AD[5]);}
+        else								{s_error_H = ((EM_AD[0] - EM_AD[6]) / AD_fenmu_H);
+        									s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
+        									s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
+        									}
+        if(Shizi_shibie_flag == 1)
         {
-        	s_error = (EM_AD[0] - EM_AD[6]) / (EM_AD[0] + EM_AD[6] + 1); 
-        	//s_error = 0.5 * s_error_1 + 0.5 * s_error;
+        	if(EM_AD[7]-EM_AD[8]>0)		{a=1;}
+        	else						{a=-1;}
+            s_error = a * s_error * s_error;//偏差平方
         }
-        else
-        {
-        	s_error_H = ((EM_AD[0] - EM_AD[6]) / AD_fenmu_H);
-        	s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
-        	s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
-        }
-        int a = 0;
-        if (s_error > 0)
-        {
-        	a = 1;
-        }
-        else
-        {
-        	a = -1;
-        }
-        s_error = a * s_error * s_error;//偏差平方
 
         /*PID*/
-        if ((Shizi_shibie_flag == 1) || (Huandao_shibie_flag == 1))
+        if (Huandao_shibie_flag == 1)
         {
-        	s_dir = 0.001*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
+        	s_dir = data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
+        	g_dir_error_1 = s_error;
+        }
+        else if (Shizi_shibie_flag == 1)
+        {
+        	s_dir = 0.000001 * (data[data_identifier].dirkp_s * s_error + data[data_identifier].dirki_s * g_dir_error_sum + data[data_identifier].dirkd_s * (s_error - g_dir_error_1));
         	g_dir_error_1 = s_error;
         }
         else
         {
-        	s_dir = 0.000001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+        	s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
+        	//s_dir = 0.00001 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
         	g_dir_error_1 = s_error;
         }
 
-
-
-        /*
-        s_error_H = ((EM_AD[0] - EM_AD[6]) / AD_fenmu_H);
-        s_error_S = ((EM_AD[2] - EM_AD[4]) / AD_fenmu_S);
-        s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
-        if(a>=data[data_identifier].zhidao_yuzhi)//直道
-        {
-            s_error=s_error_H;
-            s_dir = 0.001*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
-        	g_dir_error_1 = s_error;
-            flag_zhidao=1;
-            flag_wandao=0;
-            flag_shexingwan=0;
-            flag_shizi=0
-            flag_huandao=0;
-        }
-        else if ((b>=data[data_identifier].wandao_yuzhi)&&(a>=))//弯前减速,注意多种判据组合
-        {
-            s_error = s_error_H * data[data_identifier].Weight_x + s_error_S * data[data_identifier].Weight_y;
-            s_dir = 0.001*data[data_identifier].dirkp_w * s_error + data[data_identifier].dirki_w * g_dir_error_sum + data[data_identifier].dirkd_w * (s_error - g_dir_error_1);
-        	g_dir_error_1 = s_error;
-            flag_zhidao=0;
-            flag_wandao=1;
-            flag_shexingwan=0;
-            flag_shizi=0
-            flag_huandao=0;
-
-        }
-        else if(c>=data[data_identifier].shexingwan_yuzhi)
-        {
-            s_error=s_error_S;
-            s_dir = 0.001*data[data_identifier].dirkp_sw * s_error + data[data_identifier].dirki_sw * g_dir_error_sum + data[data_identifier].dirkd_sw * (s_error - g_dir_error_1);
-        	g_dir_error_1 = s_error;
-            flag_zhidao=0;
-            flag_wandao=0;
-            flag_shexingwan=1;
-            flag_shizi=0;
-            flag_huandao=0;
-
-        }
-        else if (d>=data[data_identifier].shizi_yuzhi||e>=data[data_identifier].huandao_yuzhi)
-        {
-            s_error=s_error_H;
-            s_dir = 0.001*data[data_identifier].dirkp_z * s_error + data[data_identifier].dirki_z * g_dir_error_sum + data[data_identifier].dirkd_z * (s_error - g_dir_error_1);
-        	g_dir_error_1 = s_error;
-            flag_zhidao=0;
-            flag_wandao=0;
-            flag_shexingwan=0;
-            flag_shizi=1;
-            flag_huandao=1;
-
-        }
-        else
-        {
-            s_error = s_error_H ;
-            s_dir = 0.001*data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1);
-        	g_dir_error_1 = s_error;
-            flag_zhidao=0;
-            flag_wandao=0;
-            flag_shexingwan=0;
-            flag_shizi=0;
-            flag_huandao=0;
-        }
-        */
-
-    	/*PID Old*/
-//        s_error = ((EM_AD[0]+128) - (EM_AD[6]+128)) / ((EM_AD[0]+128) * (EM_AD[6]+128)+1);
-//        s_dir = 10 * (data[data_identifier].dirkp * s_error + data[data_identifier].dirki * g_dir_error_sum + data[data_identifier].dirkd * (s_error - g_dir_error_1));
-//        g_dir_error_1 = s_error;
 
         /*获取差速系数*/
         Servo_Protect(&s_dir);
@@ -288,92 +207,21 @@ void Speed_Control(void)
     /*电磁模式*/
     else if (data[data_identifier].mode == 1)
     {
-        // if (Stop_Flag == 1)
-        // {
-        // 	s_speed_aim=0;
-        // }
-        // else if (EM_AD[0] <= 5 && EM_AD[6] <= 5)
-        // {
-        // 	s_speed_aim=0;
-        // }
-        // else if ((((s_error_yuanshi_H < 50) && (s_error_yuanshi_H > -50))&& (EM_AD[3] >= 85)&&(EM_AD[8]-EM_AD[7]>=-30)&&(EM_AD[8]-EM_AD[7]<=30))||(Shizi_shibie_flag==1))
-        // {
-        // 	s_speed_aim = 0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        // 	s_dir_flag =1;
-        // }
-        // else if (((EM_AD[8]-EM_AD[7]>60)||(EM_AD[8]-EM_AD[7]<-60))&&(EM_AD[3]<data[data_identifier].yuzhi))
-        // {
-        // 	s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        // 	s_dir_1_flag =1;
-        // }
-        // else
-        // {
-        // 	s_speed_aim = 0.1 * data[data_identifier].speed;
-        // 	s_dir_flag=0;
-        // 	s_dir_1_flag=0;
-        // }
 
-        /////////////a是代表直道概率b代表弯道概率c代表蛇形弯概率d代表十字概率e代表环岛概率
-        if(g_AD_nncu_RoadType==1||g_AD_nncu_RoadType==2)
+    	if (Shizi_shibie_flag == 1)
         {
-        	flag_wandao_panduan++;
+          s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
+        }
+        else if(Huandao_shibie_flag==1)
+        {
+            s_speed_aim = 0.1 * (data[data_identifier].speed + 15 );
         }
         else
         {
-        	flag_wandao_panduan=0;
+            s_speed_aim=0.1*data[data_identifier].speed;
+
+
         }
-        if(flag_wandao_panduan>=4)
-        {
-        	flag_wandao_zhixing=1;
-        }
-        else
-        {
-        	flag_wandao_zhixing=0;
-        }
-//        if (g_AD_nncu_RoadType==1||g_AD_nncu_RoadType==2)//弯前减速
-//        {
-//            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-//        }
-//        else if (g_AD_nncu_RoadType==0)
-//        {
-//            s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-//        }
-        // else if(g_AD_nncu_RoadType==2)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed  );
-        // }
-        // else if(g_AD_nncu_RoadType==3)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        // }
-        // else if(g_AD_nncu_RoadType==4)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        // }
-        // else if(g_AD_nncu_RoadType==4)
-        // {
-        //     s_speed_aim=0.1 * (data[data_identifier].speed + data[data_identifier].jia_speed );
-        // }
-        if (flag_wandao_zhixing==1)//弯前减速
-        {
-            s_speed_aim=0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
-        }
-        else
-        {
-            s_speed_aim=s_speed_aim;
-        }
-        ////////////////////////减速程序
-        // if (flag_zhuangtai==flag_zhuangtai_former)
-        // {
-        //     flag_jishi=0;
-        // }
-        // else
-        // {
-        //     flag_jishi=1;
-        // }
-        
-        
-        ///////////////////////////
     }
 
     s_speed_aim_left = s_speed_aim*(1-data[data_identifier].speedkl*Differencial);
