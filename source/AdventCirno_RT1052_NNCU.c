@@ -122,7 +122,9 @@
 /**
  * @breif NNCU FUNCTION option
  */
-#define NNCU_TEST 				AC_FUNCTION_OFF
+#define NNCU_TEST 				AC_FUNCTION_ON
+#define NNCU_TEST_DENSE         AC_FUNCTION_OFF
+#define NNCU_TEST_CNN           AC_FUNCTION_ON
 #define NNCU_CLASSIFICATION 	AC_FUNCTION_OFF
 #define NNCU_DENOISE
 #define NNCU_DENOISE_MAX_VARIATION 200
@@ -193,6 +195,8 @@ int16_t *g_AD_nncu_SP_OutBuffer;		//ServoProspect
 int16_t *g_AD_nncu_MP_OutBuffer;		//MotorProspect
 int16_t g_AD_nncu_Input[8][9];          
 int16_t g_AD_nncu_Output[3];
+int g_nncu_Prospect_Servo;      /**output with proper process**/
+int g_nncu_Prospect_Motor;
 
 /**NNCU: limitation on variation rate of nncu output**/
 int16_t g_AD_nncu_SP_History[2];
@@ -206,6 +210,7 @@ int g_AD_nncu_RoadType = 0;
 
 /**NNCU: Test Input **/
 #if NNCU_TEST
+#if NNCU_TEST_DENSE
 /*两个测试数据*/
 int8_t tmp_AD_Input[9] = {
         0xC2, 0x8E, 0x90, 0xC9, 0xDB, 0x94, 0xF2, 0xCD, 0x0C
@@ -213,6 +218,21 @@ int8_t tmp_AD_Input[9] = {
 int8_t tmp_AD_Input2[9] = {
         0xC0, 0x90, 0x8B, 0xC2, 0xDE, 0x9C, 0xE8, 0xF1, 0x19
 };
+#endif
+
+#if NNCU_TEST_CNN
+
+static const int8_t tmp_AD_CNN_Input[8][9] = {
+{-26, -117,  -34,  -30,  -20, -114,  -28,  -79,  -87},
+{-36, -119,  -41,  -34,  -14, -109,  -15,  -89,  -74},
+{-46, -120,  -46,  -35,  -13, -102,   -2,  -98,  -61},
+{-49, -120,  -49,  -43,  -14,  -90,    8, -100,  -47},
+{-54, -119,  -54,  -46,  -13,  -81,   19, -107,  -18},
+{-57, -118,  -54,  -52,  -15,  -69,   29, -110,    7},
+{-58, -112,  -49,  -56,  -28,  -48,   34, -112,   31},
+{-56, -105,  -41,  -57,  -43,  -29,   32, -113,   59}
+};
+#endif
 #endif
 
 /*TODO: TaskHandle declaration here*/
@@ -486,7 +506,23 @@ _Noreturn void AC_Task(void *pvData)
 
 #endif
 
-
+#if NNCU_TEST
+#if NNCU_TEST_CNN
+    PRINTF("[O K] AC: NNCU: Test Mode CNN.\n");
+    PRINTF("[O K] AC: NNCU: Test Input Data.\n\n");
+    for(int i = 0;i<=7;i++)
+    {
+    	for(int j=0;j<=8;j++)
+    	{
+    		if(tmp_AD_CNN_Input[i][j]<0)
+    			PRINTF("-");
+    		PRINTF("%d ",tmp_AD_CNN_Input[i][j]);
+    	}
+    	PRINTF("\n");
+    }
+#endif
+    PRINTF("\n");
+#endif
 
 
     delay_ms(2000);
@@ -531,7 +567,10 @@ _Noreturn void AC_Task(void *pvData)
 					}
 #endif
 
+		g_time_us= TimerUsGet();
+
 #if NNCU_TEST
+#if NNCU_TEST_DENSE
 		/*For Test NNCU Only*/
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
 		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
@@ -539,8 +578,18 @@ _Noreturn void AC_Task(void *pvData)
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 #endif
+#if NNCU_TEST_CNN
 
-		g_time_us= TimerUsGet();
+		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&(tmp_AD_CNN_Input));
+		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+
+		/**Real output of nncu.**/
+		g_nncu_Prospect_Servo = g_AD_nncu_Output[0]/10000*128;
+
+#endif
+#endif
+
+
 //		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 //		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
@@ -775,8 +824,9 @@ _Noreturn void AC_Task(void *pvData)
 //                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
 					OLED_P6x8Str(0,3,(uint8_t*)"nncu-SP");
 					OLED_P6x8Str(0,4,(uint8_t*)"nncu-MP");
-                    OLED_P6x8Str(0,5,(uint8_t*)"middleline");
-                    OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
+					OLED_P6x8Str(0,5,(uint8_t*)"nncu-Time");
+                    OLED_P6x8Str(0,6,(uint8_t*)"middleline");
+                    OLED_P6x8Str(0,7,(uint8_t*)"AD-6");
                 }
 
                 Str_Clr(60,1,10);
@@ -795,11 +845,11 @@ _Noreturn void AC_Task(void *pvData)
 
                 OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
 //                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
-//                OLED_Print_Num1(60,4,g_time_duration_us);
                 OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
                 OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
-                OLED_Print_Num1(60,5,middleline_nncu);
-                OLED_Print_Num1(60,6,g_AD_Data[6]);
+                OLED_Print_Num1(60,5,g_time_duration_us);
+                OLED_Print_Num1(60,6,middleline_nncu);
+                OLED_Print_Num1(60,7,g_AD_Data[6]);
 
                 //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
 

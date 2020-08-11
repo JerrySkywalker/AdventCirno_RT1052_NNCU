@@ -1,6 +1,6 @@
 #ifndef NNCU_CONFIG
 #define NNCU_CONFIG
 
-void* RunModel(const void *in_buf);
+void* RunModel_SP(const void *in_buf);
 
 #endif
