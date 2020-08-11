@@ -77,11 +77,9 @@
 #define AC_VERSION_MINOR 4
 #define AC_VERSION_REVISION 0
 
-
 /**
  * @breif Declare the AI Backend for AdventCirno
  */
-
 #define AC_AI_BACKEND_NNCU 0x01
 #define AC_AI_BACKEND_TFLite 0x02
 
@@ -90,7 +88,6 @@
 /**
  * @breif Manual Flash Operation switch
  */
-
 #define AC_FLASH_MANUAL_ENABLE 0U
 #define AC_FLASH_MANUAL_DISABLE 1U
 
@@ -99,7 +96,6 @@
 /**
  * @breif Menu storage option
  */
-
 #define AC_STORAGE_PLACE_FLASH 0U
 #define AC_STORAGE_PLACE_SD 1U
 
@@ -108,7 +104,6 @@
 /**
  * @breif Other FUNCTION option
  */
-
 #define AC_FUNCTION_ON 1U
 #define AC_FUNCTION_OFF 0U
 
@@ -117,7 +112,6 @@
 
 #define AC_DEBUG_TEST			AC_FUNCTION_OFF			/**@note: For driver test only. When you finish your motherboard test,you shuould tern it off **/
 #define AC_DEBUG_K66_OUTPUT		AC_FUNCTION_OFF
-
 
 /**
  * @breif NNCU FUNCTION option
@@ -128,10 +122,10 @@
 #define NNCU_CLASSIFICATION 	AC_FUNCTION_OFF
 #define NNCU_DENOISE			AC_FUNCTION_OFF
 #define NNCU_DENOISE_MAX_VARIATION 200
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-
 BSS_DTC uint8_t heap_heap1[64 * 1024] ALIGN(8);
 BSS_OC uint8_t heap_heap2[128 * 1024] ALIGN(8);
 BSS_SDRAM uint8_t heap_heap3[4 * 1024 * 1024] ALIGN(8);
