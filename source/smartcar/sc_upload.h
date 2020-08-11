@@ -1,6 +1,9 @@
 #ifndef _SC_UPLOAD_H
 #define _SC_UPLOAD_H
+
 #include "smartcar/sc_uart.h"
+#include "ac_lib/AC_Control.h"
+
 #define BYTE0(Temp)       (*(char *)(&Temp))
 #define BYTE1(Temp)       (*((char *)(&Temp) + 1))
 #define BYTE2(Temp)       (*((char *)(&Temp) + 2))

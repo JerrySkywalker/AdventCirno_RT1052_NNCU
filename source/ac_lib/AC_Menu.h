@@ -68,15 +68,11 @@ typedef struct Data
     int running_time;
     int Weight_x;
     int Weight_y;
-
-    int yuzhi;
-    int zhidao_yuzhi;
-    int wandao_yuzhi;
-    int shizi_yuzhi;
-    int huandao_yuzhi;
-    int jia_speed;
-    int jian_speed;
+    int Weight_e;
+    int Round_Acc;
+    int Cross_Acc;
     int s_dir;
+    int Round_TH;
     /**@brief NNCU NormalizeFactor
      *
      *  In the use of nncu selfinf code, we must use a normalize factor to justify the outcome. Usually the real outcome
@@ -193,13 +189,10 @@ int Set_AutoThreshold(int (*action)(int *data,int modify));
 int Set_RunningTime(int (*action)(int *data,int modify));
 int Set_Weight_x(int (*action)(int *data,int modify));
 int Set_Weight_y(int (*action)(int *data,int modify));
-int Set_jia_speed(int (*action)(int *data,int modify));
-int Set_jian_speed(int (*action)(int *data,int modify));
-int Set_yuzhi(int (*action)(int *data,int modify));
-int Set_zhidao_yuzhi(int (*action)(int *data,int modify));
-int Set_wandao_yuzhi(int (*action)(int *data,int modify));
-int Set_shizi_yuzhi(int (*action)(int *data,int modify));
-int Set_huandao_yuzhi(int (*action)(int *data,int modify));
+int Set_Weight_e(int (*action)(int *data,int modify));
+int Set_Cross_Acc(int (*action)(int *data,int modify));
+int Set_Round_Acc(int (*action)(int *data,int modify));
+int Set_Round_TH(int (*action)(int *data,int modify));
 int Set_s_dir(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));

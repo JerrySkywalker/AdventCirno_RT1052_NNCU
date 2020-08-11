@@ -20,7 +20,6 @@ extern int flag_jishi;
 extern int flag_shijian;
 extern int8_t g_ENC_L_Data;
 extern int8_t g_ENC_R_Data;
-extern uint16_t g_BootTime;
 //extern float s_speed_left_now, s_speed_right_now;
 //extern float s_speed_aim_left, s_speed_aim_right;
 
@@ -46,10 +45,10 @@ int Flag_Signal = 0;				//脉冲信号标志
  */
 void AC_Pit(void *pv)
 {
-    PIT_Init2(kPIT_Chnl_0, 20 * 1000);	    //Camera & image Process-20ms
+    PIT_Init2(kPIT_Chnl_0, 4 * 1000);	    //Camera & image Process-20ms
     PIT_Init2(kPIT_Chnl_1, 20 * 1000);      //Servo-20ms
-    PIT_Init2(kPIT_Chnl_2, 20 * 1000);      //Motor-20ms
-    PIT_Init2(kPIT_Chnl_3, 20 * 1000);      //NULL
+    PIT_Init2(kPIT_Chnl_2, 4 * 1000);      //Motor-20ms
+    PIT_Init2(kPIT_Chnl_3, 2 * 1000 *1000);      //NULL
     NVIC_SetPriority(PIT_IRQn, 6);	        //设置pit中断优先级为6
     PIT_StartTimer(PIT, kPIT_Chnl_0);
     PIT_StartTimer(PIT, kPIT_Chnl_1);
@@ -83,16 +82,15 @@ void AC_Pit(void *pv)
     {
         PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
 
-        if(g_BootTime<30000)
-        	g_BootTime++;
-
         /*TODO: Command */
-		if (g_ENC_L_Data > 10 && g_ENC_R_Data > 10){
-			COM_BT_Upload();
-		}
-    	else{
-			/**Do nothing*/
-		}
+//		if (g_ENC_L_Data > 10 && g_ENC_R_Data > 10){
+//			COM_BT_Upload();
+//		}
+//    	else{
+//			/**Do nothing*/
+//		}
+
+		//Send_Variable();
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_1) == kPIT_TimerFlag)
     {
@@ -124,7 +122,6 @@ void AC_Pit(void *pv)
 
 //        	}
 //        Ftm_PWM_Change(FTM3, kFTM_Chnl_6, 50, 7.5);
-       //PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor));
 
     }
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_2) == kPIT_TimerFlag)
@@ -133,7 +130,13 @@ void AC_Pit(void *pv)
 
         /*TODO: Motor control sequence here */
 
+//        g_time_us= TimerUsGet();
+
         Speed_Control();
+
+//        g_time_duration_us = TimerUsGet() - g_time_us;
+//        PRINTF("time used %d\n",(int)g_time_duration_us);
+
         // if (flag_jishi==1)
         // {
         //     Jishi_Time();
@@ -161,8 +164,6 @@ void AC_Pit(void *pv)
 
         /*TODO: Test code*/
 
-        //Send_Variable();
-
         /*测试舵机打角连续性*/
 //		if (0 == GPIO_PinRead(GPIO2, 0U))
 //		{
@@ -179,15 +180,15 @@ void AC_Pit(void *pv)
     	/*产生阶跃信号，调电机PID用*/
 //    	 if (Flag_Signal == 1)
 //    	 {
-//////    	 	Flag_Signal = 0;
-//////    	 	s_speed_aim_left = -2;
-//////    	 	s_speed_aim_right = -2;
+//    	 	Flag_Signal = 0;
+//    	 	s_speed_aim_left = -2;
+//    	 	s_speed_aim_right = -2;
 //    	 }
 //    	 else if (Flag_Signal == 0)
 //    	 {
-//////    	 	Flag_Signal = 1;
-//////    	 	s_speed_aim_left = 2;
-//////    	 	s_speed_aim_right = 2;
+//    	 	Flag_Signal = 1;
+//    	 	s_speed_aim_left = 2;
+//    	 	s_speed_aim_right = 2;
 //    	 }
 
         /*在屏幕上显示编码器返回值*/
