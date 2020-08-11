@@ -70,6 +70,13 @@
 /***********************************************************************************************************************
  * Definitions
  ***********************************************************************************************************************/
+/**
+ * @breif Version Information
+ */
+#define AC_VERSION_MAJOR 1
+#define AC_VERSION_MINOR 4
+#define AC_VERSION_REVISION 0
+
 
 /**
  * @breif Declare the AI Backend for AdventCirno
@@ -102,16 +109,21 @@
 #define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
 
 /**
- * @breif FUNCTION option
+ * @breif Other FUNCTION option
  */
 
 #define AC_FUNCTION_ON 1U
 #define AC_FUNCTION_OFF 0U
 
-#define AC_FUNCTION_SERVICE AC_FUNCTION_ON
+#define AC_FUNCTION_SERVICE 	AC_FUNCTION_ON
+#define AC_FUNCTION_CAMERA 		AC_FUNCTION_OFF
+#define AC_DEBUG_K66_OUTPUT		AC_FUNCTION_OFF
 
-//#define DEBUG_K66_OUTPUT
-
+/**
+ * @breif NNCU FUNCTION option
+ */
+#define NNCU_TEST 				AC_FUNCTION_OFF
+#define NNCU_CLASSIFICATION 	AC_FUNCTION_OFF
 #define NNCU_DENOISE
 #define NNCU_DENOISE_MAX_VARIATION 200
 /*******************************************************************************
@@ -185,10 +197,13 @@ int16_t g_AD_nncu_Output[3];
 int16_t g_AD_nncu_SP_History[2];
 
 /**NNCU : Road Type Detection **/
+#if NNCU_CLASSIFICATION
 int16_t *g_AD_nncu_ClassificationOutBuffer;
 int16_t g_AD_nncu_ClassificationOutput[5];
 int g_AD_nncu_RoadType = 0;
+#endif
 
+#if NNCU_TEST
 /*两个测试数据*/
 int8_t tmp_AD_Input[9] = {
         0xC2, 0x8E, 0x90, 0xC9, 0xDB, 0x94, 0xF2, 0xCD, 0x0C
@@ -196,7 +211,7 @@ int8_t tmp_AD_Input[9] = {
 int8_t tmp_AD_Input2[9] = {
         0xC0, 0x90, 0x8B, 0xC2, 0xDE, 0x9C, 0xE8, 0xF1, 0x19
 };
-
+#endif
 
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
@@ -268,7 +283,7 @@ void start_task(void *pvData)
  */
 TaskHandle_t AC_task_handle;
 
-void AC_Task(void *pvData)
+_Noreturn void AC_Task(void *pvData)
 {
 	img_t capture;
 	PRINTF("[O K] AC: Sleeping. Press WAKEUP key to Start...\r\n");
@@ -387,6 +402,7 @@ void AC_Task(void *pvData)
 
         /**@brief Init Menu Data*/
         OLED_P6x8Str(0, 4, (uint8_t *) "-Menu");
+
 #if((AC_FLASH_MANUAL == AC_FLASH_MANUAL_ENABLE)&&(AC_STORAGE_MENU == AC_STORAGE_PLACE_FLASH))
 
         PRINTF("[O K] AC: FLASH: Loading menu！\r\n");
@@ -426,7 +442,9 @@ void AC_Task(void *pvData)
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_SP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_MP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
+#if NNCU_CLASSIFICATION==AC_FUNCTION_ON
     g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
+#endif
     }
 #endif
 
@@ -468,57 +486,60 @@ void AC_Task(void *pvData)
     /**@brief Main Loop*/
 	while (1)
 	{
-//		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
-//		{
-//		uint16_t height;
-//		uint16_t width;
-//		height = capture.height;
-//		width = capture.width;
-//		uint8_t* capture_buffer = pvPortMalloc(height * width);
-//		if (capture.format == PixelFormatGray)
-//			{
-//				uint8_t* p = capture.pImg;
-//				for (uint32_t i = 0; i < height; i += 1)
-//					{
-//						for (uint32_t j = 0; j < width; j += 1)
-//							{
-//								capture_buffer[i * width + j] = p[i * capture.width + j];
-//								image_Buffer_0[i][j] = capture_buffer[i * width + j];
-//							}
-//					}
-//			}
-//			//THRE(image_Buffer_0, img_original);//image_Proc
-//			//map();
-//			//IMAGE_PROC_Main(image_Proc);
-//			CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
-//		}
+#if AC_FUNCTION_CAMERA
+		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
+		{
+		uint16_t height;
+		uint16_t width;
+		height = capture.height;
+		width = capture.width;
+		uint8_t* capture_buffer = pvPortMalloc(height * width);
+		if (capture.format == PixelFormatGray)
+			{
+				uint8_t* p = capture.pImg;
+				for (uint32_t i = 0; i < height; i += 1)
+					{
+						for (uint32_t j = 0; j < width; j += 1)
+							{
+								capture_buffer[i * width + j] = p[i * capture.width + j];
+								image_Buffer_0[i][j] = capture_buffer[i * width + j];
+							}
+					}
+			}
+			//THRE(image_Buffer_0, img_original);//image_Proc
+			//map();
+			//IMAGE_PROC_Main(image_Proc);
+			CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
+		}
 
-		//Image_Main(&capture);
+		Image_Main(&capture);
 
-//		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
-//					{
-//						OLED_PrintPicture(&capture,100);			 //在屏幕上显示
-//						PRINTF("fps=%d\r\n", (int)CAMERA_FpsGet());
-//						CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
-//					}
+		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
+					{
+						OLED_PrintPicture(&capture,100);			 //在屏幕上显示
+						PRINTF("fps=%d\r\n", (int)CAMERA_FpsGet());
+						CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
+					}
+#endif
 
-
+#if NNCU_TEST
 		/*For Test NNCU Only*/
-//		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
-//		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
-//
-//		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
-//		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
+		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
+
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
+		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
+#endif
 
 		g_time_us= TimerUsGet();
 //		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 //		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
-		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
-
-		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
-		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+//		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
+//		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+//
+//		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
+//		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
 		g_time_duration_us = TimerUsGet() - g_time_us;
 
@@ -542,9 +563,10 @@ void AC_Task(void *pvData)
 
 #endif
 
+#if NNCU_CLASSIFICATION
 		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
 		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
-
+#endif
 		if (0 == GPIO_Read(&wakeUp))
 		{
 			vTaskDelay(500);
@@ -682,9 +704,13 @@ void AC_Task(void *pvData)
 				    OLED_P6x8Str(60,4,(uint8_t*)"Cross");
 				    OLED_P6x8Str(60,5,(uint8_t*)"Round");
 
+#if NNCU_CLASSIFICATION==AC_FUNCTION_OFF
+				    OLED_P6x8Rst(0,7,(uint8_t*)"Offline!");
+#endif
+
                 }
         		/* TODO: Your Code */
-				
+#if NNCU_CLASSIFICATION==AC_FUNCTION_ON
 				Str_Clr(0,1,10);
 				Str_Clr(0,2,10);
 				Str_Clr(0,3,10);
@@ -710,6 +736,7 @@ void AC_Task(void *pvData)
 				}
 
 				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
+#endif
 			}
         	else if(1==g_Boma[2])
 			{
@@ -778,9 +805,9 @@ int main(void)
 	BOARD_InitBootPeripherals();
 	BOARD_InitDebugConsole();
 
-	PRINTF("\r\n********************\r\n");
-	PRINTF("Advent Cirno v0.3.1");
-	PRINTF("\r\n********************\r\n");
+	PRINTF("\r\n***************************\r\n");
+	PRINTF("Advent Cirno Version %d.%d.%d",AC_VERSION_MAJOR,AC_VERSION_MINOR,AC_VERSION_REVISION);
+	PRINTF("\r\n***************************\r\n");
     Control_Init();
 
 	cm_backtrace_init("IMRT10XX.axf", "1.1.1", "19.4.14");
@@ -812,7 +839,7 @@ void LPUART2_IRQHandler(void)
     {
         LPUART_ReadBlocking(LPUART2,temp_COM_data_buffer,17);
 
-#ifdef DEBUG_K66_OUTPUT
+#if AC_DEBUG_K66_OUTPUT
         LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,17);
 #endif
         /*Get AD Data*/
