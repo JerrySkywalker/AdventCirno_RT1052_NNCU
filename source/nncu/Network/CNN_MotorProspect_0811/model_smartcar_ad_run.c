@@ -157,16 +157,16 @@
 #define FC4_zzdbg_4_SB_AMP            16
 #define FC4_zzdbg_5_fracBitsOut       12
 #define FC4_zzdbg_8_AuxAct            "TANH"
-extern const int16_t cg_CONV1weit[]; // 5760 - Co,H,W,Ci: (32, 4, 5, 9)
-extern const int16_t cg_CONV1bias[]; // 32
-extern const int16_t cg_CONV2weit[]; // 9216 - Co,H,W,Ci: (32, 3, 3, 32)
-extern const int16_t cg_CONV2bias[]; // 32
-extern const int16_t cg_BN2weit[]; // 32 - Co,H,W,Ci: (1, 1, 1, 32)
-extern const int16_t cg_BN2bias[]; // 32
-extern const int16_t cg_FC3weit[]; // 40960 - Co, Di: (160, 256)
-extern const int16_t cg_FC3bias[]; // 160
-extern const int16_t cg_FC4weit[]; // 160 - Co, Di: (1, 160)
-extern const int16_t cg_FC4bias[]; // 1
+extern const int16_t cg_MP_CONV1weit[]; // 5760 - Co,H,W,Ci: (32, 4, 5, 9)
+extern const int16_t cg_MP_CONV1bias[]; // 32
+extern const int16_t cg_MP_CONV2weit[]; // 9216 - Co,H,W,Ci: (32, 3, 3, 32)
+extern const int16_t cg_MP_CONV2bias[]; // 32
+extern const int16_t cg_MP_BN2weit[]; // 32 - Co,H,W,Ci: (1, 1, 1, 32)
+extern const int16_t cg_MP_BN2bias[]; // 32
+extern const int16_t cg_MP_FC3weit[]; // 40960 - Co, Di: (160, 256)
+extern const int16_t cg_MP_FC3bias[]; // 160
+extern const int16_t cg_MP_FC4weit[]; // 160 - Co, Di: (1, 160)
+extern const int16_t cg_MP_FC4bias[]; // 1
 
 #include <stdint.h>
 #include "arm_math.h"
@@ -181,7 +181,7 @@ static int16_t out_buf[1]; // FC4_OY
 // total static buffer size: 2.13 kB
 
 // generated RunModel(), returns the output buffer of the last layer
-void* RunModel_SP(const void *in_buf)
+void* RunModel_MP(const void *in_buf)
 { 
     
 	{
@@ -195,8 +195,8 @@ void* RunModel_SP(const void *in_buf)
 	}
 	// Block 1: Conv2D - conv2d_1
     aia_convolve_HWC_q15_basic_nonsquare((int16_t*)img_buffer0/*0*/, CONV1_IX/*8*/, CONV1_IY/*1*/, CONV1_IC/*9*/
-        , cg_CONV1weit/*weit*/, CONV1_OC/*32*/, CONV1_KX/*5*/, CONV1_KY/*4*/, CONV1_PX/*2*/, CONV1_PY/*1*/, CONV1_SX/*1*/
-        , CONV1_SY/*1*/, cg_CONV1bias/*bias*/, CONV1_SB/*6*/, CONV1_SO/*8*/, (int16_t*)img_buffer1/*1*/, CONV1_OX/*8*/
+        , cg_MP_CONV1weit/*weit*/, CONV1_OC/*32*/, CONV1_KX/*5*/, CONV1_KY/*4*/, CONV1_PX/*2*/, CONV1_PY/*1*/, CONV1_SX/*1*/
+        , CONV1_SY/*1*/, cg_MP_CONV1bias/*bias*/, CONV1_SB/*6*/, CONV1_SO/*8*/, (int16_t*)img_buffer1/*1*/, CONV1_OX/*8*/
         , CONV1_OY/*1*/, (int16_t *) col_buf, NULL);
 
 	// Block 1: Conv2D - conv2d_1, auxact tanh
@@ -204,8 +204,8 @@ void* RunModel_SP(const void *in_buf)
 
 	// Block 2: Conv2D - conv2d_2
     aia_convolve_HWC_q15_fast_nonsquare((int16_t*)img_buffer1/*1*/, CONV2_IX/*8*/, CONV2_IY/*1*/, CONV2_IC/*32*/
-        , cg_CONV2weit/*weit*/, CONV2_OC/*32*/, CONV2_KX/*3*/, CONV2_KY/*3*/, CONV2_PX/*1*/, CONV2_PY/*1*/, CONV2_SX/*1*/
-        , CONV2_SY/*1*/, cg_CONV2bias/*bias*/, CONV2_SB/*12*/, CONV2_SO/*16*/, (int16_t*)img_buffer0/*0*/, CONV2_OX/*8*/
+        , cg_MP_CONV2weit/*weit*/, CONV2_OC/*32*/, CONV2_KX/*3*/, CONV2_KY/*3*/, CONV2_PX/*1*/, CONV2_PY/*1*/, CONV2_SX/*1*/
+        , CONV2_SY/*1*/, cg_MP_CONV2bias/*bias*/, CONV2_SB/*12*/, CONV2_SO/*16*/, (int16_t*)img_buffer0/*0*/, CONV2_OX/*8*/
         , CONV2_OY/*1*/, (int16_t *) col_buf, NULL);
 
 	// Block 2: Conv2D - conv2d_2, auxact relu
@@ -213,19 +213,19 @@ void* RunModel_SP(const void *in_buf)
 
 	// Block 2: BatchNormalization - batch_normalization_1
     aia_depthwise_separable_conv_HWC_q15_nonsquare((int16_t*)img_buffer0/*0*/, BN2_IX/*8*/, BN2_IY/*1*/, BN2_IC/*32*/
-        , cg_BN2weit/*weit*/, BN2_OC/*32*/, BN2_KX/*1*/, BN2_KY/*1*/, BN2_PX/*0*/, BN2_PY/*0*/, BN2_SX/*1*/, BN2_SY/*1*/
-        , cg_BN2bias/*bias*/, BN2_SB/*5*/, BN2_SO/*8*/, (int16_t*)img_buffer1/*1*/, BN2_OX/*8*/, BN2_OY/*1*/, (int16_t *) col_buf, NULL);
+        , cg_MP_BN2weit/*weit*/, BN2_OC/*32*/, BN2_KX/*1*/, BN2_KY/*1*/, BN2_PX/*0*/, BN2_PY/*0*/, BN2_SX/*1*/, BN2_SY/*1*/
+        , cg_MP_BN2bias/*bias*/, BN2_SB/*5*/, BN2_SO/*8*/, (int16_t*)img_buffer1/*1*/, BN2_OX/*8*/, BN2_OY/*1*/, (int16_t *) col_buf, NULL);
 
 	// Block 3: Dense - dense_1
-    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_FC3weit/*weit*/, FC3_IY/*256*/, FC3_OY/*160*/, FC3_SB/*9*/
-        , FC3_SO/*12*/, cg_FC3bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_MP_FC3weit/*weit*/, FC3_IY/*256*/, FC3_OY/*160*/, FC3_SB/*9*/
+        , FC3_SO/*12*/, cg_MP_FC3bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
 
 	// Block 3: Dense - dense_1, auxact tanh
     aia_nn_activations_direct_q15((int16_t*)img_buffer0/*0*/, FC3_OY/*160*/, FC3_AA/*2*/, ARM_TANH, 14);
 
 	// Block 4: Dense - dense_2
-    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC4weit/*weit*/, FC4_IY/*160*/, FC4_OY/*1*/, FC4_SB/*14*/
-        , FC4_SO/*18*/, cg_FC4bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_MP_FC4weit/*weit*/, FC4_IY/*160*/, FC4_OY/*1*/, FC4_SB/*14*/
+        , FC4_SO/*18*/, cg_MP_FC4bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
 
 	// Block 4: Dense - dense_2, auxact tanh
     aia_nn_activations_direct_q15((int16_t*)img_buffer1/*1*/, FC4_OY/*1*/, FC4_AA/*2*/, ARM_TANH, 14);

@@ -583,8 +583,12 @@ _Noreturn void AC_Task(void *pvData)
 		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&(tmp_AD_CNN_Input));
 		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
 
+		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&(tmp_AD_CNN_Input));
+		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+
 		/**Real output of nncu.**/
 		g_nncu_Prospect_Servo = g_AD_nncu_Output[0]/10000*128;
+		g_nncu_Prospect_Motor = g_AD_nncu_Output[1]/10000*128;
 
 #endif
 #endif
