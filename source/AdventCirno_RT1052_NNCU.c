@@ -94,9 +94,7 @@
 #define AC_FLASH_MANUAL_ENABLE 0U
 #define AC_FLASH_MANUAL_DISABLE 1U
 
-//#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
 #define AC_FLASH_MANUAL AC_FLASH_MANUAL_ENABLE
-
 
 /**
  * @breif Menu storage option
@@ -105,7 +103,6 @@
 #define AC_STORAGE_PLACE_FLASH 0U
 #define AC_STORAGE_PLACE_SD 1U
 
-//#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
 #define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
 
 /**
@@ -117,7 +114,10 @@
 
 #define AC_FUNCTION_SERVICE 	AC_FUNCTION_ON
 #define AC_FUNCTION_CAMERA 		AC_FUNCTION_OFF
+
+#define AC_DEBUG_TEST			AC_FUNCTION_OFF			/**@note: For driver test only. When you finish your motherboard test,you shuould tern it off **/
 #define AC_DEBUG_K66_OUTPUT		AC_FUNCTION_OFF
+
 
 /**
  * @breif NNCU FUNCTION option
@@ -187,22 +187,24 @@ uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
 uint8_t g_Switch_Data = 0;
 
-/**NNCU : Direct AD-Servo, AD-ServoProspect,AD-MotorProspect relationship prediction buffer **/
+/**NNCU: Direct AD-Servo, AD-ServoProspect,AD-MotorProspect relationship prediction buffer **/
 int16_t *g_AD_nncu_OutBuffer;
 int16_t *g_AD_nncu_SP_OutBuffer;		//ServoProspect
 int16_t *g_AD_nncu_MP_OutBuffer;		//MotorProspect
+int16_t g_AD_nncu_Input[8][9];          
 int16_t g_AD_nncu_Output[3];
 
-/**@note limitation on variation rate of nncu output**/
+/**NNCU: limitation on variation rate of nncu output**/
 int16_t g_AD_nncu_SP_History[2];
 
-/**NNCU : Road Type Detection **/
+/**NNCU: Road Type Detection **/
 #if NNCU_CLASSIFICATION
 int16_t *g_AD_nncu_ClassificationOutBuffer;
 int16_t g_AD_nncu_ClassificationOutput[5];
 int g_AD_nncu_RoadType = 0;
 #endif
 
+/**NNCU: Test Input **/
 #if NNCU_TEST
 /*两个测试数据*/
 int8_t tmp_AD_Input[9] = {
@@ -228,9 +230,12 @@ int g_tflite_error_reporter;
 
 /**A timer to record the boot time. used for service that needed to "start delayed" **/
 uint16_t g_BootTime = 0;
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+#if AC_DEBUG_TEST
 TaskHandle_t LED_task_handle;
 void LED_task(void *pvData)
 {
@@ -274,6 +279,7 @@ void start_task(void *pvData)
 	//test(pwm_ac, "pwm_ac", 0, 1, 0);					/*二代主控：Servo OK*/
 	vTaskDelete(NULL);
 }
+#endif
 
 /**
  * @description: Advent Cirno main function. By pressing the WakeUp Key ,you can lock and unlock the screen.
@@ -312,6 +318,9 @@ _Noreturn void AC_Task(void *pvData)
 	/*TODO: Your Init Sequence Here*/
     {
         OLED_P6x8Str(0, 0, (uint8_t*)"# AdventCirno v1.0.0");
+        OLED_Print_Num(90,0,AC_VERSION_MAJOR);
+        OLED_Print_Num(102,0,AC_VERSION_MINOR);
+        OLED_Print_Num(114,0,AC_VERSION_REVISION);
         OLED_P6x8Str(0, 1, (uint8_t*)"Boot Check...");
 
         /**@brief Init Beep*/
@@ -577,7 +586,7 @@ _Noreturn void AC_Task(void *pvData)
 					g_Flag_WakeUp = 1;
 
 					PRINTF("[O K] AC: Screen Unlocked\r\n");
-
+					Flag_ScreenRefresh = -10;
 					/*Create your task Here*/
 					xTaskCreate(AC_Menu, "AC_Menu", 1024, NULL, 2, &AC_Menu_task_handle);
 				}
@@ -754,7 +763,10 @@ _Noreturn void AC_Task(void *pvData)
                     Flag_ScreenRefresh = -1;
                     OLED_Fill(0x00);
 
-                    OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+                    OLED_P6x8Str(0, 0, (uint8_t*)"# AdventCirno v1.0.0");
+                    OLED_Print_Num(90,0,AC_VERSION_MAJOR);
+                    OLED_Print_Num(102,0,AC_VERSION_MINOR);
+                    OLED_Print_Num(114,0,AC_VERSION_REVISION);
 
                     /** @note: just a NNCU demo*/
                     OLED_P6x8Str(0,1,(uint8_t*)"Boma");
@@ -812,8 +824,10 @@ int main(void)
 
 	cm_backtrace_init("IMRT10XX.axf", "1.1.1", "19.4.14");
 	vPortDefineHeapRegions(xHeapRegions);
+#if AC_DEBUG_TEST
 	//xTaskCreate(LED_task, "LED_task", 128, NULL, 3, &LED_task_handle);//led不停，单片机不s
 	//xTaskCreate(start_task, "start_task", 1024, NULL, 2, &start_task_handle);
+#endif
 
 	//AC: Personal Settings
 	xTaskCreate(AC_Task, "AC_Task", 2048, NULL, 2, &AC_task_handle);
