@@ -73,6 +73,7 @@ typedef struct Data
     int Cross_Acc;
     int s_dir;
     int Round_TH;
+    int Round_Mid_TH;
     /**@brief NNCU NormalizeFactor
      *
      *  In the use of nncu selfinf code, we must use a normalize factor to justify the outcome. Usually the real outcome
@@ -193,6 +194,7 @@ int Set_Weight_e(int (*action)(int *data,int modify));
 int Set_Cross_Acc(int (*action)(int *data,int modify));
 int Set_Round_Acc(int (*action)(int *data,int modify));
 int Set_Round_TH(int (*action)(int *data,int modify));
+int Set_Round_Mid_TH(int (*action)(int *data,int modify));
 int Set_s_dir(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));

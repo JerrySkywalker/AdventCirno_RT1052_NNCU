@@ -43,6 +43,7 @@ MenuNode_t *Menu_Weight_x,*Menu_Weight_y,*Menu_Weight_e;
 MenuNode_t *Menu_s_dir;
 MenuNode_t *Menu_Cross_Acc,*Menu_Round_Acc;
 MenuNode_t *Menu_Round_TH;
+MenuNode_t *Menu_Round_Mid_TH;
 /**NNCU Data*/
 MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
 
@@ -482,6 +483,7 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_TH, "TH", MID, NULL, root);
     {
         Menu_MenuNodeCreate(&Menu_Round_TH, "Round_TH", DATA_INT, Set_Round_TH, Menu_TH);
+        Menu_MenuNodeCreate(&Menu_Round_Mid_TH, "Round_Mid_TH", DATA_INT, Set_Round_Mid_TH, Menu_TH);
     }
     /**@brief Settings for NNCU */
     Menu_MenuNodeCreate(&Menu_NNCU,"NNCU",MID, NULL, root);
@@ -919,7 +921,14 @@ int Set_Round_TH(int (*action)(int *data,int modify))
     data[data_identifier].Round_TH = ans;
     return ans;
 }
-
+int Set_Round_Mid_TH(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Round_Mid_TH, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Round_Mid_TH = ans;
+    return ans;
+}
 int Set_s_dir(int (*action)(int *data,int modify))
 {
     int ans = action(&data[data_identifier].s_dir, multiplicator);

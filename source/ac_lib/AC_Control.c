@@ -214,7 +214,7 @@ void Dir_Control(void)
 //        if (EM_AD[0] + EM_AD[6] >= 350)	//老判据
         if (Cross_flag == 0 && Round_flag == 0
         	&& (EM_AD[0] + EM_AD[3] + EM_AD[6] > 330/*300*/)
-			&& EM_AD[3] > 100
+			&& EM_AD[3] > 130
 			&& (EM_AD[1] < 30 || EM_AD[5] < 30)
 			&& 2*EM_AD[3] < EM_AD[0] + EM_AD[6]
 			&& EM_AD[1] + EM_AD[5] > 50)
@@ -269,7 +269,7 @@ void Dir_Control(void)
 					break;
         	}
 
-        	g_error_motor = g_error;
+        	g_error_motor = 0;
 
         	if (EM_AD[0] + EM_AD[3] + EM_AD[6] < 330/*300*/ /*&& (EM_AD[7] < 65 && EM_AD[8] < 65)*/)
         	{
@@ -297,15 +297,15 @@ void Dir_Control(void)
 //        	g_error = (s_error_X * Weight_x + s_error_Y * Weight_y)/(Weight_x + Weight_y);
         	if(EM_AD[7]-EM_AD[8]>0)		g_error = 105 - EM_AD[3];
         	else						g_error = EM_AD[3] - 105;
-        	g_error_motor = s_error_E;
+        	g_error_motor = 0;
         }
 
         else
         {
         	//BEE_OFF(&Bee_GPIO);
 
-        	Kp = 0.01*data[data_identifier].dirkp;
-        	Kd = 0.01*data[data_identifier].dirkd;
+        	Kp = 0.001*data[data_identifier].dirkp;
+        	Kd = 0.001*data[data_identifier].dirkd;
 
         	Weight_x = data[data_identifier].Weight_x;
         	Weight_e = data[data_identifier].Weight_e;
@@ -323,8 +323,8 @@ void Dir_Control(void)
 
         	if (data[data_identifier].s_dir == 2)
         	{
-            	if (g_error>=0)					g_error = g_error*g_error;
-            	else							g_error = -g_error*g_error;
+            	if (g_error >= 0)					g_error = g_error*g_error;
+            	else								g_error = -g_error*g_error;
         	}
         	else if (data[data_identifier].s_dir == 1)
         	{
