@@ -122,11 +122,11 @@
 /**
  * @breif NNCU FUNCTION option
  */
-#define NNCU_TEST 				AC_FUNCTION_ON
+#define NNCU_TEST 				AC_FUNCTION_OFF
 #define NNCU_TEST_DENSE         AC_FUNCTION_OFF
 #define NNCU_TEST_CNN           AC_FUNCTION_ON
 #define NNCU_CLASSIFICATION 	AC_FUNCTION_OFF
-#define NNCU_DENOISE
+#define NNCU_DENOISE			AC_FUNCTION_OFF
 #define NNCU_DENOISE_MAX_VARIATION 200
 /*******************************************************************************
  * Variables
@@ -193,7 +193,7 @@ uint8_t g_Switch_Data = 0;
 int16_t *g_AD_nncu_OutBuffer;
 int16_t *g_AD_nncu_SP_OutBuffer;		//ServoProspect
 int16_t *g_AD_nncu_MP_OutBuffer;		//MotorProspect
-int16_t g_AD_nncu_Input[8][9];          
+int16_t g_AD_nncu_Input_CNN[8][9];
 int16_t g_AD_nncu_Output[3];
 int g_nncu_Prospect_Servo;      /**output with proper process**/
 int g_nncu_Prospect_Motor;
@@ -586,7 +586,7 @@ _Noreturn void AC_Task(void *pvData)
 		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&(tmp_AD_CNN_Input));
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
-		/**Real output of nncu.**/
+		/**Real output of nncu. Param calculated from PC datasets**/
 		g_nncu_Prospect_Servo = g_AD_nncu_Output[0]/10000*128;
 		g_nncu_Prospect_Motor = g_AD_nncu_Output[1]/10000*128;
 
@@ -603,9 +603,19 @@ _Noreturn void AC_Task(void *pvData)
 //		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
+        g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&(g_AD_nncu_Input_CNN));
+        memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+
+        g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&(g_AD_nncu_Input_CNN));
+        memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+
+        /**Real output of nncu. Param calculated from PC datasets**/
+        g_nncu_Prospect_Servo = g_AD_nncu_Output[0]/10000*128;
+        g_nncu_Prospect_Motor = g_AD_nncu_Output[1]/10000*128;
+
 		g_time_duration_us = TimerUsGet() - g_time_us;
 
-#ifdef NNCU_DENOISE
+#if NNCU_DENOISE
 
         int16_t temp_nncu_SPVarRate = g_AD_nncu_SP_History[1] - g_AD_nncu_SP_History[0];
 
@@ -910,11 +920,24 @@ void LPUART2_IRQHandler(void)
 #if AC_DEBUG_K66_OUTPUT
         LPUART_WriteBlocking(LPUART1,temp_COM_data_buffer,17);
 #endif
+        /**Update g_AD_nncu_History**/
+
+        for(int i = 0;i<=6;i++)
+        {
+            for(int j = 0;j<=8;j++)
+            {
+                g_AD_nncu_Input_CNN[i][j] = g_AD_nncu_Input_CNN[i+1][j];
+            }
+        }
+
         /*Get AD Data*/
         for(int i = 0;i<9;i++)
         {
             g_AD_Data[i] = temp_COM_data_buffer[i+3] + 128;
             EM_AD[i] = temp_COM_data_buffer[i+3];
+
+            g_AD_nncu_Input_CNN[7][i] = temp_COM_data_buffer[i+3] + 128;
+            //g_AD_nncu_Input_CNN[7][i] = temp_COM_data_buffer[i+3];
         }
 
         /*Get Boma Data*/
