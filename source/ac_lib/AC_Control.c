@@ -203,7 +203,7 @@ void Dir_Control(void)
 //        if (((EM_AD[1] >= 100 && EM_AD[5] >= 100) && abs(EM_AD[0] - EM_AD[6]) < 50) ||
 //        	(EM_AD[1] >= 200 && EM_AD[5] >= 200))	//老判据
         if (Cross_flag == 0 && Round_flag == 0
-        	&& (((EM_AD[1] > 80 && EM_AD[5] > 80) /*&& (EM_AD[2] > 2*EM_AD[4])*/ && EM_AD[3] > 80)  /*正入十字*/
+        	&& (((EM_AD[1] > 80 && EM_AD[5] > 80) /*&& (EM_AD[2] > 2*EM_AD[4])*/ && EM_AD[3] > 80 && abs(EM_AD[0] - EM_AD[6]) < 100)  /*正入十字*/
         	|| ((EM_AD[1] > 120/*200*/ && EM_AD[5] > 120/*200*/) && EM_AD[0] + EM_AD[3] + EM_AD[6] > 320)))	/*斜入十字*/
         {
         	Cross_flag = 1;
@@ -320,6 +320,17 @@ void Dir_Control(void)
 //        	}
 
         	g_error = (s_error_X * Weight_x + s_error_E * Weight_e)/(Weight_x + Weight_e);
+
+        	if (data[data_identifier].s_dir == 2)
+        	{
+            	if (g_error>=0)					g_error = g_error*g_error;
+            	else							g_error = -g_error*g_error;
+        	}
+        	else if (data[data_identifier].s_dir == 1)
+        	{
+        		/*Do Nothing*/
+        	}
+
         	g_error_motor = s_error_E;
         }
 
