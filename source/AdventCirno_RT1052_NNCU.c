@@ -604,8 +604,8 @@ _Noreturn void AC_Task(void *pvData)
         memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
         /**Real output of nncu. Param calculated from PC datasets**/
-        g_nncu_Prospect_Servo = g_AD_nncu_Output[0]/10000*128;
-        g_nncu_Prospect_Motor = g_AD_nncu_Output[1]/10000*128;
+        g_nncu_Prospect_Servo = (g_AD_nncu_Output[0]*128)/10000;
+        g_nncu_Prospect_Motor = (g_AD_nncu_Output[1]*128)/10000;
 
 		g_time_duration_us = TimerUsGet() - g_time_us;
 
