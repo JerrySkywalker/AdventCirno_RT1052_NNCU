@@ -203,7 +203,7 @@ int8_t tmp_AD_Input2[9] = {
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
 extern TaskHandle_t AC_Pit_task_handle;
-extern int16_t middleline_nncu;
+int16_t middleline_nncu;
 
 #if(AC_AI_BACKEND & AC_AI_BACKEND_TFLite)
 
@@ -510,17 +510,17 @@ void AC_Task(void *pvData)
 //		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		//g_time_us= TimerUsGet();
-//		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
-//		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+		g_time_us= TimerUsGet();
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
+		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
-		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+//		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
+//		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+//
+//		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
+//		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
-		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
-		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
-
-		//g_time_duration_us = TimerUsGet() - g_time_us;
+		g_time_duration_us = TimerUsGet() - g_time_us;
 
 #ifdef NNCU_DENOISE
 
@@ -737,10 +737,10 @@ void AC_Task(void *pvData)
                     /** @note: just a NNCU demo*/
                     OLED_P6x8Str(0,1,(uint8_t*)"Boma");
                     OLED_P6x8Str(0,2,(uint8_t*)"Servo");
-//                    OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
-//                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-					OLED_P6x8Str(0,3,(uint8_t*)"nncu-SP");
-					OLED_P6x8Str(0,4,(uint8_t*)"nncu-MP");
+                    OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
+                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+//					OLED_P6x8Str(0,3,(uint8_t*)"nncu-SP");
+//					OLED_P6x8Str(0,4,(uint8_t*)"nncu-MP");
                     OLED_P6x8Str(0,5,(uint8_t*)"middleline");
                     OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
                 }
@@ -760,10 +760,10 @@ void AC_Task(void *pvData)
                 OLED_Print_Num(90,1,g_Boma[5]);
 
                 OLED_Print_Num1(60,2,(int)((g_dir/0.8)*127));
-//                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
-//                OLED_Print_Num1(60,4,g_time_duration_us);
-                OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
-                OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
+                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
+                OLED_Print_Num1(60,4,g_time_duration_us);
+//                OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
+//                OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
                 OLED_Print_Num1(60,5,middleline_nncu);
                 OLED_Print_Num1(60,6,g_AD_Data[6]);
 

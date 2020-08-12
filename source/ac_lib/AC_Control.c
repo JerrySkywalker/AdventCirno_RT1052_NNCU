@@ -57,7 +57,7 @@ int State_Change_Flag = 0;
 int Round_dir = 0;
 
 extern uint8_t EM_AD[NUMBER_INDUCTORS];
-int16_t middleline_nncu;
+extern int16_t middleline_nncu;
 
 pwm_t my1 = {PWM2, kPWM_Module_0, 16 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 16 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
@@ -88,8 +88,8 @@ void Dir_Control(void)
     /*摄像头&AI模式*/
     if (data[data_identifier].mode == 0)
     {
-    	Kp = 0.01*data[data_identifier].dirkp;
-    	Kd = 0.01*data[data_identifier].dirkd;
+    	Kp = 0.001*data[data_identifier].dirkp;
+    	Kd = 0.001*data[data_identifier].dirkd;
 
     	/*AI+PID*/
 //        //g_error = CAMERA_M - mid_line[data[data_identifier].forward_view];
@@ -102,24 +102,31 @@ void Dir_Control(void)
 //        g_dir_error_1 = g_error;
 
     	/*Improved AI+PID*/
-    	g_error = (float)(g_Servo_Devia);
-    	g_error_motor = (float)(g_Motor_Devia);
+//    	g_error = (float)(g_Servo_Devia);
+//    	g_error_motor = (float)(g_Motor_Devia);
+
+    	middleline_nncu = (float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
+    	if (middleline_nncu > 188)	middleline_nncu = 188;
+    	else if (middleline_nncu < 0) middleline_nncu = 0;
+    	//g_error = CAMERA_M - middleline_nncu;
+    	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
+    	g_error_motor = g_error;
 
     	/*获取PID*/
     	if (data[data_identifier].NNCU_NormalizeFactor == 0)
     	{
-    		data[data_identifier].NNCU_NormalizeFactor = 10;
+    		data[data_identifier].NNCU_NormalizeFactor = 1;
     	}
     	if (State_Change_Flag!=0)
     	{
-    		g_dir = (float)(Kp)/1000*g_error;
-    		g_dir_motor = (float)(Kp)/1000*g_error_motor;
+    		g_dir = (float)(Kp)/10*g_error;
+    		g_dir_motor = (float)(Kp)/10*g_error_motor;
     	}
     	else
     	{
     		//g_dir = (float)(g_AD_nncu_Output[2])/(100*data[data_identifier].NNCU_NormalizeFactor);
-    		g_dir = ((float)(Kp)/1000*g_error+(float)(Kd)/1000*(g_error-g_dir_error_1));
-    		g_dir_motor = ((float)(Kp)/1000*g_error_motor+(float)(Kd)/1000*(g_error_motor-g_dir_error_motor_1));
+    		g_dir = ((float)(Kp)/10*g_error+(float)(Kd)/10*(g_error-g_dir_error_1));
+    		g_dir_motor = ((float)(Kp)/10*g_error_motor+(float)(Kd)/10*(g_error_motor-g_dir_error_motor_1));
     	}
         g_dir_error_1 = g_error;
         g_dir_error_motor_1 = g_error_motor;
@@ -176,8 +183,8 @@ void Dir_Control(void)
         }
 
         /*舵机输出占空比*/
-        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + g_dir));
-        PWM_Dir_Motor = (uint16_t)(100*DIR_M + g_dir_motor);
+        PWM_AC_SetServoDuty((uint16_t)(100*DIR_M + 100*g_dir));
+        PWM_Dir_Motor = (uint16_t)(100*DIR_M + 100*g_dir_motor);
     }
 
     /*电磁模式*/
