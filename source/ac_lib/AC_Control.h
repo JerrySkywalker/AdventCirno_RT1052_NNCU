@@ -18,13 +18,13 @@
 #define CAMERA_M  94
 #define CAMERA_H  120
 #define CAMERA_W  188
-#define DIR_M 7.35/*7.77*/
+#define DIR_M 7.77/*7.35*/
 #define MAX_SERVO_DUTY 0.9                        //舵机限幅
 #define MAX_MOTOR_DUTY 95                        //电机限幅
 #define MOTOR_START_LIMIT 90
 #define FTM_CONSTANT 0.0216						//1/(11550*0.004)=1/((走1米编码器的返回值)*控制周期);K66:2890;RT1052:11550
 #define SIZE_CONSTANT 15.5/(19.9*2)             //  B/2L，B是两后轮间距，L是前后轮间距
-#define CAR_NAME 0
+#define CAR_NAME 1
 #define MID_CollectTimes 25
 #define NUMBER_INDUCTORS 9
 #define MOTOR_START_LIMIT_STEP 1000

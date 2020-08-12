@@ -139,6 +139,9 @@ void Dir_Control(void)
         speed_expect_now = 0.1 * (float)data[data_identifier].speed;
 		speed_expect = 0.1 * (float)data[data_identifier].speed;
 
+        /*出赛道保护*/
+        if (EM_AD[0] < 5 && EM_AD[6] < 5)	speed_expect_now = 0;
+
         /*温柔变速*/
         static float speed_change_rate = 0;
         if(speed_change_flag==0)
