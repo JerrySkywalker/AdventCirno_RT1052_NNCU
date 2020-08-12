@@ -203,7 +203,7 @@ void Dir_Control(void)
 //        if (((EM_AD[1] >= 100 && EM_AD[5] >= 100) && abs(EM_AD[0] - EM_AD[6]) < 50) ||
 //        	(EM_AD[1] >= 200 && EM_AD[5] >= 200))	//老判据
         if (Cross_flag == 0 && Round_flag == 0
-        	&& (((EM_AD[1] > 80 && EM_AD[5] > 80) /*&& (EM_AD[2] > 2*EM_AD[4])*/ && EM_AD[3] > 80 && abs(EM_AD[0] - EM_AD[6]) < 100)  /*正入十字*/
+        	&& (((EM_AD[1] > 80 && EM_AD[5] > 80) && (EM_AD[1] > 130 || EM_AD[5] > 130) /*&& (EM_AD[2] > 2*EM_AD[4])*/ && EM_AD[3] > 80 && abs(EM_AD[0] - EM_AD[6]) < 100)  /*正入十字*/
         	|| ((EM_AD[1] > 120/*200*/ && EM_AD[5] > 120/*200*/) && EM_AD[0] + EM_AD[3] + EM_AD[6] > 320)))	/*斜入十字*/
         {
         	Cross_flag = 1;
@@ -282,7 +282,7 @@ void Dir_Control(void)
 
           	speed_expect_now = 0.1 * ((float)data[data_identifier].speed + (float)data[data_identifier].Cross_Acc);
 
-        	if (EM_AD[1] < 70 && EM_AD[5] < 70)
+        	if (EM_AD[1] < 80 && EM_AD[5] < 80)
         	{
         		Cross_flag = 0;
         	}
@@ -323,8 +323,8 @@ void Dir_Control(void)
 
         	if (data[data_identifier].s_dir == 2)
         	{
-            	if (g_error >= 0)					g_error = g_error*g_error;
-            	else								g_error = -g_error*g_error;
+            	if (g_error >= 0)					g_error = 0.1 * g_error*g_error;
+            	else								g_error = -0.1 * g_error*g_error;
         	}
         	else if (data[data_identifier].s_dir == 1)
         	{
@@ -375,6 +375,9 @@ void Dir_Control(void)
             speed_expect_now = speed_expect;
           }
         }
+
+        /*出赛道保护*/
+        if (EM_AD[0] < 5 && EM_AD[6] < 5)	speed_expect_now = 0;
 
         /*差速期望速度获取*/
         float rate;
