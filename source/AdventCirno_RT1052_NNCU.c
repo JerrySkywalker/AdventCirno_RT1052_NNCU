@@ -688,11 +688,15 @@ void AC_Task(void *pvData)
 			}
         	else if(1==g_Boma[2])
 			{
+        		//vTaskDelay(300);
+        		while(1)
+        		{
         		if (g_Switch_Data == 1)
                 {
                 	vTaskDelay(200);
                 	Stop_Flag = 1;
                 }
+        		}
 			}
 			else
 			{

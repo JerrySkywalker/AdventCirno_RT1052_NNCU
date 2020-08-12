@@ -26,7 +26,16 @@ float s_speed_left_now = 0, s_speed_right_now = 0, s_speed_left = 0, s_speed_rig
 float s_speed_aim_left = 0, s_speed_aim_right = 0;
 float s_error_left = 0, s_error_right = 0;
 float Differencial = 0;
-
+float s_error = 0;
+float AD_fenmu_H;
+float AD_fenmu_S;
+float s_error_H;
+float s_error_S;
+float g_dir_motor;
+float g_dir_error_motor_1;
+float dir_angle = 0;
+float s_speed_aim = 0;
+float s_speed_aim_now=0;
 extern uint8_t EM_AD[NUMBER_INDUCTORS];
 int16_t middleline_nncu;
 int16_t MID_Sample[MID_CollectTimes];
@@ -55,6 +64,8 @@ int flag_shijian = 0;
 int flag_wandao_panduan=0;
 int flag_wandao_zhixing=0;
 int a;
+float s_error_motor;
+float s_dir_error_motor_1;
 pwm_t my1 = {PWM2, kPWM_Module_0, 16 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 16 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
 gpio_t OE_B = {GPIO5,02U,0 };										//L7 74LVC245_OE_B, 电机PWM相关，低电平有效
@@ -72,12 +83,7 @@ void Control_Init()
 
 void Dir_Control(void)
 {
-    float s_error = 0;
-    float AD_fenmu_H;
-    float AD_fenmu_S;
-    float s_error_H;
-    float s_error_S;
-    float dir_angle = 0;
+
 
     /*摄像头&AI模式*/
     if (data[data_identifier].mode == 0)
@@ -118,9 +124,7 @@ void Dir_Control(void)
 //        else										{AD_fenmu_S = 200; }//防止分母为零
     	Dir_Control_Huandao_Shibie();
     	/*十字识别*/
-        if (((EM_AD[1] >= data[data_identifier].shizi_yuzhi) && (EM_AD[5] >= data[data_identifier].shizi_yuzhi))/*正入十字*/
-        	||((EM_AD[1] > 120/*200*/ && EM_AD[5] > 120/*200*/) && (EM_AD[0] + EM_AD[3] + EM_AD[6] > 320))	/*斜入十字*/
-        )
+        if ((EM_AD[1] >= data[data_identifier].shizi_yuzhi) && (EM_AD[5] >= data[data_identifier].shizi_yuzhi)/*正入十字*/)
         {
         	Shizi_shibie_flag = 1;
         }
@@ -152,8 +156,10 @@ void Dir_Control(void)
         	if (s_error > 0)				{a = 1;}
         	else							{a = -1;}
         	s_error = a * s_error * s_error;//偏差平方
+
         }
         }
+
         /*PID*/
         if (Huandao_shibie_flag == 1)
         {
@@ -196,7 +202,6 @@ void Speed_Control(void)
 {
     //Running_Time();
 
-    float s_speed_aim = 0;
 
     /*当前速度*/
 //    if (ENC_Positionget(ENC3) > 11550)	s_speed_left_now = 0;
@@ -244,7 +249,7 @@ void Speed_Control(void)
             s_dir_flag=1;
             s_dir_1_flag=0;
         }
-    	else if ((EM_AD[3]<=70)||(EM_AD[2]>130)||(EM_AD[4]>130))
+    	else if ((EM_AD[3]<=70)||(EM_AD[2]>data[data_identifier].wandao_yuzhi)||(EM_AD[4]>data[data_identifier].wandao_yuzhi))
         {
           s_speed_aim = 0.1 * (data[data_identifier].speed - data[data_identifier].jian_speed );
           s_dir_flag=0;
@@ -258,8 +263,8 @@ void Speed_Control(void)
         }
         else
         {
-            s_speed_aim=0.1*data[data_identifier].speed;
-            s_dir_flag=0;
+            s_speed_aim = 0.1 * (data[data_identifier].speed  );
+    		s_dir_flag=0;
             s_dir_1_flag=0;
         }
     }

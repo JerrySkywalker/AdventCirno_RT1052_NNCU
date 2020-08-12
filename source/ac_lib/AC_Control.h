@@ -18,7 +18,7 @@
 #define CAMERA_M  94
 #define CAMERA_H  120
 #define CAMERA_W  188
-#define DIR_M 7.35
+#define DIR_M 7.77    //7.35
 #define MAX_SERVO_DUTY 0.8                        //舵机限幅
 #define MAX_MOTOR_DUTY 90                        //电机限幅
 #define MIN_MOTOR_DUTY -90
