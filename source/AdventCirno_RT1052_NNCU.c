@@ -199,6 +199,8 @@ int8_t tmp_AD_Input2[9] = {
         0xC0, 0x90, 0x8B, 0xC2, 0xDE, 0x9C, 0xE8, 0xF1, 0x19
 };
 
+extern int8_t temp_Dataset[660][9];
+
 /**NNCU: Denoise Function only**/
 int16_t g_AD_nncu_History[20];
 int16_t g_AD_nncu_DenoiseResult;
@@ -461,6 +463,16 @@ void AC_Task(void *pvData)
     }
 
 #endif
+
+
+    for(int i = 0;i<=600;i++)
+    {
+    	g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
+    	memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+
+    	if(g_AD_nncu_Output[2]<0) PRINTF("-");
+    	PRINTF("%d\n",g_AD_nncu_Output[2]);
+    }
 
 
 
