@@ -775,10 +775,22 @@ void AC_Task(void *pvData)
 
         	else if(1==g_Boma[2])
 			{
-        		if (g_Switch_Data == 1)
+        		if(3!=Flag_ScreenRefresh)
+        		{
+        			Flag_ScreenRefresh = 3; /**第一次进入跑车模式的启动项**/
+        			g_BootTime = 0;			/**计时器清零**/
+        		}
+
+        		if(g_BootTime<100)
+        		{
+        			/**电机转速强制为0**/
+        		}
+
+        		if (g_Switch_Data == 1)		/**检测到干簧管**/
                 {
                 	vTaskDelay(200);
-                	if(g_BootTime>1000){
+                	if(g_BootTime>1000)		/**检测到的干簧管是延时检测到的**/
+                	{
                 		Stop_Flag ++;
                 	}
                 }
