@@ -780,16 +780,14 @@ void AC_Task(void *pvData)
         		{
         			Flag_ScreenRefresh = 3; /**第一次进入跑车模式的启动项**/
         			g_BootTime = 0;			/**计时器清零**/
+        			Stop_Flag = 1;			/**初始化的时候，进入停车模式**/
         		}
 
-        		if(g_BootTime<100)
-        		{
-        			Stop_Flag = 1;
-        		}
-        		else
+        		if(g_BootTime>100 && g_BootTime<=300)
         		{
         			Stop_Flag = 0;
         		}
+
 
         		if (g_Switch_Data == 1)		/**检测到干簧管**/
                 {
