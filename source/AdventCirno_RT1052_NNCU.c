@@ -75,7 +75,7 @@
  * @breif Version Information
  */
 #define AC_VERSION_MAJOR 1
-#define AC_VERSION_MINOR 4
+#define AC_VERSION_MINOR 5
 #define AC_VERSION_REVISION 0
 
 
