@@ -1077,8 +1077,8 @@ int main(void)
 	cm_backtrace_init("IMRT10XX.axf", "1.1.1", "19.4.14");
 	vPortDefineHeapRegions(xHeapRegions);
 #if AC_DEBUG_TEST
-	//xTaskCreate(LED_task, "LED_task", 128, NULL, 3, &LED_task_handle);//led不停，单片机不s
-	//xTaskCreate(start_task, "start_task", 1024, NULL, 2, &start_task_handle);
+	xTaskCreate(LED_task, "LED_task", 128, NULL, 3, &LED_task_handle);//led不停，单片机不s
+	xTaskCreate(start_task, "start_task", 1024, NULL, 2, &start_task_handle);
 #endif
 	//AC: Personal Settings
 	xTaskCreate(AC_Task, "AC_Task", 2048, NULL, 2, &AC_task_handle);
