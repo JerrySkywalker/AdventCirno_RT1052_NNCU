@@ -46,7 +46,7 @@ int Flag_Signal = 0;				//脉冲信号标志
  */
 void AC_Pit(void *pv)
 {
-    PIT_Init2(kPIT_Chnl_0, 4 * 1000);	    //Camera & image Process-20ms
+    PIT_Init2(kPIT_Chnl_0, 20 * 1000);	    //Camera & image Process-20ms
     PIT_Init2(kPIT_Chnl_1, 20 * 1000);      //Servo-20ms
     PIT_Init2(kPIT_Chnl_2, 4 * 1000);      //Motor-20ms
     PIT_Init2(kPIT_Chnl_3, 2 * 1000 *1000);      //NULL

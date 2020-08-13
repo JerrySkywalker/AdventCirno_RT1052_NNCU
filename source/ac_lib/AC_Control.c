@@ -92,6 +92,19 @@ void Dir_Control(void)
     	Kp = 0.001*data[data_identifier].dirkp;
     	Kd = 0.001*data[data_identifier].dirkd;
 
+        /*环岛识别*/
+        if (Cross_flag == 0 && Round_flag == 0
+        	&& (EM_AD[0] + EM_AD[3] + EM_AD[6] > 330/*300*/)
+			&& EM_AD[3] > 130
+			&& (EM_AD[1] < 30 || EM_AD[5] < 30)
+			&& 2*EM_AD[3] < EM_AD[0] + EM_AD[6]
+			&& EM_AD[1] + EM_AD[5] > 50)
+        {
+        	Round_flag = 1;
+        	State_Change_Flag = 1;
+        	//speed_change_flag = 1;
+        }
+
     	/*AI+PID*/
 //        //g_error = CAMERA_M - mid_line[data[data_identifier].forward_view];
 //    	middleline_nncu = (g_AD_nncu_Output[2]/data[data_identifier].NNCU_NormalizeFactor)+20;
@@ -110,8 +123,8 @@ void Dir_Control(void)
 //    	if (middleline_nncu > 188)	middleline_nncu = 188;
 //    	else if (middleline_nncu < 0) middleline_nncu = 0;
     	//g_error = CAMERA_M - middleline_nncu;
-    	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
-    	g_error_motor = g_error;
+    	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[1])/10000;
+    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
 
     	/*获取PID*/
     	if (data[data_identifier].NNCU_NormalizeFactor == 0)
@@ -136,9 +149,14 @@ void Dir_Control(void)
         Servo_Protect(&g_dir);
         Servo_Protect(&g_dir_motor);
 
-        /*出赛道保护&期望速度获取*/
+        /*期望速度获取*/
         speed_expect_now = 0.1*(float)data[data_identifier].speed;
         speed_expect = 0.1*(float)data[data_identifier].speed;
+
+        if (Round_flag != 0)
+        {
+        	speed_expect_now = 0.1 * ((float)data[data_identifier].speed + (float)data[data_identifier].Round_Acc);
+        }
 
         /*温柔变速*/
         static float speed_change_rate = 0;

@@ -65,6 +65,7 @@
 #include "ac_lib/Image.h"
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
+#include "smartcar/sc_ac_delay.h"
 
 
 /***********************************************************************************************************************
@@ -783,15 +784,19 @@ void AC_Task(void *pvData)
 
         		if(g_BootTime<100)
         		{
-        			/**电机转速强制为0**/
+        			Stop_Flag = 1;
+        		}
+        		else
+        		{
+        			Stop_Flag = 0;
         		}
 
         		if (g_Switch_Data == 1)		/**检测到干簧管**/
                 {
-                	vTaskDelay(200);
-                	if(g_BootTime>1000)		/**检测到的干簧管是延时检测到的**/
+                	delay_ms(200);
+                	if(g_BootTime>300)		/**检测到的干簧管是延时检测到的**/
                 	{
-                		Stop_Flag ++;
+                		Stop_Flag = 1;
                 	}
                 }
 			}
