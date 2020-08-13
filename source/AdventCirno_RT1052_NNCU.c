@@ -776,7 +776,9 @@ void AC_Task(void *pvData)
         		if (g_Switch_Data == 1)
                 {
                 	vTaskDelay(200);
-                	Stop_Flag ++;
+                	if(g_BootTime>1000){
+                		Stop_Flag ++;
+                	}
                 }
 			}
 			else

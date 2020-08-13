@@ -20,6 +20,7 @@ extern int flag_jishi;
 extern int flag_shijian;
 extern int8_t g_ENC_L_Data;
 extern int8_t g_ENC_R_Data;
+extern uint16_t g_BootTime;
 //extern float s_speed_left_now, s_speed_right_now;
 //extern float s_speed_aim_left, s_speed_aim_right;
 
@@ -81,6 +82,9 @@ void AC_Pit(void *pv)
     if (PIT_GetStatusFlags(PIT, kPIT_Chnl_0) == kPIT_TimerFlag)
     {
         PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+
+        if(g_BootTime<30000)
+        	g_BootTime++;
 
         /*TODO: Command */
 //		if (g_ENC_L_Data > 10 && g_ENC_R_Data > 10){
