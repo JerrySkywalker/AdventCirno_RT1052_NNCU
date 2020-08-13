@@ -611,6 +611,8 @@ void AC_Task(void *pvData)
 
 					PRINTF("[O K] AC: Screen Unlocked\r\n");
 
+					Flag_ScreenRefresh = -10;
+
 					/*Create your task Here*/
 					xTaskCreate(AC_Menu, "AC_Menu", 1024, NULL, 2, &AC_Menu_task_handle);
 				}

@@ -84,6 +84,7 @@ typedef struct Data
      *  To Easily use NNCU selfinf code ,this factor can be changed deliberately.
      * */
     int NNCU_NormalizeFactor;
+    int NNCU_NormalizeFactor_Motor;
 } Data_t;
 
 typedef enum
@@ -198,6 +199,7 @@ int Set_Round_Mid_TH(int (*action)(int *data,int modify));
 int Set_s_dir(int (*action)(int *data,int modify));
 
 int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify));
+int Set_NNCU_NormalizeFactor_Motor(int (*action)(int *data,int modify));
 
 /**TODO: Task Declaration*/
 int Task_SD_SaveMenu(int (*action)(int *data,int modify));

@@ -45,7 +45,8 @@ MenuNode_t *Menu_Cross_Acc,*Menu_Round_Acc;
 MenuNode_t *Menu_Round_TH;
 MenuNode_t *Menu_Round_Mid_TH;
 /**NNCU Data*/
-MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
+MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor, *Menu_NNCU_NormalizeFactor_Motor;
+
 
 /** Menu: Task and Services*/
 MenuNode_t *Menu_Task;
@@ -489,6 +490,7 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_NNCU,"NNCU",MID, NULL, root);
     {
         Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor, "NormFactor", DATA_INT, Set_NNCU_NormalizeFactor, Menu_NNCU);
+        Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor_Motor, "NormFactor_M", DATA_INT, Set_NNCU_NormalizeFactor_Motor, Menu_NNCU);
     }
 
     /** Level 1:Quick Set*/
@@ -947,6 +949,15 @@ int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].NNCU_NormalizeFactor = ans;
+    return ans;
+}
+
+int Set_NNCU_NormalizeFactor_Motor(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].NNCU_NormalizeFactor_Motor, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].NNCU_NormalizeFactor_Motor = ans;
     return ans;
 }
 
