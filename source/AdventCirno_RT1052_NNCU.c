@@ -199,6 +199,9 @@ int8_t tmp_AD_Input2[9] = {
         0xC0, 0x90, 0x8B, 0xC2, 0xDE, 0x9C, 0xE8, 0xF1, 0x19
 };
 
+/**NNCU: Denoise Function only**/
+int16_t g_AD_nncu_History[20];
+int16_t g_AD_nncu_DenoiseResult;
 
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
@@ -520,7 +523,43 @@ void AC_Task(void *pvData)
 //		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
-		g_time_duration_us = TimerUsGet() - g_time_us;
+
+
+		/**NNCU: Denoise Function only**/
+//
+//		for(int i = 0;i<19;i++)
+//		{
+//			g_AD_nncu_History[i] = g_AD_nncu_History[i+1];
+//		}
+//
+//		    g_AD_nncu_History[19] = g_AD_nncu_Output[2];
+//
+//		    int16_t temp_nncu_buff[20];
+//			int16_t temp_nncu_swap;
+//		    memcpy(temp_nncu_buff,g_AD_nncu_History,20*sizeof(int16_t));
+//
+//		/** Pop **/
+//		for(int i = 0;i<=19;i++)
+//		{
+//		    for(int j = 0; j<=19;j++){
+//		    	if(temp_nncu_buff[i]>temp_nncu_buff[j])
+//		    	{
+//		    		temp_nncu_swap = temp_nncu_buff[i];
+//		    		temp_nncu_buff[i] = temp_nncu_buff[j];
+//		    		temp_nncu_buff[j] = temp_nncu_swap;
+//		    	}
+//		    }
+//		 }
+//
+//		 g_AD_nncu_DenoiseResult = 0;
+//		 for(int i =3 ;i<=16;i++)
+//		 {
+//			 g_AD_nncu_DenoiseResult+=g_AD_nncu_History[i];
+//		 }
+//
+//		 g_AD_nncu_DenoiseResult = g_AD_nncu_DenoiseResult/14;
+
+		 g_time_duration_us = TimerUsGet() - g_time_us;
 
 #ifdef NNCU_DENOISE
 

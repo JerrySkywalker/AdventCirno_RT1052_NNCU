@@ -58,6 +58,7 @@ int Round_dir = 0;
 
 extern uint8_t EM_AD[NUMBER_INDUCTORS];
 extern int16_t middleline_nncu;
+extern int16_t g_AD_nncu_DenoiseResult;
 
 pwm_t my1 = {PWM2, kPWM_Module_0, 16 * 1000, 0, 0, kPWM_HighTrue};	//L,dutyA为正时正转
 pwm_t my2 = {PWM2, kPWM_Module_1, 16 * 1000, 0, 0, kPWM_HighTrue};  //R,dutyB为正时正转
@@ -105,11 +106,11 @@ void Dir_Control(void)
 //    	g_error = (float)(g_Servo_Devia);
 //    	g_error_motor = (float)(g_Motor_Devia);
 
-    	middleline_nncu = (float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
-    	if (middleline_nncu > 188)	middleline_nncu = 188;
-    	else if (middleline_nncu < 0) middleline_nncu = 0;
+//    	middleline_nncu = (float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
+//    	if (middleline_nncu > 188)	middleline_nncu = 188;
+//    	else if (middleline_nncu < 0) middleline_nncu = 0;
     	//g_error = CAMERA_M - middleline_nncu;
-    	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
+    	g_error = (float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
     	g_error_motor = g_error;
 
     	/*获取PID*/
@@ -135,12 +136,13 @@ void Dir_Control(void)
         Servo_Protect(&g_dir);
         Servo_Protect(&g_dir_motor);
 
-        /*期望速度获取*/
-        speed_expect_now = 0.1 * (float)data[data_identifier].speed;
-		speed_expect = 0.1 * (float)data[data_identifier].speed;
-
-        /*出赛道保护*/
+        /*出赛道保护&期望速度获取*/
         if (EM_AD[0] < 5 && EM_AD[6] < 5)	speed_expect_now = 0;
+        else
+        {
+            speed_expect_now = 0.1 * (float)data[data_identifier].speed;
+    		speed_expect = 0.1 * (float)data[data_identifier].speed;
+        }
 
         /*温柔变速*/
         static float speed_change_rate = 0;
