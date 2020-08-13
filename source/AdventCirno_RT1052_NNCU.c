@@ -465,14 +465,14 @@ void AC_Task(void *pvData)
 #endif
 
 
-    for(int i = 0;i<=600;i++)
-    {
-    	g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
-    	memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
-
-    	if(g_AD_nncu_Output[2]<0) PRINTF("-");
-    	PRINTF("%d\n",g_AD_nncu_Output[2]);
-    }
+//    for(int i = 0;i<=600;i++)
+//    {
+//    	g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
+//    	memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+//
+//    	if(g_AD_nncu_Output[2]<0) PRINTF("-");
+//    	PRINTF("%d\n",g_AD_nncu_Output[2]);
+//    }
 
 
 

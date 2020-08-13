@@ -110,7 +110,7 @@ void Dir_Control(void)
 //    	if (middleline_nncu > 188)	middleline_nncu = 188;
 //    	else if (middleline_nncu < 0) middleline_nncu = 0;
     	//g_error = CAMERA_M - middleline_nncu;
-    	g_error = (float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
+    	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
     	g_error_motor = g_error;
 
     	/*获取PID*/
@@ -137,18 +137,14 @@ void Dir_Control(void)
         Servo_Protect(&g_dir_motor);
 
         /*出赛道保护&期望速度获取*/
-        if (EM_AD[0] < 5 && EM_AD[6] < 5)	speed_expect_now = 0;
-        else
-        {
-            speed_expect_now = 0.1 * (float)data[data_identifier].speed;
-    		speed_expect = 0.1 * (float)data[data_identifier].speed;
-        }
+        speed_expect_now = 0.1*(float)data[data_identifier].speed;
+        speed_expect = 0.1*(float)data[data_identifier].speed;
 
         /*温柔变速*/
         static float speed_change_rate = 0;
         if(speed_change_flag==0)
         {
-          if((speed_expect_now - speed_expect) > 1 ||  (speed_expect_now - speed_expect) < -1)
+          if((speed_expect_now - speed_expect) > 0.1 ||  (speed_expect_now - speed_expect) < -0.1)
           {
             speed_change_flag = 1;
             speed_change_rate = 0;
@@ -159,7 +155,7 @@ void Dir_Control(void)
           speed_expect_now = speed_expect_now * (1-speed_change_rate) + speed_expect * speed_change_rate;
           speed_change_rate += 20*0.001/speed_change_time;
     //      if((speed_expect_now - speed_expect) < 1 &&  (speed_expect_now - speed_expect) > -1)
-          if((speed_expect_now - speed_expect) < 1 &&  (speed_expect_now - speed_expect) > -1)
+          if((speed_expect_now - speed_expect) < 0.1 &&  (speed_expect_now - speed_expect) > -0.1)
           {
             speed_change_flag = 0;
             speed_expect_now = speed_expect;
@@ -174,7 +170,7 @@ void Dir_Control(void)
         if(g_dir_motor > 0)//向左转
         {
           //差速
-            rate =1 + 0.5*tan(g_dir_motor*0.0122173)*((float)L_rate/100);
+            rate =1 + 0.5*tan(g_dir_motor*0.0122173)*((float)L_rate/10);
             s_speed_aim_left = (float)speed_expect_now/rate;
             s_speed_aim_right = speed_expect_now;
         }
@@ -182,9 +178,16 @@ void Dir_Control(void)
         {
         	g_dir_motor = -g_dir_motor;
         	//差速
-        	rate =1 + 0.45*tan(g_dir_motor*0.0122173)*((float)R_rate/100);
+        	rate =1 + 0.45*tan(g_dir_motor*0.0122173)*((float)R_rate/10);
         	s_speed_aim_right = (float)speed_expect_now/rate;
         	s_speed_aim_left = speed_expect_now;
+        }
+
+        /*出赛道保护*/
+        if ((EM_AD[0] < 5 && EM_AD[6] < 5)|| Stop_Flag == 1)
+        {
+        	s_speed_aim_right = 0;
+        	s_speed_aim_left = 0;
         }
 
         /*舵机输出占空比*/
