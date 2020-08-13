@@ -195,6 +195,11 @@ int g_nncu_Prospect_Motor;
 /**NNCU: limitation on variation rate of nncu output**/
 int16_t g_AD_nncu_SP_History[2];
 
+/**NNCU: Denoise Function only**/
+int16_t g_AD_nncu_History[20];
+int16_t g_AD_nncu_DenoiseResult;
+
+
 /**NNCU: Road Type Detection **/
 #if NNCU_CLASSIFICATION
 int16_t *g_AD_nncu_ClassificationOutBuffer;
@@ -228,6 +233,8 @@ static const int8_t tmp_AD_CNN_Input[8][9] = {
 };
 #endif
 #endif
+
+extern int8_t temp_Dataset[300][9];
 
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
@@ -518,6 +525,14 @@ _Noreturn void AC_Task(void *pvData)
     PRINTF("\n");
 #endif
 
+    for(int i = 1;i<=991;i++)
+    {
+    	g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
+    	memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+
+    	if(g_AD_nncu_Output[0]<0) PRINTF("-");
+    	PRINTF("%d\n",g_AD_nncu_Output[0]);
+    }
 
     delay_ms(2000);
     OLED_Fill(0);
@@ -597,17 +612,50 @@ _Noreturn void AC_Task(void *pvData)
 //		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
-        g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&(g_AD_nncu_Input_CNN));
-        memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
-
-        g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&(g_AD_nncu_Input_CNN));
-        memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
-
-        /**Real output of nncu. Param calculated from PC datasets**/
-        g_nncu_Prospect_Servo = (g_AD_nncu_Output[0]*128)/10000;
-        g_nncu_Prospect_Motor = (g_AD_nncu_Output[1]*128)/10000;
+//        g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&(g_AD_nncu_Input_CNN));
+//        memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+//
+//        g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&(g_AD_nncu_Input_CNN));
+//        memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+//
+//        /**Real output of nncu. Param calculated from PC datasets**/
+//        g_nncu_Prospect_Servo = (g_AD_nncu_Output[0]*128)/10000;
+//        g_nncu_Prospect_Motor = (g_AD_nncu_Output[1]*128)/10000;
 
 		g_time_duration_us = TimerUsGet() - g_time_us;
+
+		/**NNCU: Denoise Function only**/
+
+		for(int i = 0;i<19;i++)
+        {
+		    g_AD_nncu_History[i] = g_AD_nncu_History[i+1];
+        }
+
+        g_AD_nncu_History[19] = /**你的NNCU输出**/
+
+		int16_t temp_nncu_buff[20];
+		int16_t temp_nncu_swap;
+        memcpy(temp_nncu_buff,g_AD_nncu_History,20*sizeof(int16_t));
+
+        /** Pop **/
+        for(int i = 0;i<=19;i++)
+        {
+            for(int j = 0; j<=19;j++){
+                if(temp_nncu_buff[i]>temp_nncu_buff[j])
+                {
+                    temp_nncu_swap = temp_nncu_buff[i];
+                    temp_nncu_buff[i] = temp_nncu_buff[j];
+                    temp_nncu_buff[j] = temp_nncu_swap;
+                }
+            }
+        }
+
+        g_AD_nncu_DenoiseResult = 0;
+        for(int i =3 ;i<=16;i++)
+        {
+            g_AD_nncu_DenoiseResult+=g_AD_nncu_History[i];
+        }
+		g_AD_nncu_DenoiseResult = g_AD_nncu_DenoiseResult/14;
 
 #if NNCU_DENOISE
 
