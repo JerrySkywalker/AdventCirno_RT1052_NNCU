@@ -29,7 +29,7 @@ const int CURSOR_SUP = 1, CURSOR_INF = 7;
 /*Menu Root: The main root of the menu tree*/
 MenuNode_t *root;
 
-MenuNode_t *Menu_Led_CoreBoard, *Menu_Speed, *Menu_Direction, *Menu_SetMode;
+MenuNode_t *Menu_Led_CoreBoard, *Menu_Speed, *Menu_Direction, *Menu_SetMode,*Menu_Weight,*Menu_Acc,*Menu_TH;
 
 MenuNode_t *Menu_CB_LED1, *Menu_CB_LED2, *Menu_CB_LED3, *Menu_CB_LED4;
 MenuNode_t *Menu_SetClass, *Menu_SetBuzz, *Menu_SetSpeed, *Menu_SetBoardLed;
@@ -39,17 +39,14 @@ MenuNode_t *Menu_SetForwardView;
 MenuNode_t *Menu_SetAutoThreshold;
 MenuNode_t *Menu_SetRunningTime;
 MenuNode_t *Menu_SetSetupTime;
-MenuNode_t *Menu_Weight_x,*Menu_Weight_y;
-MenuNode_t *Menu_jia_speed;
-MenuNode_t *Menu_jian_speed;
-MenuNode_t *Menu_yuzhi;
-MenuNode_t *Menu_zhidao_yuzhi;
-MenuNode_t *Menu_wandao_yuzhi;
-MenuNode_t *Menu_shizi_yuzhi;
-MenuNode_t *Menu_huandao_yuzhi;
+MenuNode_t *Menu_Weight_x,*Menu_Weight_y,*Menu_Weight_e;
 MenuNode_t *Menu_s_dir;
+MenuNode_t *Menu_Cross_Acc,*Menu_Round_Acc;
+MenuNode_t *Menu_Round_TH;
+MenuNode_t *Menu_Round_Mid_TH;
 /**NNCU Data*/
-MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor;
+MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor, *Menu_NNCU_NormalizeFactor_Motor;
+
 
 /** Menu: Task and Services*/
 MenuNode_t *Menu_Task;
@@ -470,11 +467,30 @@ void Menu_Init() {
         Menu_MenuNodeCreate(&Menu_SetDirKd_s, "SetDirKd_s", DATA_INT, Set_DirKd_s, Menu_Direction);
 
     }
-
+    /*@brief Settings for Weight*/
+    Menu_MenuNodeCreate(&Menu_Weight, "Weight", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", DATA_INT, Set_Weight_x, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", DATA_INT, Set_Weight_y, Menu_Weight);
+        Menu_MenuNodeCreate(&Menu_Weight_e, "Weight_e", DATA_INT, Set_Weight_e, Menu_Weight);
+    }
+    /*@brief Settings for Acc*/
+    Menu_MenuNodeCreate(&Menu_Acc, "Acc", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_Cross_Acc, "Cross_Acc", DATA_INT, Set_Cross_Acc, Menu_Acc);
+        Menu_MenuNodeCreate(&Menu_Round_Acc, "Round_Acc", DATA_INT, Set_Round_Acc, Menu_Acc);
+    }
+    /*@brief Settings for TH*/
+    Menu_MenuNodeCreate(&Menu_TH, "TH", MID, NULL, root);
+    {
+        Menu_MenuNodeCreate(&Menu_Round_TH, "Round_TH", DATA_INT, Set_Round_TH, Menu_TH);
+        Menu_MenuNodeCreate(&Menu_Round_Mid_TH, "Round_Mid_TH", DATA_INT, Set_Round_Mid_TH, Menu_TH);
+    }
     /**@brief Settings for NNCU */
     Menu_MenuNodeCreate(&Menu_NNCU,"NNCU",MID, NULL, root);
     {
         Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor, "NormFactor", DATA_INT, Set_NNCU_NormalizeFactor, Menu_NNCU);
+        Menu_MenuNodeCreate(&Menu_NNCU_NormalizeFactor_Motor, "NormFactor_M", DATA_INT, Set_NNCU_NormalizeFactor_Motor, Menu_NNCU);
     }
 
     /** Level 1:Quick Set*/
@@ -487,15 +503,8 @@ void Menu_Init() {
     Menu_MenuNodeCreate(&Menu_SetRunningTime, "SetRunTime", DATA_INT, Set_RunningTime, root);
     // Menu_MenuNodeCreate(&Menu_SetSetupTime, "SetSetupTime", DATA_INT, Set_SetupTime, root);
 
-    Menu_MenuNodeCreate(&Menu_jia_speed, "jia_speed",  DATA_INT, Set_jia_speed, root);
-    Menu_MenuNodeCreate(&Menu_jian_speed, "jian_speed", DATA_INT, Set_jian_speed, root);
-    Menu_MenuNodeCreate(&Menu_yuzhi, "yuzhi",  DATA_INT, Set_yuzhi, root);
-    Menu_MenuNodeCreate(&Menu_Weight_x, "Weight_x", DATA_INT, Set_Weight_x, root);
-    Menu_MenuNodeCreate(&Menu_Weight_y, "Weight_y", DATA_INT, Set_Weight_y, root);
-    Menu_MenuNodeCreate(&Menu_zhidao_yuzhi, "zhidao_yuzhi",  DATA_INT, Set_zhidao_yuzhi, root);
-    Menu_MenuNodeCreate(&Menu_wandao_yuzhi, "wandao_yuzhi",  DATA_INT, Set_wandao_yuzhi, root);
-    Menu_MenuNodeCreate(&Menu_shizi_yuzhi, "shizi_yuzhi",  DATA_INT, Set_shizi_yuzhi, root);
-    Menu_MenuNodeCreate(&Menu_huandao_yuzhi, "huandao_yuzhi",  DATA_INT, Set_huandao_yuzhi, root);
+
+
     Menu_MenuNodeCreate(&Menu_s_dir, "s_dir",  DATA_INT, Set_s_dir, root);
     Menu_MenuNodeCreate(&Menu_Task, "Task", MID, NULL, root);
     {
@@ -882,61 +891,44 @@ int Set_Weight_y(int (*action)(int *data,int modify))
     data[data_identifier].Weight_y = ans;
     return ans;
 }
-int Set_yuzhi(int (*action)(int *data, int modify))
+int Set_Weight_e(int (*action)(int *data,int modify))
 {
-    int ans = action(&data[data_identifier].yuzhi, multiplicator);
-    ans = ans >= 0 ? ans : 0;
-    ans = ans <= 30000 ? ans : 30000;
-    data[data_identifier].yuzhi = ans;
-    return ans;
-}
-int Set_zhidao_yuzhi(int (*action)(int *data, int modify))
-{
-    int ans = action(&data[data_identifier].zhidao_yuzhi, multiplicator);
-    ans = ans >= 0 ? ans : 0;
-    ans = ans <= 30000 ? ans : 30000;
-    data[data_identifier].zhidao_yuzhi = ans;
-    return ans;
-}
-int Set_wandao_yuzhi(int (*action)(int *data, int modify))
-{
-    int ans = action(&data[data_identifier].wandao_yuzhi, multiplicator);
-    ans = ans >= 0 ? ans : 0;
-    ans = ans <= 30000 ? ans : 30000;
-    data[data_identifier].wandao_yuzhi = ans;
-    return ans;
-}
-
-int Set_shizi_yuzhi(int (*action)(int *data, int modify))
-{
-    int ans = action(&data[data_identifier].shizi_yuzhi, multiplicator);
-    ans = ans >= 0 ? ans : 0;
-    ans = ans <= 30000 ? ans : 30000;
-    data[data_identifier].shizi_yuzhi = ans;
-    return ans;
-}
-int Set_huandao_yuzhi(int (*action)(int *data, int modify))
-{
-    int ans = action(&data[data_identifier].huandao_yuzhi, multiplicator);
-    ans = ans >= 0 ? ans : 0;
-    ans = ans <= 30000 ? ans : 30000;
-    data[data_identifier].huandao_yuzhi = ans;
-    return ans;
-}
-int Set_jia_speed(int (*action)(int *data,int modify))
-{
-    int ans = action(&data[data_identifier].jia_speed, multiplicator);
+    int ans = action(&data[data_identifier].Weight_e, multiplicator);
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
-    data[data_identifier].jia_speed = ans;
+    data[data_identifier].Weight_e = ans;
     return ans;
 }
-int Set_jian_speed(int (*action)(int *data,int modify))
+int Set_Cross_Acc(int (*action)(int *data,int modify))
 {
-    int ans = action(&data[data_identifier].jian_speed, multiplicator);
+    int ans = action(&data[data_identifier].Cross_Acc, multiplicator);
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
-    data[data_identifier].jian_speed = ans;
+    data[data_identifier].Cross_Acc = ans;
+    return ans;
+}
+int Set_Round_Acc(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Round_Acc, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Round_Acc = ans;
+    return ans;
+}
+int Set_Round_TH(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Round_TH, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Round_TH = ans;
+    return ans;
+}
+int Set_Round_Mid_TH(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].Round_Mid_TH, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].Round_Mid_TH = ans;
     return ans;
 }
 int Set_s_dir(int (*action)(int *data,int modify))
@@ -957,6 +949,15 @@ int Set_NNCU_NormalizeFactor(int (*action)(int *data,int modify))
     ans = ans >= 0 ? ans : 0;
     ans = ans <= 60000 ? ans : 60000;
     data[data_identifier].NNCU_NormalizeFactor = ans;
+    return ans;
+}
+
+int Set_NNCU_NormalizeFactor_Motor(int (*action)(int *data,int modify))
+{
+    int ans = action(&data[data_identifier].NNCU_NormalizeFactor_Motor, multiplicator);
+    ans = ans >= 0 ? ans : 0;
+    ans = ans <= 60000 ? ans : 60000;
+    data[data_identifier].NNCU_NormalizeFactor_Motor = ans;
     return ans;
 }
 

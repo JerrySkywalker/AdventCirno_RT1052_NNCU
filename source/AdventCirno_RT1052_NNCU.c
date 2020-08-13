@@ -65,7 +65,8 @@
 #include "ac_lib/Image.h"
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
-
+#include "smartcar/sc_ac_delay.h"
+#include "smartcar/sc_ac_key_5D.h"
 
 /***********************************************************************************************************************
  * Definitions
@@ -112,7 +113,7 @@
 
 //#define DEBUG_K66_OUTPUT
 
-#define NNCU_DENOISE
+//#define NNCU_DENOISE
 #define NNCU_DENOISE_MAX_VARIATION 200
 /*******************************************************************************
  * Variables
@@ -138,7 +139,7 @@ uint8_t g_Flag_WakeUp = 0;
 extern Data_t data[10];
 extern int data_identifier;
 extern uint8_t image_Buffer_0[CAMERA_H][CAMERA_W];
-extern float s_dir;
+extern float g_dir;
 extern int Cross_flag;
 extern int Round_flag;
 
@@ -154,7 +155,12 @@ int Boma2_flag = 0;
 int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
 int Flag_ScreenRefresh;
-uint8_t Stop_Flag;		//干簧管停车标志
+uint8_t Stop_Flag = 0;		//干簧管停车标志
+
+/**AD Normalize Function**/
+int8_t g_Flag_isNormComplete = 0;
+int8_t g_AD_NormFactor[9];
+
 bee_t Bee_GPIO = {GPIO2, 20U, 1};
 
 uint32_t g_time_us = 0;
@@ -170,10 +176,13 @@ volatile int8_t g_Motor_R_Data;
 volatile int8_t g_Image_Data[10];
 volatile int8_t g_ENC_L_Data;
 volatile int8_t g_ENC_R_Data;
+volatile int8_t g_Servo_Devia;
+volatile int8_t g_Motor_Devia;
 uint8_t EM_AD[NUMBER_INDUCTORS];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
 uint8_t g_Switch_Data = 0;
+int8_t Switch_Flag = 0;
 
 /**NNCU : Direct AD-Servo, AD-ServoProspect,AD-MotorProspect relationship prediction buffer **/
 int16_t *g_AD_nncu_OutBuffer;
@@ -185,9 +194,9 @@ int16_t g_AD_nncu_Output[3];
 int16_t g_AD_nncu_SP_History[2];
 
 /**NNCU : Road Type Detection **/
-int16_t *g_AD_nncu_ClassificationOutBuffer;
-int16_t g_AD_nncu_ClassificationOutput[5];
-int g_AD_nncu_RoadType = 0;
+//int16_t *g_AD_nncu_ClassificationOutBuffer;
+//int16_t g_AD_nncu_ClassificationOutput[5];
+//int g_AD_nncu_RoadType = 0;
 
 /*两个测试数据*/
 int8_t tmp_AD_Input[9] = {
@@ -197,13 +206,16 @@ int8_t tmp_AD_Input2[9] = {
         0xC0, 0x90, 0x8B, 0xC2, 0xDE, 0x9C, 0xE8, 0xF1, 0x19
 };
 
+extern int8_t temp_Dataset[660][9];
+
+/**NNCU: Denoise Function only**/
+int16_t g_AD_nncu_History[20];
+int16_t g_AD_nncu_DenoiseResult;
 
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
 extern TaskHandle_t AC_Pit_task_handle;
-extern int16_t middleline_nncu;
-extern int s_dir_flag;
-extern int s_dir_1_flag;
+int16_t middleline_nncu;
 
 #if(AC_AI_BACKEND & AC_AI_BACKEND_TFLite)
 
@@ -426,7 +438,7 @@ void AC_Task(void *pvData)
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_SP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_MP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
-    g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
+//    g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
     }
 #endif
 
@@ -458,6 +470,16 @@ void AC_Task(void *pvData)
     }
 
 #endif
+
+
+//    for(int i = 0;i<=600;i++)
+//    {
+//    	g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
+//    	memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+//
+//    	if(g_AD_nncu_Output[2]<0) PRINTF("-");
+//    	PRINTF("%d\n",g_AD_nncu_Output[2]);
+//    }
 
 
 
@@ -511,16 +533,56 @@ void AC_Task(void *pvData)
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 		g_time_us= TimerUsGet();
-//		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
-//		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
-		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
+		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
-		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel_60_120(&(g_AD_Data));
+		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		g_time_duration_us = TimerUsGet() - g_time_us;
+//		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
+//		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
+//
+//		g_AD_nncu_MP_OutBuffer = (int16_t*)RunModel_MP(&g_AD_Data);
+//		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
+
+
+
+		/**NNCU: Denoise Function only**/
+//
+//		for(int i = 0;i<19;i++)
+//		{
+//			g_AD_nncu_History[i] = g_AD_nncu_History[i+1];
+//		}
+//
+//		    g_AD_nncu_History[19] = g_AD_nncu_Output[2];
+//
+//		    int16_t temp_nncu_buff[20];
+//			int16_t temp_nncu_swap;
+//		    memcpy(temp_nncu_buff,g_AD_nncu_History,20*sizeof(int16_t));
+//
+//		/** Pop **/
+//		for(int i = 0;i<=19;i++)
+//		{
+//		    for(int j = 0; j<=19;j++){
+//		    	if(temp_nncu_buff[i]>temp_nncu_buff[j])
+//		    	{
+//		    		temp_nncu_swap = temp_nncu_buff[i];
+//		    		temp_nncu_buff[i] = temp_nncu_buff[j];
+//		    		temp_nncu_buff[j] = temp_nncu_swap;
+//		    	}
+//		    }
+//		 }
+//
+//		 g_AD_nncu_DenoiseResult = 0;
+//		 for(int i =3 ;i<=16;i++)
+//		 {
+//			 g_AD_nncu_DenoiseResult+=g_AD_nncu_History[i];
+//		 }
+//
+//		 g_AD_nncu_DenoiseResult = g_AD_nncu_DenoiseResult/14;
+
+		 g_time_duration_us = TimerUsGet() - g_time_us;
 
 #ifdef NNCU_DENOISE
 
@@ -542,8 +604,8 @@ void AC_Task(void *pvData)
 
 #endif
 
-		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
-		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
+//		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
+//		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
 
 		if (0 == GPIO_Read(&wakeUp))
 		{
@@ -555,6 +617,8 @@ void AC_Task(void *pvData)
 					g_Flag_WakeUp = 1;
 
 					PRINTF("[O K] AC: Screen Unlocked\r\n");
+
+					Flag_ScreenRefresh = -10;
 
 					/*Create your task Here*/
 					xTaskCreate(AC_Menu, "AC_Menu", 1024, NULL, 2, &AC_Menu_task_handle);
@@ -664,9 +728,6 @@ void AC_Task(void *pvData)
 
 				OLED_Print_Num(60,3, EM_AD[7]);
 				OLED_Print_Num(60,4, EM_AD[8]);
-				OLED_Print_Num(60,5, s_dir_flag);
-				OLED_Print_Num(60,6, s_dir_1_flag);
-
 			}
         	else if(1==g_Boma[1])
 			{
@@ -675,49 +736,224 @@ void AC_Task(void *pvData)
                     Flag_ScreenRefresh = 0;
 				    OLED_Fill(0x00);
 				    OLED_P6x8Str(0,0,(uint8_t*)"#Road Type");
-
-				    OLED_P6x8Str(60,1,(uint8_t*)"Straight");
+//
+//				    OLED_P6x8Str(60,1,(uint8_t*)"Straight");
 				    OLED_P6x8Str(60,2,(uint8_t*)"Curve");
-				    OLED_P6x8Str(60,3,(uint8_t*)"S-Curve");
+//				    OLED_P6x8Str(60,3,(uint8_t*)"S-Curve");
 				    OLED_P6x8Str(60,4,(uint8_t*)"Cross");
-				    OLED_P6x8Str(60,5,(uint8_t*)"Round");
-
+//				    OLED_P6x8Str(60,5,(uint8_t*)"Round");
+//
                 }
-        		/* TODO: Your Code */
-				
-				Str_Clr(0,1,10);
-				Str_Clr(0,2,10);
-				Str_Clr(0,3,10);
-				Str_Clr(0,4,10);
-				Str_Clr(0,5,10);
+//        		/* TODO: Your Code */
+//
+//				Str_Clr(0,1,10);
+//				Str_Clr(0,2,10);
+//				Str_Clr(0,3,10);
+//				Str_Clr(0,4,10);
+//				Str_Clr(0,5,10);
+//
+//				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
+//				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
+//				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
+//				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
+//				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
+//
+//				int16_t temp = g_AD_nncu_ClassificationOutput[0];
+//				g_AD_nncu_RoadType = 0;
+//				for(int i = 1 ;i<=4;i++)
+//				{
+//					if(g_AD_nncu_ClassificationOutput[i]>temp)
+//					{
+//						g_AD_nncu_RoadType = i;
+//						temp = g_AD_nncu_ClassificationOutput[i];
+//					}
+//
+//				}
+//
+//				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
 
-				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
-				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
-				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
-				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
-				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
+				/*PID赛道类型调试*/
+				Str_Clr(0,2,5);
+				Str_Clr(0,4,5);
 
-				int16_t temp = g_AD_nncu_ClassificationOutput[0];
-				g_AD_nncu_RoadType = 0;
-				for(int i = 1 ;i<=4;i++)
-				{
-					if(g_AD_nncu_ClassificationOutput[i]>temp)
-					{
-						g_AD_nncu_RoadType = i;
-						temp = g_AD_nncu_ClassificationOutput[i];
-					}
-
-				}
-
-				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
+				OLED_Print_Num(0,2, Cross_flag);
+				OLED_Print_Num(0,4, Round_flag);
 			}
+
         	else if(1==g_Boma[2])
 			{
-        		if (g_Switch_Data == 1)
+        		if(3!=Flag_ScreenRefresh)
+        		{
+        			Flag_ScreenRefresh = 3; /**第一次进入跑车模式的启动项**/
+        			g_BootTime = 0;			/**计时器清零**/
+        			Stop_Flag = 1;			/**初始化的时候，进入停车模式**/
+        			Switch_Flag = 0;		/**干簧管锁存变量**/
+
+        			OLED_Fill(0x00);
+        			OLED_P6x8Str(0,0,(uint8_t*)"#Mode: Run!");
+        			OLED_P6x8Str(0,2,(uint8_t*)"Good Luck!");
+        		}
+
+        		if (g_BootTime <= 300)
+        		{
+        			Switch_Flag = 0;
+        		}
+
+        		if(g_BootTime>150 && g_BootTime<=300)
+        		{
+        			Stop_Flag = 0;
+        		}
+
+
+        		if (Switch_Flag == 1)		/**检测到干簧管**/
                 {
-                	vTaskDelay(200);
-                	Stop_Flag = 1;
+                	delay_ms(200);
+                	if(g_BootTime>300)		/**检测到的干簧管是延时检测到的**/
+                	{
+                		Stop_Flag = 1;
+                		OLED_P6x8Rst(0,6,(uint8_t*)"#Mode: Stopped!");
+                	}
                 }
+			}
+        	else if(1==g_Boma[4])
+			{
+				if(4!=Flag_ScreenRefresh)
+				{
+					Flag_ScreenRefresh = 4;
+
+					g_Flag_isNormComplete = 0;
+
+					OLED_Fill(0x00);
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 1");
+				}
+
+				if(0 == g_Flag_isNormComplete)
+				{	while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						Str_Clr(0,2,8);
+						Str_Clr(0,3,8);
+						Str_Clr(0,4,8);
+						Str_Clr(0,5,8);
+						OLED_Print_Num(0,1, EM_AD[0]);
+						OLED_Print_Num(0,2, EM_AD[3]);
+						OLED_Print_Num(0,3, EM_AD[6]);
+						OLED_Print_Num(0,4, EM_AD[7]);
+						OLED_Print_Num(0,5, EM_AD[8]);
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[0] = EM_AD[0];
+								g_AD_NormFactor[3] = EM_AD[3];
+								g_AD_NormFactor[6] = EM_AD[6];
+								g_AD_NormFactor[7] = EM_AD[7];
+								g_AD_NormFactor[8] = EM_AD[8];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 1 OK!");
+					delay_ms(500);
+					OLED_Fill(0x00);
+
+
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 2");
+					while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						OLED_Print_Num(0,1, EM_AD[2]);
+
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[2] = EM_AD[2];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 2 OK!");
+					delay_ms(500);
+					OLED_Fill(0x00);
+
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 3");
+					while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						OLED_Print_Num(0,1, EM_AD[4]);
+
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[4] = EM_AD[4];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 3 OK!");
+					delay_ms(500);
+					OLED_Fill(0x00);
+
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 4");
+					while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						OLED_Print_Num(0,1, EM_AD[1]);
+						OLED_Print_Num(0,2, EM_AD[5]);
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[1] = EM_AD[1];
+								g_AD_NormFactor[5] = EM_AD[5];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 4 OK!");
+
+					OLED_P6x8Rst(0,7,(uint8_t*)"#NormAD: OK!");
+					g_Flag_isNormComplete = 1;
+				}
+				else
+				{
+					if(1 == g_Flag_isNormComplete)
+					{
+						g_Flag_isNormComplete = 2; /**@note: To prevent OLED refresh**/
+
+						OLED_Fill(0x00);
+						OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: OK!");
+						OLED_P6x8Rst(0,4,(uint8_t*)"Please");
+						OLED_P6x8Rst(0,5,(uint8_t*)"turn off Boma 5");
+						OLED_P6x8Rst(0,6,(uint8_t*)"to continue...");
+					}
+				}
 			}
 			else
 			{
@@ -732,10 +968,10 @@ void AC_Task(void *pvData)
                     /** @note: just a NNCU demo*/
                     OLED_P6x8Str(0,1,(uint8_t*)"Boma");
                     OLED_P6x8Str(0,2,(uint8_t*)"Servo");
-//                    OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
-//                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
-					OLED_P6x8Str(0,3,(uint8_t*)"nncu-SP");
-					OLED_P6x8Str(0,4,(uint8_t*)"nncu-MP");
+                    OLED_P6x8Str(0,3,(uint8_t*)"nncu-Out");
+                    OLED_P6x8Str(0,4,(uint8_t*)"nncu-Time");
+//					OLED_P6x8Str(0,3,(uint8_t*)"nncu-SP");
+//					OLED_P6x8Str(0,4,(uint8_t*)"nncu-MP");
                     OLED_P6x8Str(0,5,(uint8_t*)"middleline");
                     OLED_P6x8Str(0,6,(uint8_t*)"AD-6");
                 }
@@ -754,11 +990,11 @@ void AC_Task(void *pvData)
                 OLED_Print_Num(84,1,g_Boma[4]);
                 OLED_Print_Num(90,1,g_Boma[5]);
 
-                OLED_Print_Num1(60,2,(int)((s_dir/0.8)*127));
-//                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
-//                OLED_Print_Num1(60,4,g_time_duration_us);
-                OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
-                OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
+                OLED_Print_Num1(60,2,(int)((g_dir/0.8)*127));
+                OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
+                OLED_Print_Num1(60,4,g_time_duration_us);
+//                OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
+//                OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
                 OLED_Print_Num1(60,5,middleline_nncu);
                 OLED_Print_Num1(60,6,g_AD_Data[6]);
 
@@ -806,7 +1042,7 @@ int main(void)
 
 void LPUART2_IRQHandler(void)
 {
-    uint8_t temp_COM_data_buffer[17];
+    int8_t temp_COM_data_buffer[17];
     /* If new data arrived. */
     if ((kLPUART_RxDataRegFullFlag)&LPUART_GetStatusFlags(LPUART2))
     {
@@ -818,8 +1054,8 @@ void LPUART2_IRQHandler(void)
         /*Get AD Data*/
         for(int i = 0;i<9;i++)
         {
-            g_AD_Data[i] = temp_COM_data_buffer[i+3] + 128;
-            EM_AD[i] = temp_COM_data_buffer[i+3];
+            g_AD_Data[i] = temp_COM_data_buffer[i+3];
+            EM_AD[i] = temp_COM_data_buffer[i+3]-128;
         }
 
         /*Get Boma Data*/
@@ -833,12 +1069,34 @@ void LPUART2_IRQHandler(void)
         /*Get Seitch Data*/
         g_Switch_Data = temp_COM_data_buffer[13];
 
+        if (g_Switch_Data == 1)
+        {
+        	Switch_Flag = 1;
+        }
+
+        /**AD Normalization**/
+        /**
+         * @note: 	开机之后，只要没有启用过归一化程序，那 g_Flag_isNormComplete = 0， 不会进行归一化操作。
+         *
+         * 			开机之后一旦进行过归一化程序，g_Flag_isNormComplete = 1或2，则进行软件小幅度归一化。
+         *
+         * 			当前方式：先归一化EM_AD,再归一化g_AD_Data
+         * **/
+        if(g_Flag_isNormComplete!=0)
+        {
+        	for(int i = 0;i<9;i++)
+			{
+        		EM_AD[i] = (100* EM_AD[i])/g_AD_NormFactor[i];
+        		g_AD_Data[i] =EM_AD[i]-128; //或者+128？或者什么都不加？或者其他？
+			}
+        }
+
     }
 }
 
 void LPUART1_IRQHandler(void)
 {
-    uint8_t temp_COM_data_buffer[21];
+    int8_t temp_COM_data_buffer[21];
 
     /* If new data arrived. */
     if ((kLPUART_RxDataRegFullFlag)&LPUART_GetStatusFlags(LPUART1))
@@ -846,15 +1104,18 @@ void LPUART1_IRQHandler(void)
         LPUART_ReadBlocking(LPUART1,temp_COM_data_buffer,21);
 
         /*Get Servo Data*/
-        g_Servo_Data = temp_COM_data_buffer[3] + 128;
+        g_Servo_Data = temp_COM_data_buffer[3];
 
 		/*Get Motor Data*/
-        g_Motor_L_Data = temp_COM_data_buffer[4] + 128;
-        g_Motor_R_Data = temp_COM_data_buffer[5] + 128;
+        g_Motor_L_Data = temp_COM_data_buffer[4];
+        g_Motor_R_Data = temp_COM_data_buffer[5];
+
+        g_Servo_Devia = temp_COM_data_buffer[6];
+        g_Motor_Devia = temp_COM_data_buffer[7];
 
         /*Get Image Data*/
-        for(int i = 0;i<10;i++) {
-        	g_Image_Data[i] = temp_COM_data_buffer[6+i];
+        for(int i = 0; i < 8; i++) {
+        	g_Image_Data[i] = temp_COM_data_buffer[8+i];
         }
 
         /*Get ENC Data*/
