@@ -71,50 +71,65 @@
 /***********************************************************************************************************************
  * Definitions
  ***********************************************************************************************************************/
+/**
+ * @breif Version Information
+ */
+#define AC_VERSION_MAJOR 1
+#define AC_VERSION_MINOR 4
+#define AC_VERSION_REVISION 0
+
 
 /**
  * @breif Declare the AI Backend for AdventCirno
  */
-
 #define AC_AI_BACKEND_NNCU 0x01
 #define AC_AI_BACKEND_TFLite 0x02
 
 #define AC_AI_BACKEND (AC_AI_BACKEND_NNCU)
 
+
 /**
  * @breif Manual Flash Operation switch
  */
-
 #define AC_FLASH_MANUAL_ENABLE 0U
 #define AC_FLASH_MANUAL_DISABLE 1U
 
-//#define AC_FLASH_MANUAL AC_FLASH_MANUAL_DISABLE
 #define AC_FLASH_MANUAL AC_FLASH_MANUAL_ENABLE
 
 
 /**
  * @breif Menu storage option
  */
-
 #define AC_STORAGE_PLACE_FLASH 0U
 #define AC_STORAGE_PLACE_SD 1U
 
-//#define AC_STORAGE_MENU AC_STORAGE_PLACE_SD
 #define AC_STORAGE_MENU AC_STORAGE_PLACE_FLASH
+
 
 /**
  * @breif FUNCTION option
  */
-
 #define AC_FUNCTION_ON 1U
 #define AC_FUNCTION_OFF 0U
 
-#define AC_FUNCTION_SERVICE AC_FUNCTION_ON
+#define AC_FUNCTION_SERVICE 	AC_FUNCTION_ON
+#define AC_FUNCTION_CAMERA 		AC_FUNCTION_OFF
 
-//#define DEBUG_K66_OUTPUT
+#define AC_DEBUG_TEST			AC_FUNCTION_OFF			/**@note: For driver test only. When you finish your motherboard test,you shuould tern it off **/
+#define AC_DEBUG_K66_OUTPUT		AC_FUNCTION_OFF
 
-//#define NNCU_DENOISE
+
+/**
+ * @breif NNCU FUNCTION option
+ */
+#define NNCU_TEST 				AC_FUNCTION_OFF
+#define NNCU_TEST_DENSE 		AC_FUNCTION_OFF
+#define NNCU_CLASSIFICATION 	AC_FUNCTION_OFF
+#define NNCU_DENOISE			AC_FUNCTION_OFF
+#define NNCU_DENOISE_AVERAGE	AC_FUNCTION_OFF
+#define NNCU_DENOISE_LIMIT_RATE	AC_FUNCTION_OFF
 #define NNCU_DENOISE_MAX_VARIATION 200
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -193,24 +208,34 @@ int16_t g_AD_nncu_Output[3];
 /**@note limitation on variation rate of nncu output**/
 int16_t g_AD_nncu_SP_History[2];
 
+#if NNCU_CLASSIFICATION
 /**NNCU : Road Type Detection **/
-//int16_t *g_AD_nncu_ClassificationOutBuffer;
-//int16_t g_AD_nncu_ClassificationOutput[5];
-//int g_AD_nncu_RoadType = 0;
+int16_t *g_AD_nncu_ClassificationOutBuffer;
+int16_t g_AD_nncu_ClassificationOutput[5];
+int g_AD_nncu_RoadType = 0;
+#endif
 
-/*两个测试数据*/
+/**NNCU: Test Input **/
+#if NNCU_TEST
+#if NNCU_TEST_DENSE
+/*2 Demo Dataset for non-time related network*/
 int8_t tmp_AD_Input[9] = {
         0xC2, 0x8E, 0x90, 0xC9, 0xDB, 0x94, 0xF2, 0xCD, 0x0C
 };
 int8_t tmp_AD_Input2[9] = {
         0xC0, 0x90, 0x8B, 0xC2, 0xDE, 0x9C, 0xE8, 0xF1, 0x19
 };
+#endif
 
 extern int8_t temp_Dataset[660][9];
 
+#endif
+
+#if NNCU_DENOISE
 /**NNCU: Denoise Function only**/
 int16_t g_AD_nncu_History[20];
 int16_t g_AD_nncu_DenoiseResult;
+#endif
 
 /*TODO: TaskHandle declaration here*/
 extern TaskHandle_t AC_Menu_task_handle;
@@ -228,6 +253,8 @@ uint16_t g_BootTime = 0;
 /*******************************************************************************
  * Code
  ******************************************************************************/
+#if AC_DEBUG_TEST
+
 TaskHandle_t LED_task_handle;
 void LED_task(void *pvData)
 {
@@ -272,6 +299,7 @@ void start_task(void *pvData)
 	vTaskDelete(NULL);
 }
 
+#endif
 /**
  * @description: Advent Cirno main function. By pressing the WakeUp Key ,you can lock and unlock the screen.
  * 				Only when the screen is unlocked can you change the settings.
@@ -309,6 +337,9 @@ void AC_Task(void *pvData)
 	/*TODO: Your Init Sequence Here*/
     {
         OLED_P6x8Str(0, 0, (uint8_t*)"# AdventCirno v1.0.0");
+        OLED_Print_Num(90,0,AC_VERSION_MAJOR);
+        OLED_Print_Num(102,0,AC_VERSION_MINOR);
+        OLED_Print_Num(114,0,AC_VERSION_REVISION);
         OLED_P6x8Str(0, 1, (uint8_t*)"Boot Check...");
 
         /**@brief Init Beep*/
@@ -332,17 +363,19 @@ void AC_Task(void *pvData)
 		UART_Init(LPUART6, 9600, 80 * 1000 * 1000);			//总钻风
 
 		/**@brief Init ZZF Camera*/
+#if AC_FUNCTION_CAMERA
 		{
-			//ZZF_Init(ZZF_FrameSize120x184, LPUART6);
-			//	capture.format = PixelFormatGray;
-			//	capture.width = 184;
-			//	capture.height = 120;
-			//	CAMERA_SubmitBuff(buff1);
-			//	CAMERA_SubmitBuff(buff2);
-			//	CAMERA_SubmitBuff(buff3);
-			//	CAMERA_SubmitBuff(buff4);
-			//	assert(kStatus_Success == CAMERA_ReceiverStart());
+			ZZF_Init(ZZF_FrameSize120x184, LPUART6);
+			capture.format = PixelFormatGray;
+			capture.width = 184;
+			capture.height = 120;
+			CAMERA_SubmitBuff(buff1);
+			CAMERA_SubmitBuff(buff2);
+			CAMERA_SubmitBuff(buff3);
+			CAMERA_SubmitBuff(buff4);
+			assert(kStatus_Success == CAMERA_ReceiverStart());
 		}
+#endif
 
         /**@brief Init Flash*/
 
@@ -438,7 +471,9 @@ void AC_Task(void *pvData)
     g_AD_nncu_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_SP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
     g_AD_nncu_MP_OutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t));
-//    g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
+#if NNCU_CLASSIFICATION
+    g_AD_nncu_ClassificationOutBuffer = (int16_t *) pvPortMalloc(sizeof(int16_t)*5);
+#endif
     }
 #endif
 
@@ -471,17 +506,16 @@ void AC_Task(void *pvData)
 
 #endif
 
+#if NNCU_TEST
+    for(int i = 0;i<=600;i++)
+    {
+    	g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
+    	memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-//    for(int i = 0;i<=600;i++)
-//    {
-//    	g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(temp_Dataset[i][0]));
-//    	memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
-//
-//    	if(g_AD_nncu_Output[2]<0) PRINTF("-");
-//    	PRINTF("%d\n",g_AD_nncu_Output[2]);
-//    }
-
-
+    	if(g_AD_nncu_Output[2]<0) PRINTF("-");
+    	PRINTF("%d\n",g_AD_nncu_Output[2]);
+    }
+#endif
 
 
     delay_ms(2000);
@@ -490,49 +524,54 @@ void AC_Task(void *pvData)
     /**@brief Main Loop*/
 	while (1)
 	{
-//		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
-//		{
-//		uint16_t height;
-//		uint16_t width;
-//		height = capture.height;
-//		width = capture.width;
-//		uint8_t* capture_buffer = pvPortMalloc(height * width);
-//		if (capture.format == PixelFormatGray)
-//			{
-//				uint8_t* p = capture.pImg;
-//				for (uint32_t i = 0; i < height; i += 1)
-//					{
-//						for (uint32_t j = 0; j < width; j += 1)
-//							{
-//								capture_buffer[i * width + j] = p[i * capture.width + j];
-//								image_Buffer_0[i][j] = capture_buffer[i * width + j];
-//							}
-//					}
-//			}
-//			//THRE(image_Buffer_0, img_original);//image_Proc
-//			//map();
-//			//IMAGE_PROC_Main(image_Proc);
-//			CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
-//		}
+#if AC_FUNCTION_CAMERA
+		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
+		{
+		uint16_t height;
+		uint16_t width;
+		height = capture.height;
+		width = capture.width;
+		uint8_t* capture_buffer = pvPortMalloc(height * width);
+		if (capture.format == PixelFormatGray)
+			{
+				uint8_t* p = capture.pImg;
+				for (uint32_t i = 0; i < height; i += 1)
+					{
+						for (uint32_t j = 0; j < width; j += 1)
+							{
+								capture_buffer[i * width + j] = p[i * capture.width + j];
+								image_Buffer_0[i][j] = capture_buffer[i * width + j];
+							}
+					}
+			}
+			//THRE(image_Buffer_0, img_original);//image_Proc
+			//map();
+			//IMAGE_PROC_Main(image_Proc);
+			CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
+		}
 
-		//Image_Main(&capture);
+		Image_Main(&capture);
 
-//		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
-//					{
-//						OLED_PrintPicture(&capture,100);			 //在屏幕上显示
-//						PRINTF("fps=%d\r\n", (int)CAMERA_FpsGet());
-//						CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
-//					}
+		if (kStatus_Success == CAMERA_FullBufferGet(&capture.pImg))
+		{
+			OLED_PrintPicture(&capture,100);			 //在屏幕上显示
+			PRINTF("fps=%d\r\n", (int)CAMERA_FpsGet());
+			CAMERA_SubmitBuff(capture.pImg); //将空缓存提交
+		}
 
+#endif
 
+		g_time_us= TimerUsGet();		/** NNCU Timer Start **/
+
+#if NNCU_TEST
 		/*For Test NNCU Only*/
 //		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input);
 //		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_OutBuffer,sizeof(int16_t));
 //
 //		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&tmp_AD_Input2);
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
+#endif
 
-		g_time_us= TimerUsGet();
 
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
@@ -547,46 +586,48 @@ void AC_Task(void *pvData)
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_MP_OutBuffer,sizeof(int16_t));
 
 
+#if NNCU_DENOISE
 
+#if NNCU_DENOISE_AVERAGE
 		/**NNCU: Denoise Function only**/
-//
-//		for(int i = 0;i<19;i++)
-//		{
-//			g_AD_nncu_History[i] = g_AD_nncu_History[i+1];
-//		}
-//
-//		    g_AD_nncu_History[19] = g_AD_nncu_Output[2];
-//
-//		    int16_t temp_nncu_buff[20];
-//			int16_t temp_nncu_swap;
-//		    memcpy(temp_nncu_buff,g_AD_nncu_History,20*sizeof(int16_t));
-//
-//		/** Pop **/
-//		for(int i = 0;i<=19;i++)
-//		{
-//		    for(int j = 0; j<=19;j++){
-//		    	if(temp_nncu_buff[i]>temp_nncu_buff[j])
-//		    	{
-//		    		temp_nncu_swap = temp_nncu_buff[i];
-//		    		temp_nncu_buff[i] = temp_nncu_buff[j];
-//		    		temp_nncu_buff[j] = temp_nncu_swap;
-//		    	}
-//		    }
-//		 }
-//
-//		 g_AD_nncu_DenoiseResult = 0;
-//		 for(int i =3 ;i<=16;i++)
-//		 {
-//			 g_AD_nncu_DenoiseResult+=g_AD_nncu_History[i];
-//		 }
-//
-//		 g_AD_nncu_DenoiseResult = g_AD_nncu_DenoiseResult/14;
 
-		 g_time_duration_us = TimerUsGet() - g_time_us;
+		for(int i = 0;i<19;i++)
+		{
+			g_AD_nncu_History[i] = g_AD_nncu_History[i+1];
+		}
 
-#ifdef NNCU_DENOISE
+		    g_AD_nncu_History[19] = g_AD_nncu_Output[2];
 
+		    int16_t temp_nncu_buff[20];
+			int16_t temp_nncu_swap;
+		    memcpy(temp_nncu_buff,g_AD_nncu_History,20*sizeof(int16_t));
+
+		/** Pop **/
+		for(int i = 0;i<=19;i++)
+		{
+		    for(int j = 0; j<=19;j++){
+		    	if(temp_nncu_buff[i]>temp_nncu_buff[j])
+		    	{
+		    		temp_nncu_swap = temp_nncu_buff[i];
+		    		temp_nncu_buff[i] = temp_nncu_buff[j];
+		    		temp_nncu_buff[j] = temp_nncu_swap;
+		    	}
+		    }
+		 }
+
+		 g_AD_nncu_DenoiseResult = 0;
+		 for(int i =3 ;i<=16;i++)
+		 {
+			 g_AD_nncu_DenoiseResult+=g_AD_nncu_History[i];
+		 }
+
+		 g_AD_nncu_DenoiseResult = g_AD_nncu_DenoiseResult/14;
+
+#endif
+
+#if NNCU_DENOISE_LIMIT_RATE
         int16_t temp_nncu_SPVarRate = g_AD_nncu_SP_History[1] - g_AD_nncu_SP_History[0];
+
 
         /**Give it a delayed start**/
         if(g_BootTime>1000)
@@ -601,11 +642,16 @@ void AC_Task(void *pvData)
         /**Update history**/
         g_AD_nncu_SP_History[0] = g_AD_nncu_SP_History[1];
         g_AD_nncu_SP_History[1] = g_AD_nncu_Output[0];
+#endif
 
 #endif
 
-//		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
-//		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
+#if NNCU_CLASSIFICATION
+		g_AD_nncu_ClassificationOutBuffer = (int16_t*)RunModel_Classification(&(g_AD_Data));
+		memcpy(&g_AD_nncu_ClassificationOutput,g_AD_nncu_ClassificationOutBuffer,sizeof(int16_t)*5);
+#endif
+
+		g_time_duration_us = TimerUsGet() - g_time_us;	/** NNCU Timer End **/
 
 		if (0 == GPIO_Read(&wakeUp))
 		{
@@ -736,50 +782,55 @@ void AC_Task(void *pvData)
                     Flag_ScreenRefresh = 0;
 				    OLED_Fill(0x00);
 				    OLED_P6x8Str(0,0,(uint8_t*)"#Road Type");
-//
-//				    OLED_P6x8Str(60,1,(uint8_t*)"Straight");
+#if NNCU_CLASSIFICATION
+				    OLED_P6x8Str(60,1,(uint8_t*)"Straight");
+					OLED_P6x8Str(60,2,(uint8_t*)"Curve");
+				    OLED_P6x8Str(60,3,(uint8_t*)"S-Curve");
+					OLED_P6x8Str(60,4,(uint8_t*)"Cross");
+				    OLED_P6x8Str(60,5,(uint8_t*)"Round");
+#else
+				    /**@breif: PID赛道类型调试**/
 				    OLED_P6x8Str(60,2,(uint8_t*)"Curve");
-//				    OLED_P6x8Str(60,3,(uint8_t*)"S-Curve");
 				    OLED_P6x8Str(60,4,(uint8_t*)"Cross");
-//				    OLED_P6x8Str(60,5,(uint8_t*)"Round");
-//
+#endif
                 }
-//        		/* TODO: Your Code */
-//
-//				Str_Clr(0,1,10);
-//				Str_Clr(0,2,10);
-//				Str_Clr(0,3,10);
-//				Str_Clr(0,4,10);
-//				Str_Clr(0,5,10);
-//
-//				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
-//				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
-//				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
-//				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
-//				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
-//
-//				int16_t temp = g_AD_nncu_ClassificationOutput[0];
-//				g_AD_nncu_RoadType = 0;
-//				for(int i = 1 ;i<=4;i++)
-//				{
-//					if(g_AD_nncu_ClassificationOutput[i]>temp)
-//					{
-//						g_AD_nncu_RoadType = i;
-//						temp = g_AD_nncu_ClassificationOutput[i];
-//					}
-//
-//				}
-//
-//				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
+        		/* TODO: Your Code */
+#if NNCU_CLASSIFICATION
+				Str_Clr(0,1,10);
+				Str_Clr(0,2,10);
+				Str_Clr(0,3,10);
+				Str_Clr(0,4,10);
+				Str_Clr(0,5,10);
 
+				OLED_Print_Num1(0,1, g_AD_nncu_ClassificationOutput[0]);
+				OLED_Print_Num1(0,2, g_AD_nncu_ClassificationOutput[1]);
+				OLED_Print_Num1(0,3, g_AD_nncu_ClassificationOutput[2]);
+				OLED_Print_Num1(0,4, g_AD_nncu_ClassificationOutput[3]);
+				OLED_Print_Num1(0,5, g_AD_nncu_ClassificationOutput[4]);
+
+				int16_t temp = g_AD_nncu_ClassificationOutput[0];
+				g_AD_nncu_RoadType = 0;
+				for(int i = 1 ;i<=4;i++)
+				{
+					if(g_AD_nncu_ClassificationOutput[i]>temp)
+					{
+						g_AD_nncu_RoadType = i;
+						temp = g_AD_nncu_ClassificationOutput[i];
+					}
+
+				}
+
+				OLED_P6x8Str(42,g_AD_nncu_RoadType+1,(uint8_t*)"*");
+#else
 				/*PID赛道类型调试*/
 				Str_Clr(0,2,5);
 				Str_Clr(0,4,5);
 
 				OLED_Print_Num(0,2, Cross_flag);
 				OLED_Print_Num(0,4, Round_flag);
-			}
 
+#endif
+			}
         	else if(1==g_Boma[2])
 			{
         		if(3!=Flag_ScreenRefresh)
@@ -963,7 +1014,10 @@ void AC_Task(void *pvData)
                     Flag_ScreenRefresh = -1;
                     OLED_Fill(0x00);
 
-                    OLED_P6x8Str(0,0,(uint8_t*)"#AC Version 0.3.1");
+                    OLED_P6x8Str(0, 0, (uint8_t*)"# AdventCirno v1.0.0");
+                    OLED_Print_Num(90,0,AC_VERSION_MAJOR);
+                    OLED_Print_Num(102,0,AC_VERSION_MINOR);
+                    OLED_Print_Num(114,0,AC_VERSION_REVISION);
 
                     /** @note: just a NNCU demo*/
                     OLED_P6x8Str(0,1,(uint8_t*)"Boma");
@@ -993,13 +1047,14 @@ void AC_Task(void *pvData)
                 OLED_Print_Num1(60,2,(int)((g_dir/0.8)*127));
                 OLED_Print_Num1(60,3,g_AD_nncu_Output[2]);
                 OLED_Print_Num1(60,4,g_time_duration_us);
-//                OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
-//                OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
+//              OLED_Print_Num1(60,3,g_AD_nncu_Output[0]);
+//              OLED_Print_Num1(60,4,g_AD_nncu_Output[1]);
                 OLED_Print_Num1(60,5,middleline_nncu);
                 OLED_Print_Num1(60,6,g_AD_Data[6]);
 
-                //PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
-
+#if NNCU_TEST
+                PRINTF("[OK] AC: Status: nncu time used %d\n",(int)g_time_duration_us);
+#endif
 			}
         }
 	}
@@ -1021,9 +1076,10 @@ int main(void)
 
 	cm_backtrace_init("IMRT10XX.axf", "1.1.1", "19.4.14");
 	vPortDefineHeapRegions(xHeapRegions);
+#if AC_DEBUG_TEST
 	//xTaskCreate(LED_task, "LED_task", 128, NULL, 3, &LED_task_handle);//led不停，单片机不s
 	//xTaskCreate(start_task, "start_task", 1024, NULL, 2, &start_task_handle);
-
+#endif
 	//AC: Personal Settings
 	xTaskCreate(AC_Task, "AC_Task", 2048, NULL, 2, &AC_task_handle);
     xTaskCreate(AC_Pit, "AC_Pit", 2048, NULL, 2, &AC_Pit_task_handle);
