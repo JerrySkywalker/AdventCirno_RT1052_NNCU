@@ -27,7 +27,7 @@
 #define CAR_NAME 1
 #define MID_CollectTimes 25
 #define NUMBER_INDUCTORS 9
-#define MOTOR_START_LIMIT_STEP 1000
+#define MOTOR_START_LIMIT_STEP 21
 
 void Control_Init();
 void Running_Time(void);

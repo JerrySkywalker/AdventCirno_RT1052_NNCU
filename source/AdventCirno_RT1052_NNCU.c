@@ -113,7 +113,7 @@
 
 //#define DEBUG_K66_OUTPUT
 
-#define NNCU_DENOISE
+//#define NNCU_DENOISE
 #define NNCU_DENOISE_MAX_VARIATION 200
 /*******************************************************************************
  * Variables
@@ -177,6 +177,7 @@ uint8_t EM_AD[NUMBER_INDUCTORS];
 uint8_t g_Boma[6];
 uint8_t g_Boma_Compressed;
 uint8_t g_Switch_Data = 0;
+int8_t Switch_Flag = 0;
 
 /**NNCU : Direct AD-Servo, AD-ServoProspect,AD-MotorProspect relationship prediction buffer **/
 int16_t *g_AD_nncu_OutBuffer;
@@ -781,15 +782,21 @@ void AC_Task(void *pvData)
         			Flag_ScreenRefresh = 3; /**第一次进入跑车模式的启动项**/
         			g_BootTime = 0;			/**计时器清零**/
         			Stop_Flag = 1;			/**初始化的时候，进入停车模式**/
+        			Switch_Flag = 0;		/**干簧管锁存变量**/
         		}
 
-        		if(g_BootTime>100 && g_BootTime<=300)
+        		if (g_BootTime <= 300)
+        		{
+        			Switch_Flag = 0;
+        		}
+
+        		if(g_BootTime>150 && g_BootTime<=300)
         		{
         			Stop_Flag = 0;
         		}
 
 
-        		if (g_Switch_Data == 1)		/**检测到干簧管**/
+        		if (Switch_Flag == 1)		/**检测到干簧管**/
                 {
                 	delay_ms(200);
                 	if(g_BootTime>300)		/**检测到的干簧管是延时检测到的**/
@@ -911,6 +918,11 @@ void LPUART2_IRQHandler(void)
 
         /*Get Seitch Data*/
         g_Switch_Data = temp_COM_data_buffer[13];
+
+        if (g_Switch_Data == 1)
+        {
+        	Switch_Flag = 1;
+        }
 
     }
 }

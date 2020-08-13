@@ -124,7 +124,7 @@ void Dir_Control(void)
 //    	else if (middleline_nncu < 0) middleline_nncu = 0;
     	//g_error = CAMERA_M - middleline_nncu;
     	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[1])/10000;
-    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[2])/10000;
+    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor_Motor)*(float)(g_AD_nncu_Output[2])/10000;
 
     	/*获取PID*/
     	if (data[data_identifier].NNCU_NormalizeFactor == 0)
