@@ -55,6 +55,8 @@ int Straight_Flag = 0;
 int Cross_flag = 0;
 int State_Change_Flag = 0;
 int Round_dir = 0;
+int Blockage_Flag = 0;  //电机堵转标志，0：未堵转，1：已堵转
+int Blockage_Count = 0; //电机堵转时间计数
 
 extern uint8_t EM_AD[NUMBER_INDUCTORS];
 extern int16_t middleline_nncu;
@@ -124,7 +126,7 @@ void Dir_Control(void)
 //    	else if (middleline_nncu < 0) middleline_nncu = 0;
     	//g_error = CAMERA_M - middleline_nncu;
     	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[1])/10000;
-    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor_Motor)*(float)(g_AD_nncu_Output[2])/10000;
+    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor_Motor)*(float)(g_AD_nncu_Output[1])/10000;
 
     	/*获取PID*/
     	if (data[data_identifier].NNCU_NormalizeFactor == 0)
@@ -202,7 +204,7 @@ void Dir_Control(void)
         }
 
         /*出赛道保护*/
-        if ((EM_AD[0] < 5 && EM_AD[6] < 5)|| Stop_Flag == 1)
+        if ((EM_AD[0] < 5 && EM_AD[6] < 5)|| Stop_Flag == 1 || Blockage_Flag == 1)
         {
         	s_speed_aim_right = 0;
         	s_speed_aim_left = 0;
@@ -409,9 +411,6 @@ void Dir_Control(void)
           }
         }
 
-        /*出赛道保护*/
-        if (EM_AD[0] < 5 && EM_AD[6] < 5)	speed_expect_now = 0;
-
         /*差速期望速度获取*/
         float rate;
         float L_rate = (float)data[data_identifier].speedkl;
@@ -431,6 +430,13 @@ void Dir_Control(void)
         	rate =1 + 0.45*tan(g_dir_motor*0.0122173)*((float)R_rate);
         	s_speed_aim_right = (float)speed_expect_now/rate;
         	s_speed_aim_left = speed_expect_now;
+        }
+
+        /*出赛道保护*/
+        if ((EM_AD[0] < 5 && EM_AD[6] < 5)|| Stop_Flag == 1)
+        {
+        	s_speed_aim_right = 0;
+        	s_speed_aim_left = 0;
         }
 
         /*舵机输出占空比*/
@@ -619,3 +625,5 @@ void step_cnt(int *stepcnt,int stepcnt_flag)
     *stepcnt += s_speed_right_now;
   }
 }
+
+

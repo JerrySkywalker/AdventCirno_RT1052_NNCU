@@ -76,7 +76,7 @@
  */
 #define AC_VERSION_MAJOR 1
 #define AC_VERSION_MINOR 5
-#define AC_VERSION_REVISION 0
+#define AC_VERSION_REVISION 1
 
 
 /**
@@ -576,8 +576,8 @@ void AC_Task(void *pvData)
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-		g_AD_nncu_OutBuffer = (int16_t*)RunModel_60_120(&(g_AD_Data));
-		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+//		g_AD_nncu_OutBuffer = (int16_t*)RunModel_60_120(&(g_AD_Data));
+//		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 //		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
 //		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
@@ -1143,7 +1143,7 @@ void LPUART2_IRQHandler(void)
         	for(int i = 0;i<9;i++)
 			{
         		EM_AD[i] = (100* EM_AD[i])/g_AD_NormFactor[i];
-        		g_AD_Data[i] =EM_AD[i]-128; //或者+128？或者什么都不加？或者其他？
+        		g_AD_Data[i] =EM_AD[i]+128; //或者+128？或者什么都不加？或者其他？
 			}
         }
 
