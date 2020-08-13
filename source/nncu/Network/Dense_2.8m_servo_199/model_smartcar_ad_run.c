@@ -49,11 +49,11 @@
 #define FC1_OCOFS                     0
 #define FC1_OX                        1
 #define FC1_OY                        180
-#define FC1_SB                        5
-#define FC1_SO                        4
-#define FC1_zzdbg_2_SH_WT             9
-#define FC1_zzdbg_3_productShf        16
-#define FC1_zzdbg_4_SB_AMP            11
+#define FC1_SB                        6
+#define FC1_SO                        7
+#define FC1_zzdbg_2_SH_WT             12
+#define FC1_zzdbg_3_productShf        19
+#define FC1_zzdbg_4_SB_AMP            13
 #define FC1_zzdbg_5_fracBitsOut       12
 #define FC1_zzdbg_8_AuxAct            "LINEAR"
 // --------------------------------------------------------------------------------
@@ -87,10 +87,10 @@
 #define FC2_OX                        1
 #define FC2_OY                        100
 #define FC2_SB                        12
-#define FC2_SO                        10
-#define FC2_zzdbg_2_SH_WT             9
-#define FC2_zzdbg_3_productShf        22
-#define FC2_zzdbg_4_SB_AMP            10
+#define FC2_SO                        11
+#define FC2_zzdbg_2_SH_WT             10
+#define FC2_zzdbg_3_productShf        23
+#define FC2_zzdbg_4_SB_AMP            11
 #define FC2_zzdbg_5_fracBitsOut       12
 #define FC2_zzdbg_8_AuxAct            "LINEAR"
 // --------------------------------------------------------------------------------
@@ -123,11 +123,11 @@
 #define FC3_OCOFS                     0
 #define FC3_OX                        1
 #define FC3_OY                        40
-#define FC3_SB                        15
+#define FC3_SB                        14
 #define FC3_SO                        15
 #define FC3_zzdbg_2_SH_WT             12
 #define FC3_zzdbg_3_productShf        25
-#define FC3_zzdbg_4_SB_AMP            10
+#define FC3_zzdbg_4_SB_AMP            11
 #define FC3_zzdbg_5_fracBitsOut       10
 #define FC3_zzdbg_8_AuxAct            "LINEAR"
 // --------------------------------------------------------------------------------
@@ -159,11 +159,11 @@
 #define FC4_OCOFS                     0
 #define FC4_OX                        1
 #define FC4_OY                        1
-#define FC4_SB                        6
-#define FC4_SO                        17
-#define FC4_zzdbg_2_SH_WT             17
-#define FC4_zzdbg_3_productShf        27
-#define FC4_zzdbg_4_SB_AMP            21
+#define FC4_SB                        10
+#define FC4_SO                        16
+#define FC4_zzdbg_2_SH_WT             16
+#define FC4_zzdbg_3_productShf        26
+#define FC4_zzdbg_4_SB_AMP            16
 #define FC4_zzdbg_5_fracBitsOut       10
 #define FC4_zzdbg_8_AuxAct            "LINEAR"
 extern const int16_t cg_FC1weit[]; // 1620 - Co, Di: (180, 9)
@@ -201,29 +201,29 @@ void* RunModel(const void *in_buf)
 		}
 	}
 	// Block 1: Dense - dense_5
-    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC1weit/*weit*/, FC1_IY/*9*/, FC1_OY/*180*/, FC1_SB/*5*/
-        , FC1_SO/*4*/, cg_FC1bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC1weit/*weit*/, FC1_IY/*9*/, FC1_OY/*180*/, FC1_SB/*6*/
+        , FC1_SO/*7*/, cg_FC1bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
 
 	// Block 1: Activation - activation_3
     aia_nn_activations_direct_q15((int16_t*)img_buffer1/*1*/, ACT1_OY/*180*/, ACT1_AA/*2*/, ARM_TANH, 14);
 
 	// Block 2: Dense - dense_6
     arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_FC2weit/*weit*/, FC2_IY/*180*/, FC2_OY/*100*/, FC2_SB/*12*/
-        , FC2_SO/*10*/, cg_FC2bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
+        , FC2_SO/*11*/, cg_FC2bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
 
 	// Block 2: Activation - activation_4
     aia_nn_activations_direct_q15((int16_t*)img_buffer0/*0*/, ACT2_OY/*100*/, ACT2_AA/*2*/, ARM_TANH, 14);
 
 	// Block 3: Dense - dense_7
-    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC3weit/*weit*/, FC3_IY/*100*/, FC3_OY/*40*/, FC3_SB/*15*/
+    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC3weit/*weit*/, FC3_IY/*100*/, FC3_OY/*40*/, FC3_SB/*14*/
         , FC3_SO/*15*/, cg_FC3bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
 
 	// Block 3: Activation - re_lu_2
     aia_relu8_q15((int16_t*)img_buffer1/*1*/, (uint32_t)(ACT3_IX * ACT3_IY * ACT3_IC)/*1x40x1*/, ACT3_AI);
 
 	// Block 4: Dense - dense_8
-    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_FC4weit/*weit*/, FC4_IY/*40*/, FC4_OY/*1*/, FC4_SB/*6*/
-        , FC4_SO/*17*/, cg_FC4bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_FC4weit/*weit*/, FC4_IY/*40*/, FC4_OY/*1*/, FC4_SB/*10*/
+        , FC4_SO/*16*/, cg_FC4bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
 
 	memcpy(out_buf, img_buffer0, 2);
 

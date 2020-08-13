@@ -181,10 +181,10 @@ extern const int16_t cg_FC4bias[]; // 1
 #include "aia_cmsisnn_ext.h"
 // #include <model.h>
 
-int32_t img_buffer0[(200 + 3) / 4];
-int32_t img_buffer1[(360 + 3) / 4];
-int32_t col_buf[(360 + 3) / 4]; // [2, 180, 2]
-int16_t out_buf[1]; // FC4_OY
+static int32_t img_buffer0[(200 + 3) / 4];
+static int32_t img_buffer1[(360 + 3) / 4];
+static int32_t col_buf[(360 + 3) / 4]; // [2, 180, 2]
+static int16_t out_buf[1]; // FC4_OY
 // total static buffer size: 0.90 kB
 
 // generated RunModel(), returns the output buffer of the last layer

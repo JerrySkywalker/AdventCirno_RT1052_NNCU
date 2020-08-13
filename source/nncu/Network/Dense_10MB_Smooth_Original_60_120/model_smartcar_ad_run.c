@@ -166,14 +166,14 @@
 #define FC4_zzdbg_4_SB_AMP            21
 #define FC4_zzdbg_5_fracBitsOut       10
 #define FC4_zzdbg_8_AuxAct            "LINEAR"
-extern const int16_t cg_FC1weit[]; // 1620 - Co, Di: (180, 9)
-extern const int16_t cg_FC1bias[]; // 180
-extern const int16_t cg_FC2weit[]; // 18000 - Co, Di: (100, 180)
-extern const int16_t cg_FC2bias[]; // 100
-extern const int16_t cg_FC3weit[]; // 4000 - Co, Di: (40, 100)
-extern const int16_t cg_FC3bias[]; // 40
-extern const int16_t cg_FC4weit[]; // 40 - Co, Di: (1, 40)
-extern const int16_t cg_FC4bias[]; // 1
+extern const int16_t cg_60_120_FC1weit[]; // 1620 - Co, Di: (180, 9)
+extern const int16_t cg_60_120_FC1bias[]; // 180
+extern const int16_t cg_60_120_FC2weit[]; // 18000 - Co, Di: (100, 180)
+extern const int16_t cg_60_120_FC2bias[]; // 100
+extern const int16_t cg_60_120_FC3weit[]; // 4000 - Co, Di: (40, 100)
+extern const int16_t cg_60_120_FC3bias[]; // 40
+extern const int16_t cg_60_120_FC4weit[]; // 40 - Co, Di: (1, 40)
+extern const int16_t cg_60_120_FC4bias[]; // 1
 
 #include <stdint.h>
 #include "arm_math.h"
@@ -181,14 +181,14 @@ extern const int16_t cg_FC4bias[]; // 1
 #include "aia_cmsisnn_ext.h"
 // #include <model.h>
 
-int32_t img_buffer0[(200 + 3) / 4];
-int32_t img_buffer1[(360 + 3) / 4];
-int32_t col_buf[(360 + 3) / 4]; // [2, 180, 2]
-int16_t out_buf[1]; // FC4_OY
+static int32_t img_buffer0[(200 + 3) / 4];
+static int32_t img_buffer1[(360 + 3) / 4];
+static int32_t col_buf[(360 + 3) / 4]; // [2, 180, 2]
+static int16_t out_buf[1]; // FC4_OY
 // total static buffer size: 0.90 kB
 
 // generated RunModel(), returns the output buffer of the last layer
-void* RunModel(const void *in_buf)
+void* RunModel_60_120(const void *in_buf)
 { 
     
 	{
@@ -201,29 +201,29 @@ void* RunModel(const void *in_buf)
 		}
 	}
 	// Block 1: Dense - dense_5
-    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC1weit/*weit*/, FC1_IY/*9*/, FC1_OY/*180*/, FC1_SB/*5*/
-        , FC1_SO/*4*/, cg_FC1bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_60_120_FC1weit/*weit*/, FC1_IY/*9*/, FC1_OY/*180*/, FC1_SB/*5*/
+        , FC1_SO/*4*/, cg_60_120_FC1bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
 
 	// Block 1: Activation - activation_3
     aia_nn_activations_direct_q15((int16_t*)img_buffer1/*1*/, ACT1_OY/*180*/, ACT1_AA/*2*/, ARM_TANH, 14);
 
 	// Block 2: Dense - dense_6
-    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_FC2weit/*weit*/, FC2_IY/*180*/, FC2_OY/*100*/, FC2_SB/*12*/
-        , FC2_SO/*10*/, cg_FC2bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_60_120_FC2weit/*weit*/, FC2_IY/*180*/, FC2_OY/*100*/, FC2_SB/*12*/
+        , FC2_SO/*10*/, cg_60_120_FC2bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
 
 	// Block 2: Activation - activation_4
     aia_nn_activations_direct_q15((int16_t*)img_buffer0/*0*/, ACT2_OY/*100*/, ACT2_AA/*2*/, ARM_TANH, 14);
 
 	// Block 3: Dense - dense_7
-    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_FC3weit/*weit*/, FC3_IY/*100*/, FC3_OY/*40*/, FC3_SB/*15*/
-        , FC3_SO/*15*/, cg_FC3bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer0/*0*/, cg_60_120_FC3weit/*weit*/, FC3_IY/*100*/, FC3_OY/*40*/, FC3_SB/*15*/
+        , FC3_SO/*15*/, cg_60_120_FC3bias/*bias*/, (int16_t*)img_buffer1/*1*/, (int16_t*)col_buf);
 
 	// Block 3: Activation - re_lu_2
     aia_relu8_q15((int16_t*)img_buffer1/*1*/, (uint32_t)(ACT3_IX * ACT3_IY * ACT3_IC)/*1x40x1*/, ACT3_AI);
 
 	// Block 4: Dense - dense_8
-    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_FC4weit/*weit*/, FC4_IY/*40*/, FC4_OY/*1*/, FC4_SB/*6*/
-        , FC4_SO/*17*/, cg_FC4bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
+    arm_fully_connected_q15((int16_t*)img_buffer1/*1*/, cg_60_120_FC4weit/*weit*/, FC4_IY/*40*/, FC4_OY/*1*/, FC4_SB/*6*/
+        , FC4_SO/*17*/, cg_60_120_FC4bias/*bias*/, (int16_t*)img_buffer0/*0*/, (int16_t*)col_buf);
 
 	memcpy(out_buf, img_buffer0, 2);
 

@@ -526,7 +526,11 @@ void AC_Task(void *pvData)
 //		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 		g_time_us= TimerUsGet();
+
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
+		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
+
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel_60_120(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 //		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
