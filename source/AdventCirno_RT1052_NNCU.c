@@ -66,7 +66,7 @@
 #include "nncu/nncu_Config.h"
 #include "arm_math.h"
 #include "smartcar/sc_ac_delay.h"
-
+#include "smartcar/sc_ac_key_5D.h"
 
 /***********************************************************************************************************************
  * Definitions
@@ -156,6 +156,11 @@ int Flag_InitComplete = 0;
 int Flag_Find = 0; //找到斑马线 2找到 0初始
 int Flag_ScreenRefresh;
 uint8_t Stop_Flag = 0;		//干簧管停车标志
+
+/**AD Normalize Function**/
+int8_t g_Flag_isNormComplete = 0;
+int8_t g_AD_NormFactor[9];
+
 bee_t Bee_GPIO = {GPIO2, 20U, 1};
 
 uint32_t g_time_us = 0;
@@ -783,6 +788,10 @@ void AC_Task(void *pvData)
         			g_BootTime = 0;			/**计时器清零**/
         			Stop_Flag = 1;			/**初始化的时候，进入停车模式**/
         			Switch_Flag = 0;		/**干簧管锁存变量**/
+
+        			OLED_Fill(0x00);
+        			OLED_P6x8Str(0,0,(uint8_t*)"#Mode: Run!");
+        			OLED_P6x8Str(0,2,(uint8_t*)"Good Luck!");
         		}
 
         		if (g_BootTime <= 300)
@@ -802,8 +811,149 @@ void AC_Task(void *pvData)
                 	if(g_BootTime>300)		/**检测到的干簧管是延时检测到的**/
                 	{
                 		Stop_Flag = 1;
+                		OLED_P6x8Rst(0,6,(uint8_t*)"#Mode: Stopped!");
                 	}
                 }
+			}
+        	else if(1==g_Boma[4])
+			{
+				if(4!=Flag_ScreenRefresh)
+				{
+					Flag_ScreenRefresh = 4;
+
+					g_Flag_isNormComplete = 0;
+
+					OLED_Fill(0x00);
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 1");
+				}
+
+				if(0 == g_Flag_isNormComplete)
+				{	while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						Str_Clr(0,2,8);
+						Str_Clr(0,3,8);
+						Str_Clr(0,4,8);
+						Str_Clr(0,5,8);
+						OLED_Print_Num(0,1, EM_AD[0]);
+						OLED_Print_Num(0,2, EM_AD[3]);
+						OLED_Print_Num(0,3, EM_AD[6]);
+						OLED_Print_Num(0,4, EM_AD[7]);
+						OLED_Print_Num(0,5, EM_AD[8]);
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[0] = EM_AD[0];
+								g_AD_NormFactor[3] = EM_AD[3];
+								g_AD_NormFactor[6] = EM_AD[6];
+								g_AD_NormFactor[7] = EM_AD[7];
+								g_AD_NormFactor[8] = EM_AD[8];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 1 OK!");
+					delay_ms(500);
+					OLED_Fill(0x00);
+
+
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 2");
+					while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						OLED_Print_Num(0,1, EM_AD[2]);
+
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[2] = EM_AD[2];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 2 OK!");
+					delay_ms(500);
+					OLED_Fill(0x00);
+
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 3");
+					while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						OLED_Print_Num(0,1, EM_AD[4]);
+
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[4] = EM_AD[4];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 3 OK!");
+					delay_ms(500);
+					OLED_Fill(0x00);
+
+					OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: Set 4");
+					while(1)
+					{
+						/**Update AD**/
+
+						Str_Clr(0,1,8);
+						OLED_Print_Num(0,1, EM_AD[1]);
+						OLED_Print_Num(0,1, EM_AD[5]);
+
+						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+						{
+							delay_ms(10);
+							if(KEY_P_DOWN == Key_Check(KEY_ENTER))
+							{
+								/**	赋值g_AD_NormFactor**/
+								g_AD_NormFactor[1] = EM_AD[1];
+								g_AD_NormFactor[5] = EM_AD[5];
+
+								break;
+							}
+						}
+					}
+					OLED_P6x8Rst(0,6,(uint8_t*)"Set 4 OK!");
+
+					OLED_P6x8Rst(0,7,(uint8_t*)"#NormAD: OK!");
+					g_Flag_isNormComplete = 1;
+				}
+				else
+				{
+					if(1 == g_Flag_isNormComplete)
+					{
+						g_Flag_isNormComplete = 2; /**@note: To prevent OLED refresh**/
+
+						OLED_Fill(0x00);
+						OLED_P6x8Str(0,0,(uint8_t*)"#NormAD: OK!");
+						OLED_P6x8Rst(0,4,(uint8_t*)"Please");
+						OLED_P6x8Rst(0,5,(uint8_t*)"turn off Boma 5");
+						OLED_P6x8Rst(0,6,(uint8_t*)"to continue...");
+					}
+				}
 			}
 			else
 			{
@@ -922,6 +1072,23 @@ void LPUART2_IRQHandler(void)
         if (g_Switch_Data == 1)
         {
         	Switch_Flag = 1;
+        }
+
+        /**AD Normalization**/
+        /**
+         * @note: 	开机之后，只要没有启用过归一化程序，那 g_Flag_isNormComplete = 0， 不会进行归一化操作。
+         *
+         * 			开机之后一旦进行过归一化程序，g_Flag_isNormComplete = 1或2，则进行软件小幅度归一化。
+         *
+         * 			当前方式：先归一化EM_AD,再归一化g_AD_Data
+         * **/
+        if(g_Flag_isNormComplete!=0)
+        {
+        	for(int i = 0;i<9;i++)
+			{
+        		EM_AD[i] = (EM_AD[i] * EM_AD[i])/g_AD_NormFactor[i];
+        		g_AD_Data[i] =EM_AD[i]-128; //或者+128？或者什么都不加？或者其他？
+			}
         }
 
     }
