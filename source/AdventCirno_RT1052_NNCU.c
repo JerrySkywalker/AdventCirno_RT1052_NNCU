@@ -921,7 +921,7 @@ void AC_Task(void *pvData)
 
 						Str_Clr(0,1,8);
 						OLED_Print_Num(0,1, EM_AD[1]);
-						OLED_Print_Num(0,1, EM_AD[5]);
+						OLED_Print_Num(0,2, EM_AD[5]);
 
 						if(KEY_P_DOWN == Key_Check(KEY_ENTER))
 						{
