@@ -1086,7 +1086,7 @@ void LPUART2_IRQHandler(void)
         {
         	for(int i = 0;i<9;i++)
 			{
-        		EM_AD[i] = (EM_AD[i] * EM_AD[i])/g_AD_NormFactor[i];
+        		EM_AD[i] = (100* EM_AD[i])/g_AD_NormFactor[i];
         		g_AD_Data[i] =EM_AD[i]-128; //或者+128？或者什么都不加？或者其他？
 			}
         }
