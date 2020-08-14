@@ -576,8 +576,8 @@ void AC_Task(void *pvData)
 		g_AD_nncu_OutBuffer = (int16_t*)RunModel(&(g_AD_Data));
 		memcpy(&g_AD_nncu_Output[1],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
-//		g_AD_nncu_OutBuffer = (int16_t*)RunModel_60_120(&(g_AD_Data));
-//		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
+		g_AD_nncu_OutBuffer = (int16_t*)RunModel_60_120(&(g_AD_Data));
+		memcpy(&g_AD_nncu_Output[2],g_AD_nncu_OutBuffer,sizeof(int16_t));
 
 //		g_AD_nncu_SP_OutBuffer = (int16_t*)RunModel_SP(&g_AD_Data);
 //		memcpy(&g_AD_nncu_Output[0],g_AD_nncu_SP_OutBuffer,sizeof(int16_t));
@@ -858,7 +858,7 @@ void AC_Task(void *pvData)
 
         		if (Switch_Flag == 1)		/**检测到干簧管**/
                 {
-                	delay_ms(200);
+                	delay_ms(100);
                 	if(g_BootTime>300)		/**检测到的干簧管是延时检测到的**/
                 	{
                 		Stop_Flag = 1;

@@ -88,19 +88,20 @@ void Dir_Control(void)
     /*获取标准差*/
     //Get_Standard_Deviation();
 
-    /*摄像头&AI模式*/
+    /*AI模式*/
     if (data[data_identifier].mode == 0)
     {
     	Kp = 0.001*data[data_identifier].dirkp;
     	Kd = 0.001*data[data_identifier].dirkd;
 
         /*环岛识别*/
-        if (Cross_flag == 0 && Round_flag == 0
-        	&& (EM_AD[0] + EM_AD[3] + EM_AD[6] > 330/*300*/)
-			&& EM_AD[3] > 130
-			&& (EM_AD[1] < 30 || EM_AD[5] < 30)
-			&& 2*EM_AD[3] < EM_AD[0] + EM_AD[6]
-			&& EM_AD[1] + EM_AD[5] > 50)
+//        if (Cross_flag == 0 && Round_flag == 0
+//        	&& (EM_AD[0] + EM_AD[3] + EM_AD[6] > 330/*300*/)
+//			&& EM_AD[3] > 130
+//			&& (EM_AD[1] < 30 || EM_AD[5] < 30)
+//			&& 2*EM_AD[3] < EM_AD[0] + EM_AD[6]
+//			&& EM_AD[1] + EM_AD[5] > 50)
+        if (Round_flag == 0 && EM_AD[3] > 115)
         {
         	Round_flag = 1;
         	State_Change_Flag = 1;
@@ -125,8 +126,9 @@ void Dir_Control(void)
 //    	if (middleline_nncu > 188)	middleline_nncu = 188;
 //    	else if (middleline_nncu < 0) middleline_nncu = 0;
     	//g_error = CAMERA_M - middleline_nncu;
+
     	g_error = -(float)(data[data_identifier].NNCU_NormalizeFactor)*(float)(g_AD_nncu_Output[1])/10000;
-    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor_Motor)*(float)(g_AD_nncu_Output[1])/10000;
+    	g_error_motor = -(float)(data[data_identifier].NNCU_NormalizeFactor_Motor)*(float)(g_AD_nncu_Output[2])/10000;
 
     	/*获取PID*/
     	if (data[data_identifier].NNCU_NormalizeFactor == 0)
@@ -152,12 +154,20 @@ void Dir_Control(void)
         Servo_Protect(&g_dir_motor);
 
         /*期望速度获取*/
-        speed_expect_now = 0.1*(float)data[data_identifier].speed;
         speed_expect = 0.1*(float)data[data_identifier].speed;
+        speed_expect_now = 0.1*(float)data[data_identifier].speed;
 
         if (Round_flag != 0)
         {
-        	speed_expect_now = 0.1 * ((float)data[data_identifier].speed + (float)data[data_identifier].Round_Acc);
+        	if (abs(g_error) < 12)
+        	{
+        		speed_expect_now = 0.1 * ((float)data[data_identifier].speed + (float)data[data_identifier].Round_Acc);
+        	}
+
+        	if (EM_AD[3] < 115/*EM_AD[0] + EM_AD[3] + EM_AD[6] < 330*//*&& (EM_AD[7] < 65 && EM_AD[8] < 65)*/)
+        	{
+        		Round_flag = 0;
+        	}
         }
 
         /*温柔变速*/
@@ -215,7 +225,7 @@ void Dir_Control(void)
         PWM_Dir_Motor = (uint16_t)(100*DIR_M + 100*g_dir_motor);
     }
 
-    /*电磁模式*/
+    /*PID模式*/
     else if (data[data_identifier].mode == 1)
     {
     	int Weight_x = data[data_identifier].Weight_x;
@@ -291,13 +301,13 @@ void Dir_Control(void)
         	    	{
         	    		s_error_X = ((float)EM_AD[0] - (float)EM_AD[6]*(float)data[data_identifier].Round_TH/100) / ((float)EM_AD[0] + (float)EM_AD[6]*(float)data[data_identifier].Round_TH/100);
         	    		s_error_E = ((float)EM_AD[2] - (float)EM_AD[4]*(float)data[data_identifier].Round_TH/100) / ((float)EM_AD[2] + (float)EM_AD[4]*(float)data[data_identifier].Round_TH/100);
-        	    		g_error = (s_error_X * Weight_x + s_error_E * Weight_e)/(Weight_x + Weight_e);
+        	    		g_error = 0;
         	    	}
         	    	else
         	    	{
         	    		s_error_X = ((float)EM_AD[0]*(float)data[data_identifier].Round_TH/100 - (float)EM_AD[6]) / ((float)EM_AD[0]*(float)data[data_identifier].Round_TH/100 + (float)EM_AD[6]);
         	    		s_error_E = ((float)EM_AD[2]*(float)data[data_identifier].Round_TH/100 - (float)EM_AD[4]) / ((float)EM_AD[2]*(float)data[data_identifier].Round_TH/100 + (float)EM_AD[4]);
-        	    		g_error = (s_error_X * Weight_x + s_error_E * Weight_e)/(Weight_x + Weight_e);
+        	    		g_error = 0;
         	    	}
         	    	break;
         	    default:
