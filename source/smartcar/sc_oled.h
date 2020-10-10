@@ -31,7 +31,6 @@ qq：512924543
 
 //#define HIT_ES
 
-
 #ifndef OLED_DC_GPIO
 #define OLED_DC_GPIO GPIO2 //数据命令选择线  AC主控板：B13
 #define OLED_DC_PIN 26U
@@ -93,6 +92,8 @@ void OLED_PrintPicture(img_t* src, uint8_t threshold);
 /********************************************************************/
 
 void OLED_Logo_100Limited(void);
+
+void OLED_Image_Loop(uint16_t high, uint16_t width, uint8_t* pic, uint8_t loopIdentifier);
 
 #ifdef HIT_ES
 void OLED_Logo_ILoveHIT(void);

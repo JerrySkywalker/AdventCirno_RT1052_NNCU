@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 project(AdventCirno_RT1052_NNCU C)
 
 set(CMAKE_C_STANDARD 11)
@@ -239,6 +239,8 @@ add_executable(AdventCirno_RT1052_NNCU
         source/ac_lib/AC_Command.h
         source/ac_lib/AC_Control.c
         source/ac_lib/AC_Control.h
+        source/ac_lib/AC_Image_ECG.c
+        source/ac_lib/AC_Image_ECG.h
         source/ac_lib/AC_Menu.c
         source/ac_lib/AC_Menu.h
         source/ac_lib/AC_Pit.c
@@ -253,18 +255,85 @@ add_executable(AdventCirno_RT1052_NNCU
         source/cm_backtrace/cmb_def.h
         source/examples/test.h
         source/generated/usb_device_config.h
+        source/nncu/Network/Dense_0809_1904/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_0809_1904/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_60_38/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_60_38/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_72_70/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_72_70/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Auto_70_56/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Auto_70_56/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_CNN_60_10/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_CNN_60_10/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_CNN_60_59/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_CNN_60_59/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_LiteM_70_77/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_LiteM_70_77/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_M_60_120/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_M_60_120/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_M_70_60/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_M_70_60/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Plus_70_158/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Plus_70_158/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_RemoveS_70_86/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_RemoveS_70_86/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Servo/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Servo/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Smooth_60_40/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Smooth_60_40/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Smooth_60_72/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Smooth_60_72/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Smooth_Original_60_120/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Smooth_Original_60_120/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Smooth_Original_60_73/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Smooth_Original_60_73/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Smooth_Origional_60_37/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Smooth_Origional_60_37/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_10MB_Smooth_Origional_70_80/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_10MB_Smooth_Origional_70_80/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_2.8m_servo_199/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_2.8m_servo_199/model_smartcar_ad_weit.c
         source/nncu/Network/Dense_Complex/model_smartcar_ad_run.c
         source/nncu/Network/Dense_Complex/model_smartcar_ad_weit.c
         source/nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_run.c
         source/nncu/Network/Dense_Complex_200_Round/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Complex_Pro/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Complex_Pro/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_MotorProspect_0810/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_MotorProspect_0810/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_ServoProspect_0810/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_ServoProspect_0810/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_ServoProspect_0810_170/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_ServoProspect_0810_170/model_smartcar_ad_weit.c
         source/nncu/Network/Dense_Simple/model_smartcar_ad_run.c
         source/nncu/Network/Dense_Simple/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Simple_4Layer/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Simple_4Layer/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Simple_CNN/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Simple_CNN/model_smartcar_ad_weit.c
         source/nncu/Network/Dense_Simple_Plus/model_smartcar_ad_run.c
         source/nncu/Network/Dense_Simple_Plus/model_smartcar_ad_weit.c
         source/nncu/Network/Dense_Simple_SE/model_smartcar_ad_run.c
         source/nncu/Network/Dense_Simple_SE/model_smartcar_ad_weit.c
+        source/nncu/Network/Dense_Vertical_74_38/model_smartcar_ad_run.c
+        source/nncu/Network/Dense_Vertical_74_38/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification0807_0005/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification0807_0005/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification_0806/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification_0806/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification_0806_2245/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification_0806_2245/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification_0806_fix/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification_0806_fix/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification_0807_0151/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification_0807_0151/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification_Manual/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification_Manual/model_smartcar_ad_weit.c
+        source/nncu/Network/DenseClassification_Manual_Improved/model_smartcar_ad_run.c
+        source/nncu/Network/DenseClassification_Manual_Improved/model_smartcar_ad_weit.c
         source/nncu/aia_cmsisnn_ext.c
         source/nncu/aia_cmsisnn_ext.h
+        source/nncu/dataset_test.c
         source/nncu/nncu_Config.h
         source/smartcar/sc_ac_delay.c
         source/smartcar/sc_ac_delay.h
@@ -308,6 +377,8 @@ add_executable(AdventCirno_RT1052_NNCU
         source/smartcar/sc_spi.h
         source/smartcar/sc_uart.c
         source/smartcar/sc_uart.h
+        source/smartcar/sc_upload.c
+        source/smartcar/sc_upload.h
         source/smartcar/status.c
         source/smartcar/status.h
         source/smartcar/svpng.h

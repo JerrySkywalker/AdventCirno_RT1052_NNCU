@@ -205,6 +205,9 @@ int Set_NNCU_NormalizeFactor_Motor(int (*action)(int *data,int modify));
 int Task_SD_SaveMenu(int (*action)(int *data,int modify));
 int Task_SD_LoadMenu(int (*action)(int *data,int modify));
 
+/** Add_on: Show ECG Image for OLED**/
+int Task_Image_ShowECG(int (*action)(int *data,int modify));
+
 /**TODO: Service Declaration*/
 int Service_SD_SyncMenu(int (*action)(int *data,int modify));
 

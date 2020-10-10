@@ -52,6 +52,9 @@ MenuNode_t *Menu_NNCU, *Menu_NNCU_NormalizeFactor, *Menu_NNCU_NormalizeFactor_Mo
 MenuNode_t *Menu_Task;
 MenuNode_t *Menu_Task_SD_SaveMeu,*Menu_Task_SD_LoadMenu;
 
+/** Add_on: Show ECG Image on OLED  */
+MenuNode_t *Menu_Task_Image_ShowECG;
+
 MenuNode_t *Menu_Service;
 MenuNode_t *Menu_Service_SD_SyncMenu;
 
@@ -510,6 +513,7 @@ void Menu_Init() {
     {
         Menu_MenuNodeCreate(&Menu_Task_SD_SaveMeu, "SaveMenu", TASK, Task_SD_SaveMenu, Menu_Task);
         Menu_MenuNodeCreate(&Menu_Task_SD_LoadMenu, "LoadMenu", TASK, Task_SD_LoadMenu, Menu_Task);
+        Menu_MenuNodeCreate(&Menu_Task_Image_ShowECG, "ECG", TASK, Task_Image_ShowECG, Menu_Task);
     }
 
     Menu_MenuNodeCreate(&Menu_Service, "Service", MID, NULL, root);
@@ -987,4 +991,14 @@ int Service_SD_SyncMenu(int (*action)(int *data,int modify))
 
 	OLED_P6x8Str(0,1,(uint8_t*)"SD:Sync Menu");
     return 0;
+}
+
+/** Add_on : Show Image of ECG on OLED*/
+int Task_Image_ShowECG(int (*action)(int *data,int modify))
+{
+    //OLED_P6x8Str(0,1,(uint8_t*)"SD:Save Menu");
+    PRINTF("[O K] AC: Menu: Start Image: Show ECG\r\n");
+
+    int err = AC_Image_ECG_Show();
+    return err;
 }
