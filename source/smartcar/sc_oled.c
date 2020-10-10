@@ -1067,17 +1067,3 @@ void OLED_PrintPicture(img_t* src, uint8_t threshold)
 	vPortFree(gray);
 }
 
-/**********************************************************************************************************************
-*  @brief      OLED循环刷新
-*  @param      hight				x轴坐标设置
-*  @param      width    			y轴坐标设置
-*  @param      pic      			缓存
-*  @param      loopIdentifier      	循环开始时的y坐标。本函数不自动刷新，需要使用者手动更新LoopIdentifier
-*  @return     void
-*  @since      v1.0
-*  Sample usage:
-**********************************************************************************************************************/
-void OLED_Image_Loop(uint16_t high, uint16_t width, uint8_t* pic, uint8_t loopIdentifier)
-{
-
-}

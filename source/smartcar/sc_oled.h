@@ -93,7 +93,7 @@ void OLED_PrintPicture(img_t* src, uint8_t threshold);
 
 void OLED_Logo_100Limited(void);
 
-void OLED_Image_Loop(uint16_t high, uint16_t width, uint8_t* pic, uint8_t loopIdentifier);
+//void OLED_Image_ShowLoop_128x64(uint8_t*pic[][128], uint8_t loopIdentifier);
 
 #ifdef HIT_ES
 void OLED_Logo_ILoveHIT(void);
